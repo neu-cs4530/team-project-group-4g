@@ -14,3 +14,11 @@ export type ChatMessage = {
   body: string;
   dateCreated: Date;
 };
+
+/** Implement location type for vehicle */
+export type VehicleLocation = {
+  x: number;
+  y: number;
+  rotation: Direction;
+  moving: boolean;
+}

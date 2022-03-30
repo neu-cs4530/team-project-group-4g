@@ -53,7 +53,7 @@ export default class Player {
    * @param conversation 
    * @returns 
    */
-  isWithin(conversation: ServerConversationArea) : boolean {
+  isWithin(conversation: ServerConversationArea): boolean {
     return (
       this.location.x > conversation.boundingBox.x - conversation.boundingBox.width / 2 &&
       this.location.x < conversation.boundingBox.x + conversation.boundingBox.width / 2 &&
