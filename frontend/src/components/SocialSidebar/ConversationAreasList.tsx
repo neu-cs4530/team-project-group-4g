@@ -1,5 +1,3 @@
-import { Box } from '@chakra-ui/react';
-import React from 'react';
 import { Box, Heading, ListItem, UnorderedList } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import ConversationArea, { ConversationAreaListener, NO_TOPIC_STRING } from '../../classes/ConversationArea';
