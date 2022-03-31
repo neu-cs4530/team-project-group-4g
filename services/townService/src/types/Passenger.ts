@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import { ServerConversationArea } from '../client/TownsServiceClient';
 import { UserLocation } from '../CoveyTypes';
-import Player from '../types/Player';
+import Player from './Player';
 import Vehicle from './Vehicle';
 
 /**

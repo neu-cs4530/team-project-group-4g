@@ -21,4 +21,4 @@ export type VehicleLocation = {
   y: number;
   rotation: Direction;
   moving: boolean;
-}
+};
