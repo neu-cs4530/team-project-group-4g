@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { VehicleLocation } from '../CoveyTypes';
-import Passenger from './Passenger';
+// import Passenger from './Passenger';
 /**
  * Each vehicle which is connected to a town is represented by a Vehicle object
  */
@@ -13,13 +13,14 @@ export default class Vehicle {
   private readonly _id: string;
 
   /** The maximum capacity of this vehicle */
-  private readonly _capacity: number;
+  private _capacity: number;
 
   /** The speed of this vehicle (i.e., the number of time greater than the walking speed of a player) */
-  private readonly _speed: number;
+  private _speed: number;
 
   /** A list of current passengers in/on this vehicle */
-  private _passengers?: Passenger[];
+  // private _passengers?: Passenger[];
+  private _passengersByID: string[];
 
   constructor() {
     this.location = {
@@ -32,7 +33,7 @@ export default class Vehicle {
     this._id = nanoid();
     this._capacity = 4;
     this._speed = 2;
-    this._passengers = [];
+    this._passengersByID = [];
   }
 
   get id(): string {
@@ -47,11 +48,11 @@ export default class Vehicle {
     return this._speed;
   }
 
-  get passengers(): Passenger[] {
-    return this.passengers;
+  get passengersByID(): string[] {
+    return this._passengersByID;
   }
 
-  set passengers(passengers: Passenger[] | undefined) {
-    this._passengers = passengers;
+  set passengers(passengersByID: string[]) {
+    this._passengersByID = passengersByID;
   }
 }

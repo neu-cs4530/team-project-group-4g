@@ -23,13 +23,13 @@ export default class Passenger extends Player {
   get vehicle(): Vehicle | undefined {
     return this._vehicle;
   }
+  
+  set vehicle(vehicle: Vehicle | undefined) {
+    this._vehicle = vehicle;
+  }
 
   get isDriver(): boolean | undefined {
     return this._isDriver;
-  }
-
-  set vehicle(vehicle: Vehicle | undefined) {
-    this._vehicle = vehicle;
   }
 
   set isDriver(isDriver: boolean | undefined) {
