@@ -1,6 +1,3 @@
-import { nanoid } from 'nanoid';
-import { ServerConversationArea } from '../client/TownsServiceClient';
-import { UserLocation } from '../CoveyTypes';
 import Player from './Player';
 import Vehicle from './Vehicle';
 
@@ -24,12 +21,12 @@ export default class Passenger extends Player {
     return this._vehicle;
   }
 
-  get isDriver(): boolean | undefined {
-    return this._isDriver;
-  }
-
   set vehicle(vehicle: Vehicle | undefined) {
     this._vehicle = vehicle;
+  }
+
+  get isDriver(): boolean | undefined {
+    return this._isDriver;
   }
 
   set isDriver(isDriver: boolean | undefined) {
