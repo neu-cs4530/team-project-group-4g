@@ -1,9 +1,11 @@
 import { customAlphabet, nanoid } from 'nanoid';
 import { BoundingBox, ServerConversationArea } from '../client/TownsServiceClient';
-import { ChatMessage, UserLocation } from '../CoveyTypes';
+import { ChatMessage, UserLocation, VehicleLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
+import Passenger from '../types/Passenger';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
+import Vehicle from '../types/Vehicle';
 import IVideoClient from './IVideoClient';
 import TwilioVideo from './TwilioVideo';
 
@@ -54,6 +56,10 @@ export default class CoveyTownController {
     return this._conversationAreas;
   }
 
+  get vehicles(): Vehicle[] {
+    return this._vehicles;
+  }
+
   /** The list of players currently in the town * */
   private _players: Player[] = [];
 
@@ -79,12 +85,15 @@ export default class CoveyTownController {
 
   private _capacity: number;
 
+  private _vehicles: Vehicle[];
+
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();
     this._capacity = 50;
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
+    this._vehicles = [];
   }
 
   /**
@@ -261,6 +270,36 @@ export default class CoveyTownController {
 
   disconnectAllPlayers(): void {
     this._listeners.forEach(listener => listener.onTownDestroyed());
+  }
+
+  /**
+   * Updates the location for this vehicle and the location of all passengers in it.
+   * 
+   * @param vehicle Vehicle to update location for
+   * @param location New location for this vehicle
+   */
+  updateVehicleLocation(vehicle: Vehicle, location: VehicleLocation): void {
+    
+  }
+
+  /**
+   * Update the passenger's status and the corresponding veicle's status, when a player enters a vehicle.
+   * 
+   * @param vehicle Vehicle to update status for
+   * @param player New passenger for this vehicle
+   */
+  enterVehicle(vehicle: Vehicle, player: Player): void {
+
+  }
+
+  /**
+   * Update the passenger's status and the corresponding vehicle's status, when a passenger leaves a vehicle.
+   * 
+   * @param vehicle Vehicle to update status for
+   * @param passenger Passenger who leaves the vehicle
+   */
+  leaveVehicle(vehicle: Vehicle, passenger: Passenger): void {
+
   }
 
 }
