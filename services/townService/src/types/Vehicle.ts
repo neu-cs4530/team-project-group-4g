@@ -54,5 +54,5 @@ export default abstract class Vehicle {
     this._passengersByID = passengersByID;
   }
 
-  abstract gainVehicleType() : string;
+  abstract getVehicleType() : string;
 }
