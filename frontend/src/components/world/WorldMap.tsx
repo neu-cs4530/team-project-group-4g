@@ -232,9 +232,11 @@ class CoveyGameScene extends Phaser.Scene {
         player => !disconnectedPlayers.find(p => p.id === player.id),
       );
     }
+    // console.log(players);
   }
 
   updatePlayerLocation(player: Player) {
+    // console.log(player)
     let myPlayer = this.players.find(p => p.id === player.id);
     if (!myPlayer) {
       let { location } = player;
@@ -246,7 +248,7 @@ class CoveyGameScene extends Phaser.Scene {
           y: 0,
         };
       }
-      myPlayer = new Player(player.id, player.userName, location);
+      myPlayer = new Player(player.id, player.userName, location, PlayerType.Human);
       this.players.push(myPlayer);
     }
     if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
@@ -585,7 +587,7 @@ class CoveyGameScene extends Phaser.Scene {
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
     // player's body.
     const sprite = this.physics.add
-      .sprite(spawnPoint.x, spawnPoint.y, getPlayerAtlasName(this.getMyPlayerByID()), `${getPlayerAtlasType(this.getMyPlayerByID())}-front`)
+      .sprite(spawnPoint.x, spawnPoint.y, 'atlas', `misa-front`)
       .setSize(30, 40)
       .setOffset(0, 24);
       // .setScale(0.1)
@@ -664,13 +666,14 @@ class CoveyGameScene extends Phaser.Scene {
         this.currentVehicleArea = carArea;
         if (cursorKeys.space.isDown){
           const myPlayer = this.players.find(p => p.id === this.myPlayerID);
-          if (this.player && myPlayer?.location && myPlayer?.playerType === PlayerType.Human){
-            myPlayer.playerType = PlayerType.Car
+          if (this.player && myPlayer?.location && myPlayer.playerType === PlayerType.Human && this.lastLocation){
+            myPlayer.playerType = PlayerType.Car;
             this.player.sprite
               .setTexture('carAtlas',`${getPlayerAtlasType(myPlayer)}-${myPlayer.location.rotation}`)
               .setScale(0.1)
               .setSize(10, 10)
               .setOffset(0,0);
+            this.emitMovement(this.lastLocation);
           }
         }
         this.infoTextBoxForVehicleArea?.setVisible(true);
@@ -851,6 +854,7 @@ export default function WorldMap(): JSX.Element {
   const [newConversation, setNewConversation] = useState<ConversationArea>();
   const playerMovementCallbacks = usePlayerMovement();
   const players = usePlayersInTown();
+  console.log(players);
 
   useEffect(() => {
     const config = {
