@@ -1,6 +1,7 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
 import Player from '../types/Player';
+import Vehicle from '../types/Vehicle';
 import { ChatMessage, CoveyTownList, UserLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
@@ -181,10 +182,10 @@ export function townUpdateHandler(requestData: TownUpdateRequest): ResponseEnvel
  * * Ask the TownController to create the conversation area
  * @param _requestData Conversation area create request
  */
-export function conversationAreaCreateHandler(_requestData: ConversationAreaCreateRequest) : ResponseEnvelope<Record<string, null>> {
+export function conversationAreaCreateHandler(_requestData: ConversationAreaCreateRequest): ResponseEnvelope<Record<string, null>> {
   const townsStore = CoveyTownsStore.getInstance();
   const townController = townsStore.getControllerForTown(_requestData.coveyTownID);
-  if (!townController?.getSessionByToken(_requestData.sessionToken)){
+  if (!townController?.getSessionByToken(_requestData.sessionToken)) {
     return {
       isOK: false, response: {}, message: `Unable to create conversation area ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}`,
     };
@@ -219,14 +220,17 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.emit('townClosing');
       socket.disconnect(true);
     },
-    onConversationAreaDestroyed(conversation: ServerConversationArea){
+    onConversationAreaDestroyed(conversation: ServerConversationArea) {
       socket.emit('conversationDestroyed', conversation);
     },
-    onConversationAreaUpdated(conversation: ServerConversationArea){
+    onConversationAreaUpdated(conversation: ServerConversationArea) {
       socket.emit('conversationUpdated', conversation);
     },
-    onChatMessage(message: ChatMessage){
+    onChatMessage(message: ChatMessage) {
       socket.emit('chatMessage', message);
+    },
+    onVehicleMoved(newVehicle: Vehicle) {
+      socket.emit('newVehicle', newVehicle);
     },
   };
 }

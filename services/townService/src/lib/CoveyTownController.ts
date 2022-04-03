@@ -1,4 +1,5 @@
 import { customAlphabet, nanoid } from 'nanoid';
+import { PlayerStreamerInstance } from 'twilio/lib/rest/media/v1/playerStreamer';
 import { BoundingBox, ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage, UserLocation, VehicleLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
@@ -274,13 +275,38 @@ export default class CoveyTownController {
   }
 
   /**
-   * Updates the location for this vehicle and the location of all passengers in it.
+   * Updates the location for this vehicle and the location of all passengers in it within the town.
+   * 
+   * If the vehicle has changed the location, this method also updates the
+   * corresponding Player or Passenger objects tracked by the town controller, and dispatches
+   * any onConversationUpdated events as appropriate
    * 
    * @param vehicle Vehicle to update location for
    * @param location New location for this vehicle
    */
   updateVehicleLocation(vehicle: Vehicle, location: VehicleLocation): void {
+    if (vehicle.passengersByID === undefined) {
+      return;
+    }
 
+    vehicle.location = location;
+
+    const newUserLocation: UserLocation = {
+      x: location.x,
+      y: location.y,
+      rotation: location.rotation,
+      moving: location.moving,
+    };
+
+    for (let i = 0, len = vehicle.passengersByID.length; i < len; i += 1) {
+      const p = this.players.find(player => player.id === vehicle.passengersByID[i]);
+      if (p !== undefined) {
+        p.location = newUserLocation;
+        this.updatePlayerLocation(p, p.location);
+      }
+    }
+
+    this._listeners.forEach(listener => listener.onVehicleMoved(vehicle));
   }
 
   /**
@@ -289,9 +315,9 @@ export default class CoveyTownController {
    * @param vehicle Vehicle to update status for
    * @param player New passenger for this vehicle
    */
-  enterVehicle(vehicle: Vehicle, player: Player): void {
+  // enterVehicle(vehicle: Vehicle, player: Player): void {
 
-  }
+  // }
 
   /**
    * Update the passenger's status and the corresponding vehicle's status, when a passenger leaves a vehicle.
@@ -299,8 +325,8 @@ export default class CoveyTownController {
    * @param vehicle Vehicle to update status for
    * @param passenger Passenger who leaves the vehicle
    */
-  leaveVehicle(vehicle: Vehicle, passenger: Passenger): void {
+  // leaveVehicle(vehicle: Vehicle, passenger: Passenger): void {
 
-  }
+  // }
 
 }
