@@ -60,7 +60,7 @@
         <key>jxrCompressionLevel</key>
         <uint>0</uint>
         <key>ditherType</key>
-        <enum type="SettingsBase::DitherType">NearestNeighbour</enum>
+        <enum type="SettingsBase::DitherType">PngQuantLow</enum>
         <key>backgroundColor</key>
         <uint>0</uint>
         <key>libGdx</key>
@@ -185,11 +185,11 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">tuxemon-misa/misa-back-walk.000.png</key>
-            <key type="filename">tuxemon-misa/misa-back-walk.001.png</key>
-            <key type="filename">tuxemon-misa/misa-back-walk.002.png</key>
-            <key type="filename">tuxemon-misa/misa-back-walk.003.png</key>
-            <key type="filename">tuxemon-misa/misa-back.png</key>
+            <key type="filename">tuxemon-car/car-back-walk.000.png</key>
+            <key type="filename">tuxemon-car/car-back-walk.001.png</key>
+            <key type="filename">tuxemon-car/car-back-walk.002.png</key>
+            <key type="filename">tuxemon-car/car-back-walk.003.png</key>
+            <key type="filename">tuxemon-car/car-back.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -204,11 +204,11 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">tuxemon-misa/misa-front-walk.000.png</key>
-            <key type="filename">tuxemon-misa/misa-front-walk.001.png</key>
-            <key type="filename">tuxemon-misa/misa-front-walk.002.png</key>
-            <key type="filename">tuxemon-misa/misa-front-walk.003.png</key>
-            <key type="filename">tuxemon-misa/misa-front.png</key>
+            <key type="filename">tuxemon-car/car-front-walk.000.png</key>
+            <key type="filename">tuxemon-car/car-front-walk.001.png</key>
+            <key type="filename">tuxemon-car/car-front-walk.002.png</key>
+            <key type="filename">tuxemon-car/car-front-walk.003.png</key>
+            <key type="filename">tuxemon-car/car-front.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -223,11 +223,11 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">tuxemon-misa/misa-left-walk.000.png</key>
-            <key type="filename">tuxemon-misa/misa-left-walk.001.png</key>
-            <key type="filename">tuxemon-misa/misa-left-walk.002.png</key>
-            <key type="filename">tuxemon-misa/misa-left-walk.003.png</key>
-            <key type="filename">tuxemon-misa/misa-left.png</key>
+            <key type="filename">tuxemon-car/car-left-walk.000.png</key>
+            <key type="filename">tuxemon-car/car-left-walk.001.png</key>
+            <key type="filename">tuxemon-car/car-left-walk.002.png</key>
+            <key type="filename">tuxemon-car/car-left-walk.003.png</key>
+            <key type="filename">tuxemon-car/car-left.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -242,11 +242,11 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">tuxemon-misa/misa-right-walk.000.png</key>
-            <key type="filename">tuxemon-misa/misa-right-walk.001.png</key>
-            <key type="filename">tuxemon-misa/misa-right-walk.002.png</key>
-            <key type="filename">tuxemon-misa/misa-right-walk.003.png</key>
-            <key type="filename">tuxemon-misa/misa-right.png</key>
+            <key type="filename">tuxemon-car/car-right-walk.000.png</key>
+            <key type="filename">tuxemon-car/car-right-walk.001.png</key>
+            <key type="filename">tuxemon-car/car-right-walk.002.png</key>
+            <key type="filename">tuxemon-car/car-right-walk.003.png</key>
+            <key type="filename">tuxemon-car/car-right.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -264,7 +264,7 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>tuxemon-misa</filename>
+            <filename>tuxemon-car</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
