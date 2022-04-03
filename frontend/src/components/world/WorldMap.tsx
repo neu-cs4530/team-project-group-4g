@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import React, { useEffect, useMemo, useState } from 'react';
 import BoundingBox from '../../classes/BoundingBox';
 import ConversationArea from '../../classes/ConversationArea';
-import Player, { ServerPlayer, UserLocation } from '../../classes/Player';
+import Player, { ServerPlayer, UserLocation, PlayerType } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import useConversationAreas from '../../hooks/useConversationAreas';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
@@ -23,6 +23,12 @@ type ConversationGameObjects = {
   conversationArea?: ConversationArea;
 };
 
+type CarAreaGameObjects = {
+  labelText: Phaser.GameObjects.Text;
+  sprite: Phaser.GameObjects.Sprite;
+  label: string;
+}
+
 class CoveyGameScene extends Phaser.Scene {
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -34,6 +40,8 @@ class CoveyGameScene extends Phaser.Scene {
   private players: Player[] = [];
 
   private conversationAreas: ConversationGameObjects[] = [];
+
+  private carAreas: CarAreaGameObjects[] = [];
 
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys[] = [];
 
@@ -56,7 +64,11 @@ class CoveyGameScene extends Phaser.Scene {
 
   private currentConversationArea?: ConversationGameObjects;
 
+  private currentVehicleArea?: CarAreaGameObjects;
+
   private infoTextBox?: Phaser.GameObjects.Text;
+
+  private infoTextBoxForVehicleArea?: Phaser.GameObjects.Text;
 
   private setNewConversation: (conv: ConversationArea) => void;
 
@@ -88,8 +100,12 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('13_Conference_Hall_32x32', '/assets/tilesets/13_Conference_Hall_32x32.png');
     this.load.image('14_Basement_32x32', '/assets/tilesets/14_Basement_32x32.png');
     this.load.image('16_Grocery_store_32x32', '/assets/tilesets/16_Grocery_store_32x32.png');
+    // this.load.image('parking_spot_32x32','/assets/tilesets/parking_spot_32x32.png');
+    this.load.image('car_32x32','/assets/tilesets/car_32x32.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/indoors.json');
-    this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
+    // this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
+    this.load.atlas('atlas', '/assets/carAtlas/atlas.png', '/assets/carAtlas/atlas.json');
+    // this.load.atlas('carAtlas','/assets/car/car.png', '/assets/car/car.json');
   }
 
   /**
@@ -313,6 +329,17 @@ class CoveyGameScene extends Phaser.Scene {
             this.lastLocation.conversationLabel = undefined;
           }
         }
+
+        if (this.currentVehicleArea) {
+          if (
+            !Phaser.Geom.Rectangle.Overlaps(
+              this.currentVehicleArea.sprite.getBounds(),
+              this.player.sprite.getBounds(),
+            )
+          ) {
+            this.infoTextBoxForVehicleArea?.setVisible(false);
+          }
+        } 
         this.emitMovement(this.lastLocation);
       }
     }
@@ -333,6 +360,8 @@ class CoveyGameScene extends Phaser.Scene {
       '13_Conference_Hall_32x32',
       '14_Basement_32x32',
       '16_Grocery_store_32x32',
+      'car_32x32',
+      // 'parking_spot',
     ].map(v => map.addTilesetImage(v));
 
     // Parameters: layer name (or index) from Tiled, tileset, x, y
@@ -377,6 +406,46 @@ class CoveyGameScene extends Phaser.Scene {
       sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
       // the map
     });
+
+    const carAreaObject = map.filterObjects(
+      'Objects',
+      obj => obj.type === 'car_vehicle_area',
+    );
+    const carAreaSprites = map.createFromObjects(
+      'Objects',
+      carAreaObject.map(obj => ({ id: obj.id })),
+    );
+    this.physics.world.enable(carAreaSprites);
+    carAreaSprites.forEach(carArea => {
+      const sprite = carArea as Phaser.GameObjects.Sprite;
+      sprite.y += sprite.displayHeight;
+      const labelText = this.add.text(
+        sprite.x - sprite.displayWidth / 2,
+        sprite.y - sprite.displayHeight / 2,
+        carArea.name,
+        { color: '#FFFFFF', backgroundColor: '#000000' },
+      );
+      sprite.setTintFill();
+      sprite.setAlpha(0.3);
+
+      this.carAreas.push({
+        labelText,
+        sprite,
+        label: carArea.name,
+      });
+    });
+
+    this.infoTextBoxForVehicleArea = this.add
+      .text(
+        this.game.scale.width / 2,
+        this.game.scale.height / 2,
+        "You've found area to gain the vehicle!\nGain a new vehicle by pressing the spacebar.",
+        { color: '#000000', backgroundColor: '#FFFFFF' },
+      )
+      .setScrollFactor(0)
+      .setDepth(30);
+    this.infoTextBoxForVehicleArea.setVisible(false);
+    this.infoTextBoxForVehicleArea.x = this.game.scale.width / 2 - this.infoTextBoxForVehicleArea.width / 2;
 
     const conversationAreaObjects = map.filterObjects(
       'Objects',
@@ -465,8 +534,11 @@ class CoveyGameScene extends Phaser.Scene {
     // player's body.
     const sprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
-      .setSize(30, 40)
-      .setOffset(0, 24);
+      // .setSize(30, 40)
+      // .setOffset(0, 24);
+      .setScale(0.1)
+      .setSize(10, 10)
+      .setOffset(0,0);
     const label = this.add.text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
       font: '18px monospace',
       color: '#000000',
@@ -528,6 +600,23 @@ class CoveyGameScene extends Phaser.Scene {
           }
           this.infoTextBox?.setVisible(true);
         }
+      },
+    );
+
+    this.physics.add.overlap(
+      sprite,
+      carAreaSprites,
+      (overlappingPlayer, carAreaSprite) => {
+        const carAreaLabel = carAreaSprite.name;
+        const carArea = this.carAreas.find(area => area.label === carAreaLabel);
+        this.currentVehicleArea = carArea;
+        if (cursorKeys.space.isDown){
+          const myPlayer = this.players.find(p => p.id === this.myPlayerID);
+          if (myPlayer?.playerType === PlayerType.Human){
+            myPlayer.playerType = PlayerType.Car
+          }
+        }
+        this.infoTextBoxForVehicleArea?.setVisible(true);
       },
     );
 

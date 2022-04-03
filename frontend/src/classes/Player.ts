@@ -1,3 +1,10 @@
+export enum PlayerType {
+  Human,
+  Car,
+  SkateBoard,
+  Dinasour,
+}
+
 export default class Player {
   public location?: UserLocation;
 
@@ -9,10 +16,13 @@ export default class Player {
 
   public label?: Phaser.GameObjects.Text;
 
+  public playerType?: PlayerType;
+
   constructor(id: string, userName: string, location: UserLocation) {
     this._id = id;
     this._userName = userName;
     this.location = location;
+    this.playerType = PlayerType.Human;
   }
 
   get userName(): string {
