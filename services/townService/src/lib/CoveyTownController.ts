@@ -1,9 +1,7 @@
 import { customAlphabet, nanoid } from 'nanoid';
-import { PlayerStreamerInstance } from 'twilio/lib/rest/media/v1/playerStreamer';
 import { BoundingBox, ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage, UserLocation, VehicleLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
-import Passenger from '../types/Passenger';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import Vehicle from '../types/Vehicle';
