@@ -5,11 +5,12 @@ import TwilioVideo from './TwilioVideo';
 import Player from '../types/Player';
 import CoveyTownController from './CoveyTownController';
 import CoveyTownListener from '../types/CoveyTownListener';
-import { UserLocation } from '../CoveyTypes';
+import { UserLocation, VehicleLocation } from '../CoveyTypes';
 import PlayerSession from '../types/PlayerSession';
 import { townSubscriptionHandler } from '../requestHandlers/CoveyTownRequestHandlers';
 import CoveyTownsStore from './CoveyTownsStore';
 import * as TestUtils from '../client/TestUtils';
+import Car from '../types/Car';
 
 const mockTwilioVideo = mockDeep<TwilioVideo>();
 jest.spyOn(TwilioVideo, 'getInstance').mockReturnValue(mockTwilioVideo);
@@ -289,4 +290,42 @@ describe('CoveyTownController', () => {
       expect(mockListener.onConversationAreaUpdated).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('updateVehicleLocation', () =>{
+    let testingTown: CoveyTownController;
+    beforeEach(() => {
+      const townName = `updateVehicleLocation test town ${nanoid()}`;
+      testingTown = new CoveyTownController(townName, false);
+    });
+    it('should update each defined player"s location based on the given vehicleLocation', async ()=>{
+      const newVehicle = new Car(); 
+      
+      const player = new Player(nanoid());
+
+      testingTown.enterVehicle(newVehicle, player);
+
+      await testingTown.addPlayer(player);
+
+      const newLocation: VehicleLocation = { x: 25, y: 25, moving: false, rotation: 'front'};
+      testingTown.updateVehicleLocation(newVehicle, newLocation);
+
+      expect(player.location.x).toEqual(newLocation.x);
+      expect(player.location.y).toEqual(newLocation.y);
+      expect(player.location.moving).toEqual(false);
+      expect(player.location.rotation).toEqual("front");
+    }); 
+    it('should emit an onVehicleMoved event when the vehicle moves', async () =>{
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const newVehicle = new Car(); 
+      const player = new Player(nanoid());
+      testingTown.enterVehicle(newVehicle, player);
+      await testingTown.addPlayer(player);
+      const newLocation:VehicleLocation = { x: 25, y: 25, moving: false, rotation: 'front'};
+      testingTown.updateVehicleLocation(newVehicle, newLocation);
+      expect(mockListener.onVehicleMoved).toHaveBeenCalledTimes(1);
+    });
+  });
+
 });
