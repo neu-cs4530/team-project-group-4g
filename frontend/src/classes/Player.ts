@@ -1,3 +1,10 @@
+export enum PlayerType {
+  Human,
+  Car,
+  SkateBoard,
+  Dinasour,
+}
+
 export default class Player {
   public location?: UserLocation;
 
@@ -9,10 +16,13 @@ export default class Player {
 
   public label?: Phaser.GameObjects.Text;
 
-  constructor(id: string, userName: string, location: UserLocation) {
+  public playerType: PlayerType;
+
+  constructor(id: string, userName: string, location: UserLocation, playerType: PlayerType = PlayerType.Human) {
     this._id = id;
     this._userName = userName;
     this.location = location;
+    this.playerType = playerType;
   }
 
   get userName(): string {
@@ -24,10 +34,10 @@ export default class Player {
   }
 
   static fromServerPlayer(playerFromServer: ServerPlayer): Player {
-    return new Player(playerFromServer._id, playerFromServer._userName, playerFromServer.location);
+    return new Player(playerFromServer._id, playerFromServer._userName, playerFromServer.location, playerFromServer.playerType);
   }
 }
-export type ServerPlayer = { _id: string, _userName: string, location: UserLocation };
+export type ServerPlayer = { _id: string, _userName: string, location: UserLocation, playerType: PlayerType };
 
 export type Direction = 'front'|'back'|'left'|'right';
 
@@ -36,5 +46,5 @@ export type UserLocation = {
   y: number,
   rotation: Direction,
   moving: boolean,
-  conversationLabel?: string
+  conversationLabel?: string 
 };
