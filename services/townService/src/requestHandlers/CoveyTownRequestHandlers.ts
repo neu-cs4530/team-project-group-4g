@@ -2,7 +2,7 @@ import assert from 'assert';
 import { Socket } from 'socket.io';
 import Player from '../types/Player';
 import Vehicle from '../types/Vehicle';
-import { ChatMessage, CoveyTownList, UserLocation } from '../CoveyTypes';
+import { ChatMessage, CoveyTownList, UserLocation, VehicleLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 import { ConversationAreaCreateRequest, ServerConversationArea } from '../client/TownsServiceClient';
@@ -275,5 +275,11 @@ export function townSubscriptionHandler(socket: Socket): void {
   // location, inform the CoveyTownController
   socket.on('playerMovement', (movementData: UserLocation) => {
     townController.updatePlayerLocation(s.player, movementData);
+  });
+
+  // Register an event listener for the client socket: if the client updates their
+  // location, inform the CoveyTownController
+  socket.on('vehicleMovement', (movementData: VehicleLocation) => {
+    townController.updateVehicleLocation(, movementData);
   });
 }
