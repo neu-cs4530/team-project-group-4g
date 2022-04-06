@@ -1,6 +1,7 @@
 import { ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage } from '../CoveyTypes';
 import Player from './Player';
+import Vehicle from './Vehicle';
 
 /**
  * A listener for player-related events in each town
@@ -19,9 +20,10 @@ export default interface CoveyTownListener {
   onPlayerMoved(movedPlayer: Player): void;
 
   /**
-   * 
+   * Called when a vehicle's location changes
    * @param movedVehicle the vehicle that moved 
    */
+  onVehicleMoved(movedVehicle: Vehicle): void;
 
   /**
    * Called when a player disconnects from the town

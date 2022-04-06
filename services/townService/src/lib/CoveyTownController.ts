@@ -2,7 +2,6 @@ import { customAlphabet, nanoid } from 'nanoid';
 import { BoundingBox, ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage, UserLocation, VehicleLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
-import Passenger from '../types/Passenger';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import Vehicle from '../types/Vehicle';
@@ -274,13 +273,17 @@ export default class CoveyTownController {
   }
 
   /**
-   * Updates the location for this vehicle and the location of all passengers in it.
+   * Updates the location for this vehicle and the location of all passengers in it within the town.
+   * 
+   * If the vehicle has changed the location, this method also updates the
+   * corresponding Player or Passenger objects tracked by the town controller, and dispatches
+   * any onConversationUpdated events as appropriate
    * 
    * @param vehicle Vehicle to update location for
    * @param location New location for this vehicle
    */
   // updateVehicleLocation(vehicle: Vehicle, location: VehicleLocation): void {
-
+  //
   // }
 
   /**
