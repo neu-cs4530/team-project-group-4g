@@ -282,30 +282,9 @@ export default class CoveyTownController {
    * @param vehicle Vehicle to update location for
    * @param location New location for this vehicle
    */
-  updateVehicleLocation(vehicle: Vehicle, location: VehicleLocation): void {
-    if (vehicle.passengersByID === undefined) {
-      return;
-    }
-
-    vehicle.location = location;
-
-    const newUserLocation: UserLocation = {
-      x: location.x,
-      y: location.y,
-      rotation: location.rotation,
-      moving: location.moving,
-    };
-
-    for (let i = 0, len = vehicle.passengersByID.length; i < len; i += 1) {
-      const p = this.players.find(player => player.id === vehicle.passengersByID[i]);
-      if (p !== undefined) {
-        p.location = newUserLocation;
-        this.updatePlayerLocation(p, p.location);
-      }
-    }
-
-    this._listeners.forEach(listener => listener.onVehicleMoved(vehicle));
-  }
+  // updateVehicleLocation(vehicle: Vehicle, location: VehicleLocation): void {
+  //
+  // }
 
   /**
    * Update the passenger's status and the corresponding veicle's status, when a player enters a vehicle.
