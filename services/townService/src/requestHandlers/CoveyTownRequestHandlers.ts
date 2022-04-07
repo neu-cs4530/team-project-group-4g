@@ -6,6 +6,7 @@ import { ChatMessage, CoveyTownList, UserLocation, VehicleLocation } from '../Co
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 import { ConversationAreaCreateRequest, ServerConversationArea } from '../client/TownsServiceClient';
+import Passenger from '../types/Passenger';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -280,6 +281,8 @@ export function townSubscriptionHandler(socket: Socket): void {
   // Register an event listener for the client socket: if the client updates their
   // location, inform the CoveyTownController
   socket.on('vehicleMovement', (movementData: VehicleLocation) => {
-    townController.updateVehicleLocation(, movementData);
+    if (s.player instanceof Passenger) {
+      townController.updateVehicleLocation(s.player.vehicle, movementData);
+    }
   });
 }
