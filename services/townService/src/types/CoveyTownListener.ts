@@ -1,5 +1,6 @@
 import { ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage } from '../CoveyTypes';
+import Passenger from './Passenger';
 import Player from './Player';
 import Vehicle from './Vehicle';
 
@@ -53,4 +54,10 @@ export default interface CoveyTownListener {
    * @param message the new chat message
    */
   onChatMessage(message: ChatMessage): void;
+
+   /**
+   * Called when a player joins a town
+   * @param passenger the new player
+   */
+    onPlayerJoinedVehicle(passenger: Passenger): void;
 }
