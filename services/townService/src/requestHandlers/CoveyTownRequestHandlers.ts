@@ -200,6 +200,8 @@ export function conversationAreaCreateHandler(_requestData: ConversationAreaCrea
   };
 }
 
+// add vehicleCreateHandler here ...
+
 /**
  * An adapter between CoveyTownController's event interface (CoveyTownListener)
  * and the low-level network communication protocol

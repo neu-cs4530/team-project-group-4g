@@ -107,6 +107,8 @@ export interface ConversationAreaCreateRequest {
   conversationArea: ServerConversationArea;
 }
 
+// add vehicleCreateRequest here...
+
 /**
  * Envelope that wraps any response from the server
  */
