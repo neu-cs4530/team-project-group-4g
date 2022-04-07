@@ -281,7 +281,7 @@ export default class CoveyTownController {
    * @param vehicle Vehicle to update location for
    * @param location New location for this vehicle
    */
-  updateVehicleLocation(vehicle: Vehicle| undefined, location: VehicleLocation): void {
+  updateVehicleLocation(vehicle: Vehicle | undefined, location: VehicleLocation): void {
     if (vehicle === undefined) {
       return;
     }
