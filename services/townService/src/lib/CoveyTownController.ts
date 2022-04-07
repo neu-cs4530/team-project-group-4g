@@ -2,6 +2,7 @@ import { customAlphabet, nanoid } from 'nanoid';
 import { BoundingBox, ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage, UserLocation, VehicleLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
+import Passenger from '../types/Passenger';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import Vehicle from '../types/Vehicle';
@@ -118,6 +119,36 @@ export default class CoveyTownController {
 
     return theSession;
   }
+
+/**
+   * Adds a vehicle to this Covey Town when a user hit "enter" to get a car, provisioning the necessary credentials for the
+   * vehicle, and returning them
+   *
+   * @param newVehicle The new vehicle to add to the town
+   * @param newPlayer The new player to add to the vehicle
+   */
+ addVehicle(newVehicle: Vehicle, newPlayer: Player): boolean {
+
+  this._vehicles.push(newVehicle);
+
+  //add the player into the vehicle (need to confirm if necessary)
+  //this.newVehicle.enterVehicle(newPlayer);
+
+  //make the player to a passenger
+  newPlayer = new Passenger(newPlayer.userName);
+
+  //indicates that the player is a driver 
+  
+  //player is driver 
+
+  // Notify other players that this player has joined the vehicle
+  this._listeners.forEach(listener => listener.onPlayerJoined(newPlayer));
+
+  // Notify other players that this vehicle is added to the town
+  this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
+
+  return true;
+}
 
   /**
    * Destroys all data related to a player in this town.
