@@ -63,7 +63,6 @@ function ConversationAreaView({ area }: ConversationAreaViewProps): JSX.Element 
   );
 }
 export default function ConversationAreasList(): JSX.Element {
-  return <Box />;
   const conversationAreas = useConversationAreas();
   const activeConversationAreas = conversationAreas.filter(eachArea => eachArea.topic !== NO_TOPIC_STRING);
   return (

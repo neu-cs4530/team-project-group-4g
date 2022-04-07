@@ -19,7 +19,6 @@ import PlayerName from './PlayerName';
  * 
  */
 export default function PlayersInTownList(): JSX.Element {
-  return <></>
   const players = usePlayersInTown();
   const { currentTownFriendlyName, currentTownID } = useCoveyAppState();
   const sorted = players.concat([]);
