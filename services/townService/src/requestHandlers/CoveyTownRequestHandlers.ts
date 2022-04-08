@@ -233,6 +233,12 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     onVehicleMoved(newVehicle: Vehicle) {
       socket.emit('newVehicle', newVehicle);
     },
+    onPlayerJoinedVehicle(newPassenger: Passenger) {
+      socket.emit('newPassenger', newPassenger);
+    },
+    onVehicleCreated(newVehicle: Vehicle) {
+      socket.emit('newVehicle', newVehicle);
+    },
   };
 }
 
