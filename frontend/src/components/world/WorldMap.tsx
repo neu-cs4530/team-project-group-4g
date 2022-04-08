@@ -302,8 +302,22 @@ class CoveyGameScene extends Phaser.Scene {
     if (this.paused) {
       return;
     }
+    let speed = 175;
     if (this.player && this.cursors) {
-      const speed = 175;
+      const myPlayer = this.players.find(p => p.id === this.myPlayerID);
+      if (myPlayer){
+        switch(myPlayer.playerType){
+          case PlayerType.Car:
+            speed = 3* 175
+            break;
+          case PlayerType.Human:
+            speed =175;
+            break;
+          default:
+            speed = 175;
+        }
+      }
+      // const speed = 175;
 
       const prevVelocity = this.player.sprite.body.velocity.clone();
       const body = this.player.sprite.body as Phaser.Physics.Arcade.Body;
