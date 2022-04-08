@@ -5,8 +5,9 @@ import Vehicle from '../types/Vehicle';
 import { ChatMessage, CoveyTownList, UserLocation, VehicleLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
-import { ConversationAreaCreateRequest, ServerConversationArea } from '../client/TownsServiceClient';
+import { ConversationAreaCreateRequest, ServerConversationArea, VehicleCreateRequest} from '../client/TownsServiceClient';
 import Passenger from '../types/Passenger';
+import PlayerSession from '../types/PlayerSession';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -201,6 +202,38 @@ export function conversationAreaCreateHandler(_requestData: ConversationAreaCrea
 }
 
 /**
+ * A handler to process the "Create Vehicle" request
+ * The intended flow of this handler is:
+ * * Fetch the town controller for the specified town ID
+ * * Validate that the sessionToken is valid for that town
+ * * Ask the TownController to create the Vehicle
+ * @param _requestData Vehicle create request
+ */
+export function vehicleCreateHandler(_requestData: VehicleCreateRequest): ResponseEnvelope<Record<string, null>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const townController = townsStore.getControllerForTown(_requestData.coveyTownID);
+  if (!townController?.getSessionByToken(_requestData.sessionToken)) {
+    return {
+      isOK: false, response: {}, message: `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}`,
+    };
+  }
+  const player = townController.players.find(player => player.id === _requestData.playerId);
+  if (!player) {
+    return {
+      isOK: false, response: {}, message: `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}`,
+    }
+  }
+    
+  const success = townController.addVehicle(player, _requestData.conversationArea, _requestData.vehicleType);
+
+  return {
+    isOK: success,
+    response: {},
+    message: !success ? `Unable to create conversation area ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}` : undefined,
+  };
+}
+
+/**
  * An adapter between CoveyTownController's event interface (CoveyTownListener)
  * and the low-level network communication protocol
  *
@@ -233,12 +266,13 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     onVehicleMoved(newVehicle: Vehicle) {
       socket.emit('newVehicle', newVehicle);
     },
-    onPlayerJoinedVehicle(newPassenger: Passenger) {
-      socket.emit('newPassenger', newPassenger);
-    },
+    //add the emits for the listeners
     onVehicleCreated(newVehicle: Vehicle) {
-      socket.emit('newVehicle', newVehicle);
+      socket.emit('vehicleCreated', newVehicle);
     },
+    onPlayerJoinedVehicle(passenger: Passenger) {
+      socket.emit('PlayerJoined', passenger);
+    }
   };
 }
 

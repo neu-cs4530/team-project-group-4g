@@ -108,6 +108,17 @@ export interface ConversationAreaCreateRequest {
 }
 
 /**
+ * Payload sent by the client to create a vehicle
+ */
+export interface VehicleCreateRequest {
+  coveyTownID: string;
+  sessionToken: string;
+  conversationArea: ServerConversationArea;
+  playerId: string;
+  vehicleType: string;
+}
+
+/**
  * Envelope that wraps any response from the server
  */
 export interface ResponseEnvelope<T> {

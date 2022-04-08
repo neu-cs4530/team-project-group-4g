@@ -6,8 +6,11 @@ import Passenger from '../types/Passenger';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import Vehicle from '../types/Vehicle';
+import Car from '../types/Car';
 import IVideoClient from './IVideoClient';
 import TwilioVideo from './TwilioVideo';
+import Dinosaur from '../types/Dinosaur';
+import SkateBoard from '../types/SkateBoard';
 
 const friendlyNanoID = customAlphabet('1234567890ABCDEF', 8);
 
@@ -120,35 +123,52 @@ export default class CoveyTownController {
     return theSession;
   }
 
-  /**
-     * Adds a vehicle to this Covey Town when a user hit "enter" to get a car, provisioning the necessary credentials for the
-     * vehicle, and returning them
-     *
-     * @param newVehicle The new vehicle to add to the town
-     * @param newPlayer The new player to add to the vehicle
-     */
-  addVehicle(newVehicle: Vehicle, newPlayer: Player): boolean {
+/**
+   * Adds a vehicle to this Covey Town when a user hit "enter" to get a car, provisioning the necessary credentials for the
+   * vehicle, and returning them
+   *
+   * @param newVehicle The new vehicle to add to the town
+   * @param newPlayer The new player to add to the vehicle
+   */
+ addVehicle(newPlayer: Player, _conversationArea: ServerConversationArea, vehicleType: string="car"): boolean {
+  const addConversationArea = this.addConversationArea(_conversationArea);
+  if (!addConversationArea) {
+    return false;
+  }
 
-    this._vehicles.push(newVehicle);
+  let newVehicle: Vehicle;
 
-    // add the player into the vehicle (need to confirm if necessary)
-    // this.newVehicle.enterVehicle(newPlayer);
+  if (vehicleType === "dinasour") {
+    newVehicle = new Dinosaur(); 
+  }
+  else if (vehicleType === "car") {
+    newVehicle = new Car();
+  }
+  else if (vehicleType === "skateboard") {
+    newVehicle = new SkateBoard();
+  }
+  else {
+    return false;
+  }  
+  
+  this._vehicles.push(newVehicle);
 
-    // make the player to a passenger
-    newPlayer = new Passenger(newPlayer.userName);
+  newVehicle.conversationArea = _conversationArea;
 
-    // indicates that the player is a driver 
+  //make the player to a passenger
+  const newPassenger = new Passenger(newPlayer, newVehicle, true);
 
-    // player is driver 
+  //add the passenger to the vehicle
+  newVehicle.addPassenger(newPassenger);
 
     // Notify other players that this player has joined the vehicle
     this._listeners.forEach(listener => listener.onPlayerJoined(newPlayer));
 
-    // Notify other players that this vehicle is added to the town
-    this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
+  // Notify other players that this player has joined the vehicle
+  this._listeners.forEach(listener => listener.onPlayerJoinedVehicle(newPassenger));
 
-    return true;
-  }
+  return true;
+}
 
   /**
    * Destroys all data related to a player in this town.
@@ -361,3 +381,4 @@ export default class CoveyTownController {
   // }
 
 }
+
