@@ -5,9 +5,8 @@ import Vehicle from '../types/Vehicle';
 import { ChatMessage, CoveyTownList, UserLocation, VehicleLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
-import { ConversationAreaCreateRequest, ServerConversationArea, VehicleCreateRequest} from '../client/TownsServiceClient';
+import { ConversationAreaCreateRequest, ServerConversationArea, VehicleCreateRequest } from '../client/TownsServiceClient';
 import Passenger from '../types/Passenger';
-import PlayerSession from '../types/PlayerSession';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -217,13 +216,13 @@ export function vehicleCreateHandler(_requestData: VehicleCreateRequest): Respon
       isOK: false, response: {}, message: `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}`,
     };
   }
-  const player = townController.players.find(player => player.id === _requestData.playerId);
+  const player = townController.players.find(p => p.id === _requestData.playerId);
   if (!player) {
     return {
       isOK: false, response: {}, message: `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}`,
-    }
+    };
   }
-    
+
   const success = townController.addVehicle(player, _requestData.conversationArea, _requestData.vehicleType);
 
   return {
@@ -266,13 +265,13 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     onVehicleMoved(newVehicle: Vehicle) {
       socket.emit('newVehicle', newVehicle);
     },
-    //add the emits for the listeners
+    /** Add the emits for the listeners */
     onVehicleCreated(newVehicle: Vehicle) {
       socket.emit('vehicleCreated', newVehicle);
     },
     onPlayerJoinedVehicle(passenger: Passenger) {
       socket.emit('PlayerJoined', passenger);
-    }
+    },
   };
 }
 

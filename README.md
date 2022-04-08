@@ -12,6 +12,12 @@ The frontend implements video chat using the [Twilio Programmable Video](https:/
 
 A backend service (in the `services/townService` directory) implements the application logic: tracking which "towns" are available to be joined, and the state of each of those towns.
 
+## Important Links
+
+[Repository](https://github.com/neu-cs4530-s22/team-project-group-4g) <br />
+[Front-end deployment on Netlify](https://sharp-euler-df5a04.netlify.app/) <br />
+[Back-end deployment on Heroku](https://covey-app.herokuapp.com/towns) <br />
+
 ## Running this app locally
 
 Running the application locally entails running both the backend service and a frontend.
@@ -45,3 +51,14 @@ Create a `.env` file in the `frontend` directory, with the line: `REACT_APP_TOWN
 
 In the `frontend` directory, run `npm start` (again, you'll need to run `npm install` the very first time). After several moments (or minutes, depending on the speed of your machine), a browser will open with the frontend running locally.
 The frontend will automatically re-compile and reload in your browser if you change any files in the `frontend/src` directory.
+
+### Installation instructions
+
+This new upgraded version of Covey.Town doesn't have any extra installation features that you need to worry about. Just make sure to do an `npm install` in both the front-end and back-end, follow the above steps for running locally and you should be all set.
+
+You can clone our repository by entering:
+
+`$ git clone git@github.com:neu-cs4530-s22/team-project-group-4g.git`
+
+## Deploying new feature
+

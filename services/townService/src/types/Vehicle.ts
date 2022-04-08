@@ -1,17 +1,12 @@
 import { nanoid } from 'nanoid';
 import { ServerConversationArea } from '../client/TownsServiceClient';
 import { VehicleLocation } from '../CoveyTypes';
-import Passenger from './Passenger';
+
 /**
  * Each vehicle which is connected to a town is represented by a Vehicle object.
  * To be notified, vehicle is an abstract class. 
  */
 export default abstract class Vehicle {
-
-  // add the passenger to the vehicle list of Passengers by ID
-  addPassenger(newPassenger: Passenger) {
-    this._passengersByID.push(newPassenger.id);
-  }
 
   /** The current location of this vehicle */
   public location: VehicleLocation;
@@ -29,6 +24,10 @@ export default abstract class Vehicle {
   // private _passengers?: Passenger[];
   private _passengersByID: string[];
 
+  /**
+   * The vehicle's unique conversation area
+   * extends conversation area?
+   */
   private _conversationArea: ServerConversationArea | undefined;
 
   constructor() {
@@ -38,7 +37,7 @@ export default abstract class Vehicle {
       moving: false,
       rotation: 'back',
     };
-    
+
     this._id = nanoid();
     this._passengersByID = [];
   }
@@ -51,7 +50,7 @@ export default abstract class Vehicle {
     return this._capacity;
   }
 
-  get speed(): number | undefined{
+  get speed(): number | undefined {
     return this._speed;
   }
 
@@ -71,5 +70,11 @@ export default abstract class Vehicle {
     this._conversationArea = conversationArea;
   }
 
-  abstract getVehicleType() : string;
+  abstract getVehicleType(): string;
+
+  /** Add the passenger to the vehicle list of Passengers by ID */
+  addPassengerByID(passengerID: string): void {
+    this._passengersByID.push(passengerID);
+  }
+
 }

@@ -53,6 +53,9 @@ export interface TownJoinResponse {
   isPubliclyListed: boolean;
   /** Conversation areas */
   conversationAreas: ServerConversationArea[];
+
+  /** List of vehiles currently in this town */
+
 }
 
 /**
@@ -184,7 +187,7 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  async createConversationArea(requestData: ConversationAreaCreateRequest) : Promise<void>{
+  async createConversationArea(requestData: ConversationAreaCreateRequest): Promise<void> {
     const responseWrapper = await this._axios.post(`/towns/${requestData.coveyTownID}/conversationAreas`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
