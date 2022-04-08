@@ -13,10 +13,10 @@ export default abstract class Vehicle {
   private readonly _id: string;
 
   /** The maximum capacity of this vehicle */
-  protected _capacity?: number;
+  private _capacity?: number;
 
   /** The speed of this vehicle (i.e., the number of time greater than the walking speed of a player) */
-  protected _speed?: number;
+  private _speed?: number;
 
   /** A list of current passengers in/on this vehicle */
   // private _passengers?: Passenger[];
@@ -42,7 +42,7 @@ export default abstract class Vehicle {
     return this._capacity;
   }
 
-  get speed(): number | undefined{
+  get speed(): number | undefined {
     return this._speed;
   }
 
@@ -54,5 +54,5 @@ export default abstract class Vehicle {
     this._passengersByID = passengersByID;
   }
 
-  abstract getVehicleType() : string;
+  abstract getVehicleType(): string;
 }
