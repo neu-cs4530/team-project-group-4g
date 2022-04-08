@@ -10,13 +10,13 @@ export default class Player {
   public location: UserLocation;
 
   /** The unique identifier for this player * */
-  private readonly _id: string;
+  protected readonly _id: string;
 
   /** The player's username, which is not guaranteed to be unique within the town * */
-  private readonly _userName: string;
+  protected readonly _userName: string;
 
   /** The current ConversationArea that the player is in, or undefined if they are not located within one */
-  private _activeConversationArea?: ServerConversationArea;
+  protected _activeConversationArea?: ServerConversationArea;
 
   constructor(userName: string) {
     this.location = {
