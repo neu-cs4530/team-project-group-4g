@@ -5,7 +5,7 @@ import Vehicle from '../types/Vehicle';
 import { ChatMessage, CoveyTownList, UserLocation, VehicleLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
-import { ConversationAreaCreateRequest, ServerConversationArea, VehicleCreateRequest } from '../client/TownsServiceClient';
+import { ConversationAreaCreateRequest, ServerConversationArea, VehicleAddRequest } from '../client/TownsServiceClient';
 import Passenger from '../types/Passenger';
 
 /**
@@ -208,7 +208,7 @@ export function conversationAreaCreateHandler(_requestData: ConversationAreaCrea
  * * Ask the TownController to create the Vehicle
  * @param _requestData Vehicle create request
  */
-export function vehicleCreateHandler(_requestData: VehicleCreateRequest): ResponseEnvelope<Record<string, null>> {
+export function vehicleCreateHandler(_requestData: VehicleAddRequest): ResponseEnvelope<Record<string, null>> {
   const townsStore = CoveyTownsStore.getInstance();
   const townController = townsStore.getControllerForTown(_requestData.coveyTownID);
   if (!townController?.getSessionByToken(_requestData.sessionToken)) {
