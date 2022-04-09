@@ -243,6 +243,9 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     onPlayerMoved(movedPlayer: Player) {
       socket.emit('playerMoved', movedPlayer);
     },
+    onVehicleMoved(movedVehicle: Vehicle) {
+      socket.emit('vehicleMoved', movedVehicle);
+    },
     onPlayerDisconnected(removedPlayer: Player) {
       socket.emit('playerDisconnect', removedPlayer);
     },
@@ -261,9 +264,6 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     },
     onChatMessage(message: ChatMessage) {
       socket.emit('chatMessage', message);
-    },
-    onVehicleMoved(newVehicle: Vehicle) {
-      socket.emit('newVehicle', newVehicle);
     },
     /** Add the emits for the listeners */
     onVehicleCreated(newVehicle: Vehicle) {
