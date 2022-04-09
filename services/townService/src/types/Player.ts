@@ -18,6 +18,8 @@ export default class Player {
   /** The current ConversationArea that the player is in, or undefined if they are not located within one */
   protected _activeConversationArea?: ServerConversationArea;
 
+  public visible: boolean;
+
   constructor(userName: string) {
     this.location = {
       x: 0,
@@ -27,6 +29,7 @@ export default class Player {
     };
     this._userName = userName;
     this._id = nanoid();
+    this.visible = true;
   }
 
   get userName(): string {
