@@ -1,5 +1,4 @@
 import Player from './Player';
-import Vehicle from './Vehicle';
 import { ServerConversationArea } from '../client/TownsServiceClient';
 
 /**
@@ -14,20 +13,20 @@ export default class Passenger {
   private _player: Player;
 
   /** The vehicle this passenger is currently in, if any */
-  private _vehicle: Vehicle;
+  private _vehicleByID: string;
 
-  constructor(player: Player, vehicle: Vehicle, isDriver = false) {
+  constructor(player: Player, vehicleByID: string, isDriver = true) {
     this._player = player;
-    this._vehicle = vehicle;
+    this._vehicleByID = vehicleByID;
     this._isDriver = isDriver;
   }
 
-  get vehicle(): Vehicle {
-    return this._vehicle;
+  get vehicleByID(): string {
+    return this._vehicleByID;
   }
 
-  set vehicle(vehicle: Vehicle) {
-    this._vehicle = vehicle;
+  set vehicleByID(vehicleByID: string) {
+    this._vehicleByID = vehicleByID;
   }
 
   get isDriver(): boolean {

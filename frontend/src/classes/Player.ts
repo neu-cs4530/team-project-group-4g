@@ -16,13 +16,17 @@ export default class Player {
 
   public label?: Phaser.GameObjects.Text;
 
+  // Might be useless in the later version. Do not use this field!
   public playerType: PlayerType;
 
-  constructor(id: string, userName: string, location: UserLocation, playerType: PlayerType = PlayerType.Human) {
+  public visible: boolean;
+
+  constructor(id: string, userName: string, location: UserLocation, playerType: PlayerType = PlayerType.Human, visible = true) {
     this._id = id;
     this._userName = userName;
     this.location = location;
     this.playerType = playerType;
+    this.visible = visible;
   }
 
   get userName(): string {

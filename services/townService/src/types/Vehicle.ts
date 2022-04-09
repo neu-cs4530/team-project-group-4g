@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import { ServerConversationArea } from '../client/TownsServiceClient';
 import { VehicleLocation } from '../CoveyTypes';
+import Passenger from './Passenger';
 
 /**
  * Each vehicle which is connected to a town is represented by a Vehicle object.
@@ -21,8 +22,8 @@ export default abstract class Vehicle {
   protected _speed?: number;
 
   /** A list of current passengers in/on this vehicle */
-  // private _passengers?: Passenger[];
-  private _passengersByID: string[];
+  private _passengers: Passenger[];
+  // private _passengersByID: string[];
 
   /**
    * The vehicle's unique conversation area
@@ -39,7 +40,7 @@ export default abstract class Vehicle {
     };
 
     this._id = nanoid();
-    this._passengersByID = [];
+    this._passengers = [];
   }
 
   get id(): string {
@@ -54,12 +55,12 @@ export default abstract class Vehicle {
     return this._speed;
   }
 
-  get passengersByID(): string[] {
-    return this._passengersByID;
+  get passengers(): Passenger[] {
+    return this._passengers;
   }
 
-  set passengersByID(passengersByID: string[]) {
-    this._passengersByID = passengersByID;
+  set passengers(passengers: Passenger[]) {
+    this._passengers = passengers;
   }
 
   get conversationArea(): ServerConversationArea | undefined {
@@ -72,9 +73,19 @@ export default abstract class Vehicle {
 
   abstract getVehicleType(): string;
 
-  /** Add the passenger to the vehicle list of Passengers by ID */
-  addPassengerByID(passengerID: string): void {
-    this._passengersByID.push(passengerID);
+  /** Add the passenger to the vehicle's list of Passengers */
+  addPassenger(passenger: Passenger): void {
+    this._passengers.push(passenger);
+  }
+
+  gainDriverID() : string {
+    const passengerList = this.passengers;
+    for (let i = 0; i < passengerList.length; i += 1){
+      if (passengerList[i].isDriver){
+        return passengerList[i].id;
+      }
+    }
+    throw Error('No Driver on the vehicle');
   }
 
 }

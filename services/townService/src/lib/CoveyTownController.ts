@@ -123,6 +123,18 @@ export default class CoveyTownController {
     return theSession;
   }
 
+  findVehicle(passengerID: string) : Vehicle | undefined {
+    const vehicleList = this._vehicles;
+    let vehicleWithPassengerID;
+    for (let i = 0; i < vehicleList.length; i += 1) {
+      if (vehicleList[i].gainDriverID() === passengerID) {
+        vehicleWithPassengerID = vehicleList[i];
+        break;
+      }
+    }
+    return vehicleWithPassengerID;
+  }
+
   /**
      * Adds a vehicle to this Covey Town when a user hit "enter" to get a car, provisioning the necessary credentials for the
      * vehicle, and returning them
@@ -155,11 +167,11 @@ export default class CoveyTownController {
     newVehicle.conversationArea = _conversationArea;
 
     /** Create a new passenger instance */
-    const newPassenger = new Passenger(newPlayer, newVehicle, true);
+    const newPassenger = new Passenger(newPlayer, newVehicle.id, true);
 
     // newVehicle.addPassenger(newPassenger);
     /** Add the passenger to the vehicle */
-    newVehicle.addPassengerByID(newPassenger.id);
+    newVehicle.addPassenger(newPassenger);
 
     this._listeners.forEach(listener => listener.onPlayerJoined(newPlayer));
     this._listeners.forEach(listener => listener.onPlayerJoinedVehicle(newPassenger));
@@ -333,7 +345,7 @@ export default class CoveyTownController {
     if (vehicle === undefined) {
       return;
     }
-    if (vehicle.passengersByID === undefined) {
+    if (vehicle.passengers === undefined) {
       return;
     }
 
@@ -346,8 +358,8 @@ export default class CoveyTownController {
       moving: location.moving,
     };
 
-    for (let i = 0, len = vehicle.passengersByID.length; i < len; i += 1) {
-      const p = this.players.find(player => player.id === vehicle.passengersByID[i]);
+    for (let i = 0, len = vehicle.passengers.length; i < len; i += 1) {
+      const p = this.players.find(player => player.id === vehicle.passengers[i].id);
       if (p !== undefined) {
         p.location = newUserLocation;
         this.updatePlayerLocation(p, p.location);
