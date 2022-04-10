@@ -208,7 +208,7 @@ export function conversationAreaCreateHandler(_requestData: ConversationAreaCrea
  * * Ask the TownController to create the Vehicle
  * @param _requestData Vehicle create request
  */
-export function vehicleCreateHandler(_requestData: VehicleAddRequest): ResponseEnvelope<Record<string, null>> {
+export function addVehicleHandler(_requestData: VehicleAddRequest): ResponseEnvelope<Record<string, null>> {
   const townsStore = CoveyTownsStore.getInstance();
   const townController = townsStore.getControllerForTown(_requestData.coveyTownID);
   if (!townController?.getSessionByToken(_requestData.sessionToken)) {
