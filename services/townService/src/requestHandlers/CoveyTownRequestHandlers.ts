@@ -228,7 +228,7 @@ export function vehicleCreateHandler(_requestData: VehicleAddRequest): ResponseE
   return {
     isOK: success,
     response: {},
-    message: !success ? `Unable to create conversation area ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}` : undefined,
+    message: !success ? `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}` : undefined,
   };
 }
 

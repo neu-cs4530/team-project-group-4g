@@ -166,6 +166,8 @@ export default class CoveyTownController {
 
     newVehicle.conversationArea = _conversationArea;
 
+
+
     /** Create a new passenger instance */
     const newPassenger = new Passenger(newPlayer, newVehicle.id, true);
 
@@ -173,7 +175,7 @@ export default class CoveyTownController {
     /** Add the passenger to the vehicle */
     newVehicle.addPassenger(newPassenger);
 
-    this._listeners.forEach(listener => listener.onPlayerJoined(newPlayer));
+    this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
     this._listeners.forEach(listener => listener.onPlayerJoinedVehicle(newPassenger));
 
     return true;
