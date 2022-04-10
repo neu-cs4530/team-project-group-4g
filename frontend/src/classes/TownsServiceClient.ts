@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import assert from 'assert';
 import { ServerPlayer } from './Player';
+import { ServerVehicle } from './Vehicle';
 import { ServerConversationArea } from './ConversationArea';
 
 /**
@@ -34,6 +35,8 @@ export interface TownJoinResponse {
   isPubliclyListed: boolean;
   /** Names and occupants of any existing ConversationAreas */
   conversationAreas: ServerConversationArea[];
+  /** List of players currently in this town * */
+  currentVehicles: ServerVehicle[];
 }
 
 /**

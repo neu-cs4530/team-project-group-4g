@@ -96,7 +96,11 @@ export default class CoveyTownController {
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
-    this._vehicles = [];
+    // test whether or not the vehicle could be sent to fronted
+    this._vehicles = [new Car()];
+    this.vehicles.push(new Dinosaur());
+    this.vehicles.push(new SkateBoard());
+    // this._vehicles = [];
   }
 
   /**
