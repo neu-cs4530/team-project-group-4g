@@ -15,7 +15,6 @@ import { io, Socket } from 'socket.io-client';
 import './App.css';
 import ConversationArea, { ServerConversationArea } from './classes/ConversationArea';
 import Player, { ServerPlayer, UserLocation } from './classes/Player';
-import Vehicle, { ServerVehicle, VehicleLocation } from './classes/Vehicle';
 import TownsServiceClient, { TownJoinResponse } from './classes/TownsServiceClient';
 import Video from './classes/Video/Video';
 import Login from './components/Login/Login';
@@ -34,7 +33,6 @@ import CoveyAppContext from './contexts/CoveyAppContext';
 import NearbyPlayersContext from './contexts/NearbyPlayersContext';
 import PlayerMovementContext, { PlayerMovementCallback } from './contexts/PlayerMovementContext';
 import PlayersInTownContext from './contexts/PlayersInTownContext';
-import VehiclesInTownContext from './contexts/VehiclesInTownContext';
 import VideoContext from './contexts/VideoContext';
 import { CoveyAppState } from './CoveyTypes';
 
@@ -129,7 +127,6 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
   const [appState, dispatchAppUpdate] = useReducer(appStateReducer, defaultAppState());
   const [playerMovementCallbacks] = useState<PlayerMovementCallback[]>([]);
   const [playersInTown, setPlayersInTown] = useState<Player[]>([]);
-  const [vehiclesInTown, setVehiclesInTown] = useState<Vehicle[]>([]);
   const [nearbyPlayers, setNearbyPlayers] = useState<Player[]>([]);
   // const [currentLocation, setCurrentLocation] = useState<UserLocation>({moving: false, rotation: 'front', x: 0, y: 0});
   const [conversationAreas, setConversationAreas] = useState<ConversationArea[]>([]);
@@ -154,14 +151,11 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       let currentLocation: UserLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
 
       let localPlayers = initData.currentPlayers.map(sp => Player.fromServerPlayer(sp));
-      // Should modify to 'let' ranther 'const' later because we need to add and delete the vehicle later
-      const localVehicles = initData.currentVehicles.map(sp => Vehicle.fromServerVehicle(sp));
       let localConversationAreas = initData.conversationAreas.map(sa =>
         ConversationArea.fromServerConversationArea(sa),
       );
       let localNearbyPlayers: Player[] = [];
       setPlayersInTown(localPlayers);
-      setVehiclesInTown(localVehicles);
       setConversationAreas(localConversationAreas);
       setNearbyPlayers(localNearbyPlayers);
 
@@ -300,11 +294,9 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           <PlayerMovementContext.Provider value={playerMovementCallbacks}>
             <PlayersInTownContext.Provider value={playersInTown}>
               <NearbyPlayersContext.Provider value={nearbyPlayers}>
-                <VehiclesInTownContext.Provider value = {vehiclesInTown}>
-                  <ConversationAreasContext.Provider value={conversationAreas}>
-                    {page}
-                  </ConversationAreasContext.Provider>
-                </VehiclesInTownContext.Provider>
+                <ConversationAreasContext.Provider value={conversationAreas}>
+                  {page}
+                </ConversationAreasContext.Provider>
               </NearbyPlayersContext.Provider>
             </PlayersInTownContext.Provider>
           </PlayerMovementContext.Provider>

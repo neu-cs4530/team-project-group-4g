@@ -88,8 +88,7 @@ export default class CoveyTownController {
 
   private _capacity: number;
 
-  // private _vehicles: Vehicle[] = [];
-  private _vehicles: Vehicle[];
+  private _vehicles: Vehicle[] = [];
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();
@@ -97,11 +96,6 @@ export default class CoveyTownController {
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
-    // test whether or not the vehicle could be sent to fronted
-    this._vehicles = [new Car()];
-    this.vehicles.push(new Dinosaur());
-    this.vehicles.push(new SkateBoard());
-    // this._vehicles = [];
   }
 
   /**

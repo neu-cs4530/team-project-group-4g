@@ -4,8 +4,6 @@ import { UserLocation, VehicleLocation } from '../CoveyTypes';
 
 
 export type ServerPlayer = { _id: string, _userName: string, location: UserLocation };
-export type ServerVehicle = { _id: string, _vehicleType: string, _capacity: number, _speed: number, location: VehicleLocation, passengers: Passenger[] };
-export type Passenger = { player: ServerPlayer, isDriver: boolean, vehicleByID: string };
 
 /**
  * A bounding box, with a coordinate system that matches the frontend game engine's coordinates
@@ -55,8 +53,9 @@ export interface TownJoinResponse {
   isPubliclyListed: boolean;
   /** Conversation areas */
   conversationAreas: ServerConversationArea[];
+
   /** List of vehiles currently in this town */
-  currentVehicles: ServerVehicle[];
+
 }
 
 /**
