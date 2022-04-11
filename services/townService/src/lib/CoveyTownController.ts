@@ -6,11 +6,11 @@ import Passenger from '../types/Passenger';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import Vehicle from '../types/Vehicle';
-import Car from '../types/Car';
+// import Car from '../types/Car';
 import IVideoClient from './IVideoClient';
 import TwilioVideo from './TwilioVideo';
-import Dinosaur from '../types/Dinosaur';
-import SkateBoard from '../types/SkateBoard';
+// import Dinosaur from '../types/Dinosaur';
+// import SkateBoard from '../types/SkateBoard';
 
 const friendlyNanoID = customAlphabet('1234567890ABCDEF', 8);
 
@@ -89,7 +89,7 @@ export default class CoveyTownController {
   private _capacity: number;
 
   // private _vehicles: Vehicle[] = [];
-  private _vehicles: Vehicle[] = [new Car(), new Dinosaur(), new SkateBoard()];
+  private _vehicles: Vehicle[] = [new Vehicle('Car'), new Vehicle('Dinasour'), new Vehicle('SkateBoard')];
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();
@@ -316,12 +316,12 @@ export default class CoveyTownController {
 
     let newVehicle: Vehicle;
 
-    if (vehicleType === 'dinasour') {
-      newVehicle = new Dinosaur();
-    } else if (vehicleType === 'car') {
-      newVehicle = new Car();
-    } else if (vehicleType === 'skateboard') {
-      newVehicle = new SkateBoard();
+    if (vehicleType === 'Dinasour') {
+      newVehicle = new Vehicle('Dinasour');
+    } else if (vehicleType === 'Car') {
+      newVehicle = new Vehicle('Car');
+    } else if (vehicleType === 'SkateBoard') {
+      newVehicle = new Vehicle('SkateBoard');
     } else {
       return false;
     }

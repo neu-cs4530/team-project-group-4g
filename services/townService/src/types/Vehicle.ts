@@ -7,7 +7,7 @@ import Passenger from './Passenger';
  * Each vehicle which is connected to a town is represented by a Vehicle object.
  * To be notified, vehicle is an abstract class. 
  */
-export default abstract class Vehicle {
+export default class Vehicle {
 
   /** The current location of this vehicle */
   public location: VehicleLocation;
@@ -16,10 +16,12 @@ export default abstract class Vehicle {
   private readonly _id: string;
 
   /** The maximum capacity of this vehicle */
-  protected _capacity?: number;
+  private readonly _capacity: number;
 
   /** The speed of this vehicle (i.e., the number of time greater than the walking speed of a player) */
-  protected _speed?: number;
+  private readonly _speed: number;
+
+  private readonly _type: string;
 
   /** A list of current passengers in/on this vehicle */
   private _passengers: Passenger[];
@@ -31,7 +33,7 @@ export default abstract class Vehicle {
    */
   private _conversationArea: ServerConversationArea | undefined;
 
-  constructor() {
+  constructor(type: string) {
     this.location = {
       x: 50,
       y: 50,
@@ -41,6 +43,20 @@ export default abstract class Vehicle {
 
     this._id = nanoid();
     this._passengers = [];
+    this._type = type;
+    if (type === 'Car'){
+      this._capacity = 4;
+      this._speed = 10;
+    } else if (type === 'Dinasour'){
+      this._capacity = 2;
+      this._speed = 5;
+    } else if (type === 'SkateBoard'){
+      this._capacity = 1;
+      this._speed = 2;
+    } else {
+      this._capacity = 1;
+      this._speed = 2;
+    }
   }
 
   get id(): string {
@@ -53,6 +69,10 @@ export default abstract class Vehicle {
 
   get speed(): number | undefined {
     return this._speed;
+  }
+
+  get type(): string {
+    return this._type;
   }
 
   get passengers(): Passenger[] {
@@ -71,7 +91,7 @@ export default abstract class Vehicle {
     this._conversationArea = conversationArea;
   }
 
-  abstract getVehicleType(): string;
+  // abstract getVehicleType(): string;
 
   /** Add the passenger to the vehicle's list of Passengers */
   addPassenger(passenger: Passenger): void {
