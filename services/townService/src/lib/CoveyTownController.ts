@@ -88,8 +88,8 @@ export default class CoveyTownController {
 
   private _capacity: number;
 
-  private _vehicles: Vehicle[] = [];
-  // private _vehicles: Vehicle[] = [new Car(), new Dinosaur(), new SkateBoard()];
+  // private _vehicles: Vehicle[] = [];
+  private _vehicles: Vehicle[] = [new Car(), new Dinosaur(), new SkateBoard()];
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();
@@ -102,7 +102,7 @@ export default class CoveyTownController {
     // this.vehicles.push(new Dinosaur());
     // this.vehicles.push(new SkateBoard());
     // this._vehicles = [];
-    console.log(this._vehicles);
+    // console.log(this._vehicles);
   }
 
   /**
