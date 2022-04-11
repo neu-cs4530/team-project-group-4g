@@ -39,6 +39,8 @@ export interface TownJoinResponse {
   isPubliclyListed: boolean;
   /** Conversation areas currently active in this town */
   conversationAreas: ServerConversationArea[];
+  /** List of vehicles currently in this town * */
+  currentVehicles: Vehicle[];
 }
 
 /**
@@ -124,6 +126,7 @@ export async function townJoinHandler(requestData: TownJoinRequest): Promise<Res
       friendlyName: coveyTownController.friendlyName,
       isPubliclyListed: coveyTownController.isPubliclyListed,
       conversationAreas: coveyTownController.conversationAreas,
+      currentVehicles: coveyTownController.vehicles,
     },
   };
 }
