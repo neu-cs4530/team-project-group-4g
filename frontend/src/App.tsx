@@ -263,6 +263,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       dispatchAppUpdate,
       playerMovementCallbacks,
       setPlayersInTown,
+      setVehiclesInTown,
       setNearbyPlayers,
       setConversationAreas,
     ],
