@@ -87,6 +87,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         });
     }
   });
+
   /**
    * Update a town
    */
@@ -126,7 +127,6 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         });
     }
   });
-
 
   /**
    * Adds a vehicle to a town

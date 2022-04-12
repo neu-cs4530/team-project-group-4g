@@ -228,8 +228,9 @@ export function addVehicleHandler(_requestData: VehicleAddRequest): ResponseEnve
 
   const success = townController.addVehicle(player, _requestData.conversationArea, _requestData.vehicleType);
 
+  // if the string is undefined then addPlaceable was sucessful
   return {
-    isOK: success,
+    isOK: success === undefined,
     response: {},
     message: !success ? `Unable to create conversation area ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}` : undefined,
   };
