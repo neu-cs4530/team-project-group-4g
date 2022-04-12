@@ -96,6 +96,7 @@ function wrappedTownSelection() {
     socket: null,
     emitMovement: () => {
     },
+    emitCreateVehicle: () => {},
     apiClient: new TownsServiceClient(),
   }}><ChatProvider>
     <TownSelection doLogin={doLoginMock}/></ChatProvider></CoveyAppContext.Provider></ChakraProvider>;

@@ -14,6 +14,8 @@ import { ServerPlayer } from "./Player";
     private readonly _speed: number;
   
     public sprite?: Phaser.GameObjects.Sprite;
+
+    public label?: Phaser.GameObjects.Text;
   
     constructor(id: string, vehicleType: string, capacity: number, speed: number, location: VehicleLocation, passengers: Passenger[]) {
       this._id = id;
@@ -45,6 +47,38 @@ import { ServerPlayer } from "./Player";
         vehicleFromServer._capacity, vehicleFromServer._speed,
         vehicleFromServer.location, vehicleFromServer._passengers);
     }
+
+    gainDriverID() : string {
+      const passengerList = this.passengers;
+      if (passengerList){
+        // console.log('exist')
+        for (let i = 0; i < passengerList.length; i += 1){
+          // console.log('length')
+          // console.log(passengerList[i])
+          if (passengerList[i]._isDriver === true){
+            // console.log('checkDriver')
+            return passengerList[i]._player._id;
+          }
+        }
+      }
+      throw Error('No Driver on the vehicle');
+    }
+  
+
+    gainDriverUserName() : string {
+      const passengerList = this.passengers;
+      if (passengerList){
+        // console.log('exist')
+        for (let i = 0; i < passengerList.length; i += 1){
+          // console.log('lenth')
+          if (passengerList[i]._isDriver === true){
+            // console.log('drive')
+            return passengerList[i]._player._userName;
+          }
+        }
+      }
+      throw Error('No Driver on the vehicle');
+    }
   }
 
   // Might need to add conversatoin in the next week.
@@ -59,9 +93,5 @@ import { ServerPlayer } from "./Player";
     moving: boolean,
   }
   
-  export type Passenger = {
-      player: ServerPlayer,
-      isDriver: boolean,
-      vehicleByID: string,
-  };
+  export type Passenger = {_isDriver: boolean, _player: ServerPlayer, _vehicleByID: string};
   

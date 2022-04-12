@@ -52,6 +52,7 @@ type CoveyAppUpdate =
         myPlayerID: string;
         socket: Socket;
         emitMovement: (location: UserLocation) => void;
+        emitCreateVehicle: (location: UserLocation, vehicleType: string) => void
       };
     }
   | { action: 'disconnect' };
@@ -66,6 +67,7 @@ function defaultAppState(): CoveyAppState {
     userName: '',
     socket: null,
     emitMovement: () => {},
+    emitCreateVehicle: () => {},
     apiClient: new TownsServiceClient(),
   };
 }
@@ -79,6 +81,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     userName: state.userName,
     socket: state.socket,
     emitMovement: state.emitMovement,
+    emitCreateVehicle: state.emitCreateVehicle,
     apiClient: state.apiClient,
   };
 
@@ -91,6 +94,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.currentTownIsPubliclyListed = update.data.townIsPubliclyListed;
       nextState.userName = update.data.userName;
       nextState.emitMovement = update.data.emitMovement;
+      nextState.emitCreateVehicle = update.data.emitCreateVehicle;
       nextState.socket = update.data.socket;
       break;
     case 'disconnect':
@@ -187,6 +191,10 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           }
         }
       };
+      // Something like that
+      const emitCreateVehicle = (location: UserLocation, vehicleType: string) => {
+        socket.emit('newVehicle', location, vehicleType )
+      }
       socket.on('newPlayer', (player: ServerPlayer) => {
         localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
         setPlayersInTown(localPlayers);
@@ -253,6 +261,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           myPlayerID: gamePlayerID,
           townIsPubliclyListed: video.isPubliclyListed,
           emitMovement,
+          emitCreateVehicle,
           socket,
         },
       });

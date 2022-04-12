@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid';
 import { ServerConversationArea } from '../client/TownsServiceClient';
 import { VehicleLocation } from '../CoveyTypes';
 import Passenger from './Passenger';
+import Player from './Player';
 
 /**
  * Each vehicle which is connected to a town is represented by a Vehicle object.
@@ -33,14 +34,16 @@ export default abstract class Vehicle {
 
   constructor() {
     this.location = {
-      x: 50,
-      y: 50,
+      x: 0,
+      y: 0,
       moving: false,
       rotation: 'back',
     };
 
     this._id = nanoid();
-    this._passengers = [];
+    // this._passengers = [];
+    // testUsage
+    this._passengers = [new Passenger(new Player('Xin'), this.id, true)];
   }
 
   get id(): string {
@@ -81,7 +84,7 @@ export default abstract class Vehicle {
   gainDriverID() : string {
     const passengerList = this.passengers;
     for (let i = 0; i < passengerList.length; i += 1){
-      if (passengerList[i].isDriver){
+      if (passengerList[i].isDriver === true){
         return passengerList[i].id;
       }
     }

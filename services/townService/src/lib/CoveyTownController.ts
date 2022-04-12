@@ -64,7 +64,7 @@ export default class CoveyTownController {
   }
 
   /** The list of players currently in the town * */
-  private _players: Player[] = [];
+  private _players: Player[] = [new Player('Xin')];
 
   /** The list of valid sessions for this town * */
   private _sessions: PlayerSession[] = [];
@@ -89,7 +89,7 @@ export default class CoveyTownController {
   private _capacity: number;
 
   // private _vehicles: Vehicle[] = [];
-  private _vehicles: Vehicle[] = [new Car(), new Dinosaur(), new SkateBoard()];
+  private _vehicles: Vehicle[] = [new Car()];
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();
