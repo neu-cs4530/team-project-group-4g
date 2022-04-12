@@ -39,6 +39,8 @@ export interface TownJoinResponse {
   isPubliclyListed: boolean;
   /** Conversation areas currently active in this town */
   conversationAreas: ServerConversationArea[];
+  /** List of vehicles currently in this town * */
+  currentVehicles: Vehicle[];
 }
 
 /**
@@ -124,6 +126,7 @@ export async function townJoinHandler(requestData: TownJoinRequest): Promise<Res
       friendlyName: coveyTownController.friendlyName,
       isPubliclyListed: coveyTownController.isPubliclyListed,
       conversationAreas: coveyTownController.conversationAreas,
+      currentVehicles: coveyTownController.vehicles,
     },
   };
 }
@@ -208,7 +211,7 @@ export function conversationAreaCreateHandler(_requestData: ConversationAreaCrea
  * * Ask the TownController to create the Vehicle
  * @param _requestData Vehicle create request
  */
-export function vehicleCreateHandler(_requestData: VehicleAddRequest): ResponseEnvelope<Record<string, null>> {
+export function addVehicleHandler(_requestData: VehicleAddRequest): ResponseEnvelope<Record<string, null>> {
   const townsStore = CoveyTownsStore.getInstance();
   const townController = townsStore.getControllerForTown(_requestData.coveyTownID);
   if (!townController?.getSessionByToken(_requestData.sessionToken)) {
@@ -225,8 +228,9 @@ export function vehicleCreateHandler(_requestData: VehicleAddRequest): ResponseE
 
   const success = townController.addVehicle(player, _requestData.conversationArea, _requestData.vehicleType);
 
+  // if the string is undefined then addPlaceable was sucessful
   return {
-    isOK: success,
+    isOK: success === undefined,
     response: {},
     message: !success ? `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}` : undefined,
   };

@@ -88,7 +88,8 @@ export default class CoveyTownController {
 
   private _capacity: number;
 
-  private _vehicles: Vehicle[];
+  // private _vehicles: Vehicle[] = [];
+  private _vehicles: Vehicle[] = [new Car(), new Dinosaur(), new SkateBoard()];
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();
@@ -96,7 +97,29 @@ export default class CoveyTownController {
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
-    this._vehicles = [];
+    // test whether or not the vehicle could be sent to fronted
+    // this._vehicles.push(new Car());
+    // this.vehicles.push(new Dinosaur());
+    // this.vehicles.push(new SkateBoard());
+    // this._vehicles = [];
+    // console.log(this._vehicles);
+  }
+
+  /**
+   * Finds the vehicle in the list
+   * @param passengerID 
+   * @returns 
+   */
+  findVehicle(passengerID: string): Vehicle | undefined {
+    const vehicleList = this._vehicles;
+    let vehicleWithPassengerID;
+    for (let i = 0; i < vehicleList.length; i += 1) {
+      if (vehicleList[i].gainDriverID() === passengerID) {
+        vehicleWithPassengerID = vehicleList[i];
+        break;
+      }
+    }
+    return vehicleWithPassengerID;
   }
 
   /**
@@ -180,6 +203,7 @@ export default class CoveyTownController {
 
     return true;
   }
+
 
   /**
    * Destroys all data related to a player in this town.
@@ -333,6 +357,90 @@ export default class CoveyTownController {
   disconnectAllPlayers(): void {
     this._listeners.forEach(listener => listener.onTownDestroyed());
   }
+
+  /**
+   * Adds a vehicle to this CoveyTown, checking that the player can enter(add) vehicles and this vehicle can be added at this specified location
+   *  
+   * @param player the player add to the vehicle when adds a vehicle to this town
+   * @param vehicleID the vehicle id
+   * @param _conversationArea the conversation area in the vehicle
+   * @param vehicleType the vehicle type 
+   */
+  addVehicle(
+    player: Player,
+    // vehicleID: string,
+    conversationArea: ServerConversationArea,
+    vehicleType = 'car',
+  ): string | undefined {
+
+    // chek that the vehicle id given is one that exists in the list
+    // for (let i = 0; i < this._vehicles.length; i += 1) {
+    //   if (this._vehicles[i].id === vehicleID) {
+    //     return 'cannot add:\ngiven id for vehicle that does exist';
+    //   }
+    // }
+
+    const addConversationArea = this.addConversationArea(conversationArea);
+
+    if (!addConversationArea) {
+      return 'cannot add conversation area to the vehicle';
+    }
+
+    // copy current player's location to the vehicle
+    const addVehicleLocation: VehicleLocation = {
+      x: player.location.x,
+      y: player.location.y,
+      rotation: player.location.rotation,
+      moving: player.location.moving,
+    };
+
+    // create a new vehicle
+    let newVehicle: Vehicle;
+
+    // needs initialize the type of vehicle and its location as same as player location
+    if (vehicleType === 'dinasour') {
+      newVehicle = new Dinosaur();
+    } else if (vehicleType === 'car') {
+      newVehicle = new Car();
+    } else if (vehicleType === 'skateboard') {
+      newVehicle = new SkateBoard();
+    } else {
+      return 'the vehicle must have a type';
+    }
+
+    // add vehicle at this location
+    this._vehicles.push(newVehicle);
+
+    newVehicle.conversationArea = conversationArea;
+
+    // Create a new passenger instance
+    const newPassenger = new Passenger(player, newVehicle.id, true);
+
+    // Add the passenger to the vehicle
+    newVehicle.addPassenger(newPassenger);
+
+    // notify all listeners to this town that a vehicle was added
+    this._listeners.forEach(listener => {
+      listener.onVehicleCreated(newVehicle);
+    });
+
+    // notify all listeners to this town that a player/passenger was joined in the added vehicle
+    this._listeners.forEach(listener => listener.onPlayerJoinedVehicle(newPassenger));
+
+    return undefined;
+  }
+
+  /**
+   * Deletes a vehicle with the corresponding location
+   * 
+   * @param location the vehicle location
+   */
+  // deleteVehicle(location: VehicleLocation): string | undefined {
+
+  //   // removes the vehicle from the list of vehicles
+
+
+  // }
 
   /**
    * Updates the location for this vehicle and the location of all passengers in it within the town.

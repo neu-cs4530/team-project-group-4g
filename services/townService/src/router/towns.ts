@@ -9,7 +9,7 @@ import {
   townListHandler,
   townSubscriptionHandler,
   townUpdateHandler,
-  vehicleCreateHandler,
+  addVehicleHandler,
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
 
@@ -87,6 +87,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         });
     }
   });
+
   /**
    * Update a town
    */
@@ -127,10 +128,13 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     }
   });
 
+  /**
+   * Adds a vehicle to a town
+   */
   app.post('/towns/:townID/vehicle', express.json(), async (req, res) => {
     try {
       const result = vehicleCreateHandler({
-      //conveyTownID no need 
+        //conveyTownID no need
         coveyTownID: req.params.townID,
         sessionToken: req.body.sessionToken,
         conversationArea: req.body.conversationArea,
@@ -151,6 +155,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   /**
    * Deletes a vehicle from a town
    */
+
   // app.delete('/towns/:townID/vehicle', express.json(), async (req, res) => {
   //   try {
   //     const result = await deleteVehicleHandler({
@@ -158,6 +163,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   //       sessionToken: req.body.sessionToken,
   //       playerId: req.body.playerId,
   //       vehicleLocation: req.body.location,
+
   //     });
   //     res.status(StatusCodes.OK).json(result);
   //   } catch (err) {

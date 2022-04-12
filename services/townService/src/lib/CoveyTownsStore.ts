@@ -1,5 +1,7 @@
 import CoveyTownController from './CoveyTownController';
-import { CoveyTownList } from '../CoveyTypes';
+import { CoveyTownList, VehicleLocation } from '../CoveyTypes';
+import Player from '../types/Player';
+import { ServerConversationArea } from '../client/TownsServiceClient';
 
 function passwordMatches(provided: string, expected: string): boolean {
   if (provided === expected) {
@@ -105,4 +107,47 @@ export default class CoveyTownsStore {
     return false;
   }
 
+  /**
+   * adds the vehicle to this covey town
+   * 
+   * @param coveyTownID the covey town id
+   * @param player the player in the covey town
+   * @param conversationArea the conversation area to be added in the vehicle
+   * @param vehicleType
+   */
+  addVehicle(coveyTownID: string, player: Player, conversationArea: ServerConversationArea): string | undefined {
+
+    const existingTown = this.getControllerForTown(coveyTownID);
+
+    // checks that this town exists
+    if (existingTown) {
+      if (!(player.location !== undefined &&
+        player.location.x !== undefined &&
+        player.location.y !== undefined)) {
+        return 'Invalid Location:\nThe location to add the vehicle must be defined.';
+      }
+
+      const addResponse = existingTown.addVehicle(
+        player,
+        conversationArea,
+        'car',
+      );
+      return addResponse;
+    }
+    return 'Invalid town:\nDouble check that the town exists.';
+  }
+
+  /**
+   * 
+   * @param coveyTownID 
+   * @param vehicleLocation 
+   */
+  // deleteVehicle(coveyTownID: string, vehicleLocation: VehicleLocation): string | undefined {
+
+  //   const existingTown = this.getControllerForTown(coveyTownID);
+
+  //   if (existingTown) {
+  //     const deleteResponse = existingTown.deleteVehicle();
+  //   }
+  // }
 }
