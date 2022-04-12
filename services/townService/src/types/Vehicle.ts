@@ -25,12 +25,10 @@ export default abstract class Vehicle {
   private _passengers: Passenger[];
   // private _passengersByID: string[];
 
-  /**
-   * The vehicle's unique conversation area
-   * extends conversation area?
-   */
+  /** The vehicle's unique conversation area */
   private _conversationArea: ServerConversationArea | undefined;
 
+  // location: VehicleLocation
   constructor() {
     this.location = {
       x: 50,
@@ -78,10 +76,11 @@ export default abstract class Vehicle {
     this._passengers.push(passenger);
   }
 
-  gainDriverID() : string {
+  /** */
+  gainDriverID(): string {
     const passengerList = this.passengers;
-    for (let i = 0; i < passengerList.length; i += 1){
-      if (passengerList[i].isDriver){
+    for (let i = 0; i < passengerList.length; i += 1) {
+      if (passengerList[i].isDriver) {
         return passengerList[i].id;
       }
     }
