@@ -130,6 +130,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   app.post('/towns/:townID/vehicle', express.json(), async (req, res) => {
     try {
       const result = vehicleCreateHandler({
+      //conveyTownID no need 
         coveyTownID: req.params.townID,
         sessionToken: req.body.sessionToken,
         conversationArea: req.body.conversationArea,
@@ -146,6 +147,26 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         });
     }
   });
+
+  /**
+   * Deletes a vehicle from a town
+   */
+  // app.delete('/towns/:townID/vehicle', express.json(), async (req, res) => {
+  //   try {
+  //     const result = await deleteVehicleHandler({
+  //       coveyTownID: req.params.townID,
+  //       sessionToken: req.body.sessionToken,
+  //       playerId: req.body.playerId,
+  //       vehicleLocation: req.body.location,
+  //     });
+  //     res.status(StatusCodes.OK).json(result);
+  //   } catch (err) {
+  //     logError(err);
+  //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+  //       message: 'Internal server error, please see log in server for more details',
+  //     });
+  //   }
+  // });
 
   const socketServer = new io.Server(http, { cors: { origin: '*' } });
   socketServer.on('connection', townSubscriptionHandler);
