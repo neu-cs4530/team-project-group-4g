@@ -272,7 +272,7 @@ class CoveyGameScene extends Phaser.Scene {
       myPlayer = new Player(player.id, player.userName, location, player.visible);
       this.players.push(myPlayer);
     }
-    if (this.physics && player.location) {
+    if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
       let { sprite } = myPlayer;
       if (!sprite) {
         sprite = this.physics.add
@@ -328,10 +328,10 @@ class CoveyGameScene extends Phaser.Scene {
 
       myVehicle = new Vehicle(vehicle.id, vehicle.vehicleType, vehicle.capacity, vehicle.speed, location, passengers);
       this.vehicles.push(myVehicle);
-      // console.log(this.vehicles);
+      console.log(this.vehicles);
     }
     // if (this.myPlayerID !== vehicle.gainDriverID() && this.physics && vehicle.location) {
-    if (this.physics && vehicle.location) {
+    if (this.myPlayerID!== myVehicle.gainDriverID() && this.physics && vehicle.location) {
       let { sprite } = myVehicle;
       if (!sprite) {
         sprite = this.physics.add

@@ -200,7 +200,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         setPlayersInTown(localPlayers);
         recalculateNearbyPlayers();
       });
-      socket.on('newVehicle', (vehicle: ServerVehicle)=>{
+      socket.on('VehicleCreated', (vehicle: ServerVehicle)=>{
         localVehicles = localVehicles.concat(Vehicle.fromServerVehicle(vehicle));
         setVehiclesInTown(localVehicles);
       });

@@ -202,7 +202,6 @@ export default class CoveyTownController {
           moving: initLocation.moving,
           rotation: initLocation.rotation,
         };
-        this.vehicles.push(newVehicle);
         break;
       case 'Dinasour':
         newVehicle = new Dinosaur();
