@@ -13,7 +13,7 @@ export default abstract class Vehicle {
   /** The current location of this vehicle */
   public location: VehicleLocation;
 
-  /** The unique identifier for this vehicle */
+  /** The identifier for this vehicle */
   private readonly _id: string;
 
   /** The maximum capacity of this vehicle */

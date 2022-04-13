@@ -64,7 +64,7 @@ export default class CoveyTownController {
   }
 
   /** The list of players currently in the town * */
-  private _players: Player[] = [new Player('Xin')];
+  private _players: Player[] = [];
 
   /** The list of valid sessions for this town * */
   private _sessions: PlayerSession[] = [];
@@ -89,7 +89,7 @@ export default class CoveyTownController {
   private _capacity: number;
 
   // private _vehicles: Vehicle[] = [];
-  private _vehicles: Vehicle[] = [new Car()];
+  private _vehicles: Vehicle[] = [];
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();
@@ -189,6 +189,46 @@ export default class CoveyTownController {
     }
 
     this._listeners.forEach(listener => listener.onPlayerMoved(player));
+  }
+
+  createInitVehicle(driver: Player, initLocation: UserLocation, vehicleType: string): void{
+    let newVehicle: Vehicle;
+    switch (vehicleType) {
+      case 'Car':
+        newVehicle = new Car();
+        newVehicle.location = {
+          x: initLocation.x,
+          y: initLocation.y,
+          moving: initLocation.moving,
+          rotation: initLocation.rotation,
+        };
+        this.vehicles.push(newVehicle);
+        break;
+      case 'Dinasour':
+        newVehicle = new Dinosaur();
+        newVehicle.location = {
+          x: initLocation.x,
+          y: initLocation.y,
+          moving: initLocation.moving,
+          rotation: initLocation.rotation,
+        };
+        break;
+      case 'SkateBoard':
+        newVehicle = new SkateBoard();
+        newVehicle.location = {
+          x: initLocation.x,
+          y: initLocation.y,
+          moving: initLocation.moving,
+          rotation: initLocation.rotation,
+        };
+        break;
+      default:
+        throw new Error('The vehicle type is not applicable');
+    }
+    newVehicle.addPassenger(new Passenger(driver, newVehicle.id, true));
+    this._vehicles.push(newVehicle);
+    
+    this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
   }
 
   /**
@@ -299,54 +339,54 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onTownDestroyed());
   }
 
-  /**
-   * Adds a vehicle to this CoveyTown, checking that the player can enter(add) vehicles and this vehicle can be added at this specified location 
-   *
-   * @param _conversationArea the conversation area in the vehicle
-   * @param newPlayer the player to add to the vehicle
-   * @param vehicleType the vehicle type 
-   */
-  addVehicle(player: Player, conversationArea: ServerConversationArea, vehicleType = 'car'): boolean {
+  // /**
+  //  * Adds a vehicle to this CoveyTown, checking that the player can enter(add) vehicles and this vehicle can be added at this specified location 
+  //  *
+  //  * @param _conversationArea the conversation area in the vehicle
+  //  * @param newPlayer the player to add to the vehicle
+  //  * @param vehicleType the vehicle type 
+  //  */
+  // addVehicle(player: Player, conversationArea: ServerConversationArea, vehicleType = 'car'): boolean {
 
-    const addConversationArea = this.addConversationArea(conversationArea);
+  //   const addConversationArea = this.addConversationArea(conversationArea);
 
-    if (!addConversationArea) {
-      return false;
-    }
+  //   if (!addConversationArea) {
+  //     return false;
+  //   }
 
-    let newVehicle: Vehicle;
+  //   let newVehicle: Vehicle;
 
-    if (vehicleType === 'dinasour') {
-      newVehicle = new Dinosaur();
-    } else if (vehicleType === 'car') {
-      newVehicle = new Car();
-    } else if (vehicleType === 'skateboard') {
-      newVehicle = new SkateBoard();
-    } else {
-      return false;
-    }
+  //   if (vehicleType === 'dinasour') {
+  //     newVehicle = new Dinosaur();
+  //   } else if (vehicleType === 'car') {
+  //     newVehicle = new Car();
+  //   } else if (vehicleType === 'skateboard') {
+  //     newVehicle = new SkateBoard();
+  //   } else {
+  //     return false;
+  //   }
 
-    this._vehicles.push(newVehicle);
+  //   this._vehicles.push(newVehicle);
 
-    newVehicle.conversationArea = conversationArea;
+  //   newVehicle.conversationArea = conversationArea;
 
-    // Create a new passenger instance
-    const newPassenger = new Passenger(player, newVehicle.id, true);
+  //   // Create a new passenger instance
+  //   const newPassenger = new Passenger(player, newVehicle.id, true);
 
-    // newVehicle.addPassenger(newPassenger);
-    /** Add the passenger to the vehicle */
-    newVehicle.addPassenger(newPassenger);
+  //   // newVehicle.addPassenger(newPassenger);
+  //   /** Add the passenger to the vehicle */
+  //   newVehicle.addPassenger(newPassenger);
 
-    // notify town listener that a vehicle was added
-    this._listeners.forEach(listener => {
-      listener.onVehicleCreated(newVehicle);
-    });
+  //   // notify town listener that a vehicle was added
+  //   this._listeners.forEach(listener => {
+  //     listener.onVehicleCreated(newVehicle);
+  //   });
 
-    // notify
-    this._listeners.forEach(listener => listener.onPlayerJoinedVehicle(newPassenger));
+  //   // notify
+  //   this._listeners.forEach(listener => listener.onPlayerJoinedVehicle(newPassenger));
 
-    return true;
-  }
+  //   return true;
+  // }
 
   /**
    * Updates the location for this vehicle and the location of all passengers in it within the town.

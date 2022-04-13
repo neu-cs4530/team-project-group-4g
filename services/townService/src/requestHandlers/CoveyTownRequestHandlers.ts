@@ -203,37 +203,37 @@ export function conversationAreaCreateHandler(_requestData: ConversationAreaCrea
   };
 }
 
-/**
- * A handler to process the "Create Vehicle" request
- * The intended flow of this handler is:
- * * Fetch the town controller for the specified town ID
- * * Validate that the sessionToken is valid for that town
- * * Ask the TownController to create the Vehicle
- * @param _requestData Vehicle create request
- */
-export function addVehicleHandler(_requestData: VehicleAddRequest): ResponseEnvelope<Record<string, null>> {
-  const townsStore = CoveyTownsStore.getInstance();
-  const townController = townsStore.getControllerForTown(_requestData.coveyTownID);
-  if (!townController?.getSessionByToken(_requestData.sessionToken)) {
-    return {
-      isOK: false, response: {}, message: `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}`,
-    };
-  }
-  const player = townController.players.find(p => p.id === _requestData.playerId);
-  if (!player) {
-    return {
-      isOK: false, response: {}, message: `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}`,
-    };
-  }
+// /**
+//  * A handler to process the "Create Vehicle" request
+//  * The intended flow of this handler is:
+//  * * Fetch the town controller for the specified town ID
+//  * * Validate that the sessionToken is valid for that town
+//  * * Ask the TownController to create the Vehicle
+//  * @param _requestData Vehicle create request
+//  */
+// export function addVehicleHandler(_requestData: VehicleAddRequest): ResponseEnvelope<Record<string, null>> {
+//   const townsStore = CoveyTownsStore.getInstance();
+//   const townController = townsStore.getControllerForTown(_requestData.coveyTownID);
+//   if (!townController?.getSessionByToken(_requestData.sessionToken)) {
+//     return {
+//       isOK: false, response: {}, message: `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}`,
+//     };
+//   }
+//   const player = townController.players.find(p => p.id === _requestData.playerId);
+//   if (!player) {
+//     return {
+//       isOK: false, response: {}, message: `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}`,
+//     };
+//   }
 
-  const success = townController.addVehicle(player, _requestData.conversationArea, _requestData.vehicleType);
+//   const success = townController.addVehicle(player, _requestData.conversationArea, _requestData.vehicleType);
 
-  return {
-    isOK: success,
-    response: {},
-    message: !success ? `Unable to create conversation area ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}` : undefined,
-  };
-}
+//   return {
+//     isOK: success,
+//     response: {},
+//     message: !success ? `Unable to create conversation area ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}` : undefined,
+//   };
+// }
 
 /**
  * An adapter between CoveyTownController's event interface (CoveyTownListener)
@@ -270,7 +270,7 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     },
     /** Add the emits for the listeners */
     onVehicleCreated(newVehicle: Vehicle) {
-      socket.emit('vehicleCreated', newVehicle);
+      socket.emit('newVehicle', newVehicle);
     },
     onPlayerJoinedVehicle(passenger: Passenger) {
       socket.emit('PlayerJoined', passenger);
@@ -318,6 +318,11 @@ export function townSubscriptionHandler(socket: Socket): void {
   // location, inform the CoveyTownController
   socket.on('playerMovement', (movementData: UserLocation) => {
     townController.updatePlayerLocation(s.player, movementData);
+  });
+
+  // Xin Jin 2022/04/12
+  socket.on('newVehicle', (initLocation: UserLocation, vehicleType: string) => {
+    townController.createInitVehicle(s.player, initLocation, vehicleType);
   });
 
   // Register an event listener for the client socket: if the client updates their

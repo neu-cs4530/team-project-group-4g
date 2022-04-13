@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import BoundingBox from '../../classes/BoundingBox';
 import ConversationArea from '../../classes/ConversationArea';
 import Player, { ServerPlayer, UserLocation } from '../../classes/Player';
-import Vehicle, { ServerVehicle, VehicleLocation } from '../../classes/Vehicle';
+import Vehicle, { ServerVehicle, VehicleLocation, Passenger } from '../../classes/Vehicle';
 import Video from '../../classes/Video/Video';
 import useConversationAreas from '../../hooks/useConversationAreas';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
@@ -111,6 +111,8 @@ class CoveyGameScene extends Phaser.Scene {
 
   private emitMovement: (loc: UserLocation) => void;
 
+  private emitCreateVehicle: (loc: UserLocation, type: string) => void;
+
   private currentConversationArea?: ConversationGameObjects;
 
   private currentVehicleArea?: CarAreaGameObjects;
@@ -135,12 +137,14 @@ class CoveyGameScene extends Phaser.Scene {
   constructor(
     video: Video,
     emitMovement: (loc: UserLocation) => void,
+    emitCreateVehicle: (loc: UserLocation, type: string) => void,
     setNewConversation: (conv: ConversationArea) => void,
     myPlayerID: string,
   ) {
     super('PlayGame');
     this.video = video;
     this.emitMovement = emitMovement;
+    this.emitCreateVehicle = emitCreateVehicle;
     this.myPlayerID = myPlayerID;
     this.setNewConversation = setNewConversation;
   }
@@ -242,7 +246,7 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
   updateVehiclesLocations(vehicles: Vehicle[]) {
-    console.log(vehicles)
+    // console.log(vehicles)
     if (!this.ready) {
       this.vehicles = vehicles;
       return;
@@ -268,7 +272,7 @@ class CoveyGameScene extends Phaser.Scene {
       myPlayer = new Player(player.id, player.userName, location, player.visible);
       this.players.push(myPlayer);
     }
-    if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
+    if (this.physics && player.location) {
       let { sprite } = myPlayer;
       if (!sprite) {
         sprite = this.physics.add
@@ -286,7 +290,7 @@ class CoveyGameScene extends Phaser.Scene {
         myPlayer.sprite = sprite;
       }
       if (!sprite.anims) return;
-      console.log(sprite);
+      // console.log(sprite);
       sprite.setX(player.location.x);
       sprite.setY(player.location.y);
       myPlayer.label?.setX(player.location.x);
@@ -326,22 +330,20 @@ class CoveyGameScene extends Phaser.Scene {
       this.vehicles.push(myVehicle);
       // console.log(this.vehicles);
     }
-    console.log(myVehicle);
-    if (this.myPlayerID !== vehicle.gainDriverID() && this.physics && vehicle.location) {
+    // if (this.myPlayerID !== vehicle.gainDriverID() && this.physics && vehicle.location) {
+    if (this.physics && vehicle.location) {
       let { sprite } = myVehicle;
       if (!sprite) {
         sprite = this.physics.add
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - JB todo
           .sprite(0, 0, 'carAtlas', `car-${vehicle.location.rotation}`)
-          .setSize(30, 40)
-          .setOffset(0, 24)
-          // .setScale(0.1)
-          // .setSize(10, 10)
-          // .setOffset(0,0);
           // .setSize(30, 40)
-          // .setOffset(0, 24);
-        console.log(sprite);
+          // .setOffset(0, 24)
+          .setScale(0.1)
+          .setSize(10, 10)
+          .setOffset(0,0);
+        // console.log(sprite);
         const label = this.add.text(0, 0, `Driver: ${vehicle.gainDriverUserName()}`, {
           font: '18px monospace',
           color: '#000000',
@@ -351,7 +353,7 @@ class CoveyGameScene extends Phaser.Scene {
         myVehicle.sprite = sprite;
       }
       if (!sprite.anims) return;
-      console.log(sprite);
+      // console.log(sprite);
       sprite.setX(vehicle.location.x);
       sprite.setY(vehicle.location.y);
       myVehicle.label?.setX(vehicle.location.x);
@@ -778,19 +780,19 @@ class CoveyGameScene extends Phaser.Scene {
         this.currentVehicleArea = carArea;
         const myPlayer = this.players.find(p => p.id === this.myPlayerID);
         if (cursorKeys.space.isDown){
-          if (this.player && this.lastLocation && myPlayer && myPlayer.visible === true){
+          if (this.player && this.lastLocation && myPlayer && myPlayer.visible === true && myPlayer.location){
             // 1. We will just check whether or not the Player is visble or not.
             // If it is visble, we could control the Player normally.
             // If it is not visible, then we need to check whether or not the corresponding passenge of the vehicle is driver.
             // If it is driver, it would control the specific vehicle by findVehicleByUerID.
             // If it is not, it would not control anything.
             
-            
-            // const vehicle = this.emitCreateVehicle(this.lastLocation, 'Car');
-            // this.vehicles.push(vehicle)
-            // 后端需要通过这个部分把Player.visible改成false,并且在vehicle中加入对应的passenger,并将Passenger的driver设置为true。
-            // this.emitGetOnVehicle(vehicle.id)
             myPlayer.visible = false;
+            this.emitCreateVehicle(this.lastLocation, 'Car');
+
+            // 后端需要通过这个部分把Player.visible改成false,并且在vehicle中加入对应的passenger,并将Passenger的driver设置为true
+            // this.emitGetOnVehicle(vehicle.id)
+            
             this.player.sprite.setVisible(false);
             this.player.label.setVisible(false);
           }
@@ -979,7 +981,7 @@ class CoveyGameScene extends Phaser.Scene {
 
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
-  const { emitMovement, myPlayerID } = useCoveyAppState();
+  const { emitMovement, emitCreateVehicle, myPlayerID } = useCoveyAppState();
   const conversationAreas = useConversationAreas();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   const [newConversation, setNewConversation] = useState<ConversationArea>();
@@ -1010,7 +1012,7 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement, setNewConversation, myPlayerID);
+      const newGameScene = new CoveyGameScene(video, emitMovement, emitCreateVehicle, setNewConversation, myPlayerID);
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {

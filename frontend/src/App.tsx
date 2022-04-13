@@ -159,7 +159,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
 
       let localPlayers = initData.currentPlayers.map(sp => Player.fromServerPlayer(sp));
       // Should modify to 'let' ranther 'const' later because we need to add and delete the vehicle later
-      const localVehicles = initData.currentVehicles.map(sp => Vehicle.fromServerVehicle(sp));
+      let localVehicles = initData.currentVehicles.map(sp => Vehicle.fromServerVehicle(sp));
       let localConversationAreas = initData.conversationAreas.map(sa =>
         ConversationArea.fromServerConversationArea(sa),
       );
@@ -194,11 +194,15 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       // Something like that
       const emitCreateVehicle = (location: UserLocation, vehicleType: string) => {
         socket.emit('newVehicle', location, vehicleType )
-      }
+      };
       socket.on('newPlayer', (player: ServerPlayer) => {
         localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
         setPlayersInTown(localPlayers);
         recalculateNearbyPlayers();
+      });
+      socket.on('newVehicle', (vehicle: ServerVehicle)=>{
+        localVehicles = localVehicles.concat(Vehicle.fromServerVehicle(vehicle));
+        setVehiclesInTown(localVehicles);
       });
       socket.on('playerMoved', (player: ServerPlayer) => {
         if (player._id !== gamePlayerID) {

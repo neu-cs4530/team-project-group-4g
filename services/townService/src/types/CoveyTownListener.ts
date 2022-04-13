@@ -62,7 +62,7 @@ export default interface CoveyTownListener {
   onPlayerJoinedVehicle(passenger: Passenger): void;
 
   /**
-   * Called when a player joins a town
+   * Called when a player create a vehicle
    * @param newVehicle the new vehicle
    */
   onVehicleCreated(newVehicle: Vehicle): void;
