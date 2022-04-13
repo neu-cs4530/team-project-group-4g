@@ -224,6 +224,17 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           }
         }
       });
+      socket.on('playerInvisible', (player: ServerPlayer) => {
+        if (player._id !== gamePlayerID) {
+          const updatePlayer = localPlayers.find(p => p.id === player._id);
+          if (updatePlayer) {
+            updatePlayer.visible = false;
+          } else {
+            localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
+            setPlayersInTown(localPlayers);
+          }
+        }
+      });
       // add vehicleMoved() here ...
       socket.on('playerDisconnect', (disconnectedPlayer: ServerPlayer) => {
         localPlayers = localPlayers.filter(player => player.id !== disconnectedPlayer._id);

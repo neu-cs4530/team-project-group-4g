@@ -289,6 +289,10 @@ class CoveyGameScene extends Phaser.Scene {
         myPlayer.label = label;
         myPlayer.sprite = sprite;
       }
+      // this.physics.add.collider(sprite, worldLayer);
+      // this.physics.add.collider(sprite, wallsLayer);
+      // this.physics.add.collider(sprite, aboveLayer);
+      // this.physics.add.collider(sprite, onTheWallsLayer);
       if (!sprite.anims) return;
       // console.log(sprite);
       sprite.setX(player.location.x);
@@ -301,6 +305,11 @@ class CoveyGameScene extends Phaser.Scene {
         sprite.anims.stop();
         sprite.setTexture('atlas', `misa-${player.location.rotation}`);
       }
+    }
+    if (myPlayer.visible === false){
+      myPlayer.sprite?.setVisible(false);
+      myPlayer.label?.setVisible(false);
+      console.log(myPlayer.sprite);
     }
   }
 
@@ -331,7 +340,7 @@ class CoveyGameScene extends Phaser.Scene {
       console.log(this.vehicles);
     }
     // if (this.myPlayerID !== vehicle.gainDriverID() && this.physics && vehicle.location) {
-    if (this.myPlayerID!== myVehicle.gainDriverID() && this.physics && vehicle.location) {
+    if (this.physics && vehicle.location) {
       let { sprite } = myVehicle;
       if (!sprite) {
         sprite = this.physics.add
@@ -404,6 +413,7 @@ class CoveyGameScene extends Phaser.Scene {
       // }
       const myPlayer = this.players.find(p => p.id === this.myPlayerID)
       if(myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
+        // 下车的部分在这里
         // Do some socket thing here.
         // const vehicleID = this.emitGetOffVehicle();
         // const vehicle = this.vehicles.find(v => v.id === vehicleID)
@@ -413,10 +423,19 @@ class CoveyGameScene extends Phaser.Scene {
         //   this.emitDeleteVehicle();
         // }
         myPlayer.visible = true;
+        // this.player.sprite.setVisible(true);
         this.player.sprite.setVisible(true);
         this.player.label.setVisible(true);
       }
-      const speed = 175;
+      let speed = 175;
+      if (myPlayer?.visible === false){
+        const vehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
+        if (vehicle){
+          speed *= vehicle.speed;
+        } else {
+          speed = 0;
+        }
+      }
 
       const prevVelocity = this.player.sprite.body.velocity.clone();
       const body = this.player.sprite.body as Phaser.Physics.Arcade.Body;
@@ -793,8 +812,10 @@ class CoveyGameScene extends Phaser.Scene {
             // 后端需要通过这个部分把Player.visible改成false,并且在vehicle中加入对应的passenger,并将Passenger的driver设置为true
             // this.emitGetOnVehicle(vehicle.id)
             
+            // this.player.sprite.setVisible(false);
             this.player.sprite.setVisible(false);
             this.player.label.setVisible(false);
+            console.log(this.player.sprite.body);
           }
         }
         // if (cursorKeys.shift.isDown){
@@ -822,6 +843,11 @@ class CoveyGameScene extends Phaser.Scene {
     this.physics.add.collider(sprite, wallsLayer);
     this.physics.add.collider(sprite, aboveLayer);
     this.physics.add.collider(sprite, onTheWallsLayer);
+
+    // this.physics.add.collider(this.player.sprite, worldLayer);
+    // this.physics.add.collider(this.player.sprite, wallsLayer);
+    // this.physics.add.collider(this.player.sprite, aboveLayer);
+    // this.physics.add.collider(this.player.sprite, onTheWallsLayer);
 
     // Create the player's walking animations from the texture atlas. These are stored in the global
     // animation manager so any sprite can access them.
@@ -1025,7 +1051,7 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement, setNewConversation, myPlayerID]);
+  }, [video, emitMovement, emitCreateVehicle, setNewConversation, myPlayerID]);
 
   // This side Effect does not influence the create stage.
   // This Side Effect only affect the movement of the Player during animation.

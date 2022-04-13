@@ -246,6 +246,9 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     onPlayerMoved(movedPlayer: Player) {
       socket.emit('playerMoved', movedPlayer);
     },
+    onPlayerInvisible(invisiblePlayer: Player) {
+      socket.emit('playerInvisible', invisiblePlayer);
+    },
     onVehicleMoved(movedVehicle: Vehicle) {
       socket.emit('vehicleMoved', movedVehicle);
     },

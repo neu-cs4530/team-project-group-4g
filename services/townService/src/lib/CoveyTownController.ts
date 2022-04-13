@@ -224,9 +224,10 @@ export default class CoveyTownController {
       default:
         throw new Error('The vehicle type is not applicable');
     }
+    driver.visible = false;
     newVehicle.addPassenger(new Passenger(driver, newVehicle.id, true));
     this._vehicles.push(newVehicle);
-    
+    this._listeners.forEach(listener => listener.onPlayerInvisible(driver));
     this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
   }
 

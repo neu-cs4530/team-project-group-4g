@@ -43,7 +43,7 @@ export default abstract class Vehicle {
     this._id = nanoid();
     // this._passengers = [];
     // testUsage
-    this._passengers = [new Passenger(new Player('Xin'), this.id, true)];
+    this._passengers = [];
   }
 
   get id(): string {
