@@ -257,7 +257,7 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
   updatePlayerLocation(player: Player) {
-    // console.log(player)
+    console.log(player)
     let myPlayer = this.players.find(p => p.id === player.id);
     if (!myPlayer) {
       let { location } = player;
@@ -272,6 +272,8 @@ class CoveyGameScene extends Phaser.Scene {
       myPlayer = new Player(player.id, player.userName, location, player.visible);
       this.players.push(myPlayer);
     }
+    // Update the visible field in the front end player list;
+    myPlayer.visible = player.visible;
     if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
       let { sprite } = myPlayer;
       if (!sprite) {
@@ -305,12 +307,19 @@ class CoveyGameScene extends Phaser.Scene {
         sprite.anims.stop();
         sprite.setTexture('atlas', `misa-${player.location.rotation}`);
       }
+
+      // if (myPlayer.visible === false){
+      //   sprite.setAlpha(0);
+      //   myPlayer.label?.setVisible(false);
+      //   // console.log(myPlayer.sprite);
+      // }
     }
-    if (myPlayer.visible === false){
+    if (player.visible === false){
       myPlayer.sprite?.setVisible(false);
       myPlayer.label?.setVisible(false);
-      console.log(myPlayer.sprite);
+      // console.log(myPlayer.sprite);
     }
+    console.log(myPlayer);
   }
 
   updateVehicleLocation(vehicle: Vehicle) {

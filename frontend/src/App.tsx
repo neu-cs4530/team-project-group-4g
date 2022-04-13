@@ -229,9 +229,12 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           const updatePlayer = localPlayers.find(p => p.id === player._id);
           if (updatePlayer) {
             updatePlayer.visible = false;
+            setPlayersInTown(localPlayers);
+            console.log(localPlayers);
           } else {
             localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
             setPlayersInTown(localPlayers);
+            console.log(localPlayers);
           }
         }
       });
