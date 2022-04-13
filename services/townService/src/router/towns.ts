@@ -133,7 +133,8 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
    */
   app.post('/towns/:townID/vehicle', express.json(), async (req, res) => {
     try {
-      const result = addVehicleHandler({
+      const result = vehicleCreateHandler({
+        //conveyTownID no need
         coveyTownID: req.params.townID,
         sessionToken: req.body.sessionToken,
         conversationArea: req.body.conversationArea,
@@ -154,9 +155,14 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   /**
    * Deletes a vehicle from a town
    */
-  // app.delete('/vehicle/:townID', express.json(), async (req, res) => {
+
+  // app.delete('/towns/:townID/vehicle', express.json(), async (req, res) => {
   //   try {
   //     const result = await deleteVehicleHandler({
+  //       coveyTownID: req.params.townID,
+  //       sessionToken: req.body.sessionToken,
+  //       playerId: req.body.playerId,
+  //       vehicleLocation: req.body.location,
 
   //     });
   //     res.status(StatusCodes.OK).json(result);
