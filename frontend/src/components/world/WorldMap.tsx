@@ -8,7 +8,7 @@ import Video from '../../classes/Video/Video';
 import useConversationAreas from '../../hooks/useConversationAreas';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
 import usePlayerMovement from '../../hooks/usePlayerMovement';
-// import useVehicleMovement from '../../hooks/useVehicleMovement';
+import useVehicleMovement from '../../hooks/useVehicleMovement';
 import usePlayersInTown from '../../hooks/usePlayersInTown';
 import useVehiclesInTown from '../../hooks/useVehiclesInTown';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
@@ -82,6 +82,8 @@ class CoveyGameScene extends Phaser.Scene {
     label: Phaser.GameObjects.Text;
   };
 
+  // private vehicleSprite? : Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+
   private myPlayerID: string;
 
   private players: Player[] = [];
@@ -93,6 +95,8 @@ class CoveyGameScene extends Phaser.Scene {
   private carAreas: CarAreaGameObjects[] = [];
 
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys[] = [];
+
+  private collideLayers: Phaser.Tilemaps.TilemapLayer[] = [];
 
   /*
    * A "captured" key doesn't send events to the browser - they are trapped by Phaser
@@ -110,6 +114,8 @@ class CoveyGameScene extends Phaser.Scene {
   private video: Video;
 
   private emitMovement: (loc: UserLocation) => void;
+
+  private emitVehicleMovement: (loc: VehicleLocation) => void;
 
   private emitCreateVehicle: (loc: UserLocation, type: string) => void;
 
@@ -137,6 +143,7 @@ class CoveyGameScene extends Phaser.Scene {
   constructor(
     video: Video,
     emitMovement: (loc: UserLocation) => void,
+    emitVehicleMovement:(loc: VehicleLocation) => void,
     emitCreateVehicle: (loc: UserLocation, type: string) => void,
     setNewConversation: (conv: ConversationArea) => void,
     myPlayerID: string,
@@ -144,6 +151,7 @@ class CoveyGameScene extends Phaser.Scene {
     super('PlayGame');
     this.video = video;
     this.emitMovement = emitMovement;
+    this.emitVehicleMovement = emitVehicleMovement;
     this.emitCreateVehicle = emitCreateVehicle;
     this.myPlayerID = myPlayerID;
     this.setNewConversation = setNewConversation;
@@ -282,7 +290,7 @@ class CoveyGameScene extends Phaser.Scene {
           // @ts-ignore - JB todo
           .sprite(0, 0, 'atlas', `misa-${player.location.rotation}`)
           .setSize(30, 40)
-          .setOffset(0, 24);
+          // .setOffset(0, 24);
         const label = this.add.text(0, 0, myPlayer.userName, {
           font: '18px monospace',
           color: '#000000',
@@ -291,10 +299,6 @@ class CoveyGameScene extends Phaser.Scene {
         myPlayer.label = label;
         myPlayer.sprite = sprite;
       }
-      // this.physics.add.collider(sprite, worldLayer);
-      // this.physics.add.collider(sprite, wallsLayer);
-      // this.physics.add.collider(sprite, aboveLayer);
-      // this.physics.add.collider(sprite, onTheWallsLayer);
       if (!sprite.anims) return;
       // console.log(sprite);
       sprite.setX(player.location.x);
@@ -349,7 +353,7 @@ class CoveyGameScene extends Phaser.Scene {
       console.log(this.vehicles);
     }
     // if (this.myPlayerID !== vehicle.gainDriverID() && this.physics && vehicle.location) {
-    if (this.physics && vehicle.location) {
+    if (this.myPlayerID !== myVehicle.gainDriverID() && this.physics && vehicle.location) {
       let { sprite } = myVehicle;
       if (!sprite) {
         sprite = this.physics.add
@@ -360,7 +364,7 @@ class CoveyGameScene extends Phaser.Scene {
           // .setOffset(0, 24)
           .setScale(0.1)
           .setSize(10, 10)
-          .setOffset(0,0);
+          // .setOffset(0,0);
         // console.log(sprite);
         const label = this.add.text(0, 0, `Driver: ${vehicle.gainDriverUserName()}`, {
           font: '18px monospace',
@@ -405,21 +409,8 @@ class CoveyGameScene extends Phaser.Scene {
     if (this.paused) {
       return;
     }
-    // let speed = 175;
     if (this.player && this.cursors) {
-      // const myPlayer = this.players.find(p => p.id === this.myPlayerID);
-      // if (myPlayer){
-      //   switch(myPlayer.playerType){
-      //     case PlayerType.Car:
-      //       speed = 3* 175
-      //       break;
-      //     case PlayerType.Human:
-      //       speed =175;
-      //       break;
-      //     default:
-      //       speed = 175;
-      //   }
-      // }
+      // console.log(1)
       const myPlayer = this.players.find(p => p.id === this.myPlayerID)
       if(myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
         // 下车的部分在这里
@@ -436,14 +427,10 @@ class CoveyGameScene extends Phaser.Scene {
         this.player.sprite.setVisible(true);
         this.player.label.setVisible(true);
       }
-      let speed = 175;
+
+      let playerSpeed = 175;
       if (myPlayer?.visible === false){
-        const vehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
-        if (vehicle){
-          speed *= vehicle.speed;
-        } else {
-          speed = 0;
-        }
+        playerSpeed = 0;
       }
 
       const prevVelocity = this.player.sprite.body.velocity.clone();
@@ -455,19 +442,19 @@ class CoveyGameScene extends Phaser.Scene {
       const primaryDirection = this.getNewMovementDirection();
       switch (primaryDirection) {
         case 'left':
-          body.setVelocityX(-speed);
+          body.setVelocityX(-playerSpeed);
           this.player.sprite.anims.play('misa-left-walk', true);
           break;
         case 'right':
-          body.setVelocityX(speed);
+          body.setVelocityX(playerSpeed);
           this.player.sprite.anims.play('misa-right-walk', true);
           break;
         case 'front':
-          body.setVelocityY(speed);
+          body.setVelocityY(playerSpeed);
           this.player.sprite.anims.play('misa-front-walk', true);
           break;
         case 'back':
-          body.setVelocityY(-speed);
+          body.setVelocityY(-playerSpeed);
           this.player.sprite.anims.play('misa-back-walk', true);
           break;
         default:
@@ -485,17 +472,17 @@ class CoveyGameScene extends Phaser.Scene {
       }
 
       // Normalize and scale the velocity so that player can't move faster along a diagonal
-      this.player.sprite.body.velocity.normalize().scale(speed);
+      this.player.sprite.body.velocity.normalize().scale(playerSpeed);
 
       const isMoving = primaryDirection !== undefined;
       this.player.label.setX(body.x);
       this.player.label.setY(body.y - 20);
       if (
-        !this.lastLocation ||
+        (!this.lastLocation ||
         this.lastLocation.x !== body.x ||
         this.lastLocation.y !== body.y ||
         (isMoving && this.lastLocation.rotation !== primaryDirection) ||
-        this.lastLocation.moving !== isMoving
+        this.lastLocation.moving !== isMoving) && (myPlayer?.visible === true)
       ) {
         if (!this.lastLocation) {
           this.lastLocation = {
@@ -536,6 +523,85 @@ class CoveyGameScene extends Phaser.Scene {
           }
         } 
         this.emitMovement(this.lastLocation);
+      }
+
+      const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID)
+      if (myVehicle && myVehicle.sprite && myPlayer && myPlayer.visible === false){
+        // console.log(1);
+        // Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+        // for (let i = 0; i <= this.collideLayers.length; i+=1){
+        //   console.log('add');
+        //   this.physics.add.collider(myVehicle.sprite, this.collideLayers[i]);
+        // }
+        const vehicleSpeed = 175 * myVehicle.speed;
+        const vehilceSprite = myVehicle.sprite as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+        const preVehicleVelocity = vehilceSprite.body.velocity.clone();
+        const vehicleBody = vehilceSprite.body as Phaser.Physics.Arcade.Body;
+        vehicleBody.setVelocity(0);
+        // console.log(this.collideLayers);
+        // for (let i = 0; i <= this.collideLayers.length; i+=1){
+        //   // console.log('add');
+        //   this.physics.add.collider(vehilceSprite, this.collideLayers[i]);
+        // }
+        let lastVehicleLocation = myVehicle.location;
+        vehicleBody.setVelocity(0);
+        switch(primaryDirection) {
+          case 'left':
+            vehicleBody.setVelocityX(-vehicleSpeed);
+            vehilceSprite.anims.play('car-left-walk', true);
+            break;
+          case 'right':
+            vehicleBody.setVelocityX(vehicleSpeed);
+            vehilceSprite.anims.play('car-right-walk', true);
+            break;
+          case 'front':
+            vehicleBody.setVelocityY(vehicleSpeed);
+            vehilceSprite.anims.play('car-front-walk', true);
+            break;
+          case 'back':
+            vehicleBody.setVelocityY(-vehicleSpeed);
+            vehilceSprite.anims.play('car-back-walk', true);
+            break;
+          default:
+            // Not moving
+            vehilceSprite.anims.stop();
+            // If we were moving, pick and idle frame to use
+            if (preVehicleVelocity.x < 0) {
+              vehilceSprite.setTexture('carAtlas', 'car-left');
+            } else if (preVehicleVelocity.x > 0) {
+              vehilceSprite.setTexture('carAtlas', 'car-right');
+            } else if (preVehicleVelocity.y < 0) {
+              vehilceSprite.setTexture('carAtlas', 'car-back');
+            } else if (preVehicleVelocity.y > 0) vehilceSprite.setTexture('carAtlas', 'car-front');
+            break;
+        }
+        // vehilceSprite.body.velocity.normalize().scale(playerSpeed);
+        const isVehicleMoving = primaryDirection !== undefined;
+        myVehicle.label?.setX(vehicleBody.x);
+        myVehicle.label?.setY(vehicleBody.y - 20);
+        
+        if (
+          !lastVehicleLocation ||
+          lastVehicleLocation.x !== vehicleBody.x ||
+          lastVehicleLocation.y !== vehicleBody.y ||
+          (isVehicleMoving && lastVehicleLocation.rotation !== primaryDirection) ||
+          lastVehicleLocation.moving !== isVehicleMoving
+        ) {
+          if (!lastVehicleLocation) {
+            lastVehicleLocation = {
+              x: vehicleBody.x,
+              y: vehicleBody.y,
+              rotation: primaryDirection || 'front',
+              moving: isVehicleMoving,
+            };
+          }
+          lastVehicleLocation.x = vehicleBody.x;
+          lastVehicleLocation.y = vehicleBody.y;
+          lastVehicleLocation.rotation = primaryDirection || 'front';
+          lastVehicleLocation.moving = isVehicleMoving;
+
+        this.emitVehicleMovement(lastVehicleLocation);
+        }
       }
     }
   }
@@ -731,7 +797,7 @@ class CoveyGameScene extends Phaser.Scene {
     const sprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', `misa-front`)
       .setSize(30, 40)
-      .setOffset(0, 24);
+      // .setOffset(0, 24);
       // .setScale(0.1)
       // .setSize(10, 10)
       // .setOffset(0,0);
@@ -849,9 +915,23 @@ class CoveyGameScene extends Phaser.Scene {
 
     // Watch the player and worldLayer for collisions, for the duration of the scene:
     this.physics.add.collider(sprite, worldLayer);
+    this.collideLayers.push(worldLayer);
     this.physics.add.collider(sprite, wallsLayer);
+    this.collideLayers.push(wallsLayer);
     this.physics.add.collider(sprite, aboveLayer);
+    this.collideLayers.push(aboveLayer);
     this.physics.add.collider(sprite, onTheWallsLayer);
+    this.collideLayers.push(onTheWallsLayer);
+    const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID)
+    console.log('Create Page')
+    if (myVehicle && myVehicle.sprite){
+      console.log('addCollider')
+      this.physics.add.collider(myVehicle.sprite, worldLayer);
+      this.physics.add.collider(myVehicle.sprite, wallsLayer);
+      this.physics.add.collider(myVehicle.sprite, wallsLayer);
+      this.physics.add.collider(myVehicle.sprite, wallsLayer);
+    }
+    
 
     // this.physics.add.collider(this.player.sprite, worldLayer);
     // this.physics.add.collider(this.player.sprite, wallsLayer);
@@ -1016,11 +1096,12 @@ class CoveyGameScene extends Phaser.Scene {
 
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
-  const { emitMovement, emitCreateVehicle, myPlayerID } = useCoveyAppState();
+  const { emitMovement, emitCreateVehicle, emitVehicleMovement, myPlayerID } = useCoveyAppState();
   const conversationAreas = useConversationAreas();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   const [newConversation, setNewConversation] = useState<ConversationArea>();
   const playerMovementCallbacks = usePlayerMovement();
+  const vehicleMovementCallbacks = useVehicleMovement();
   const players = usePlayersInTown();
   const vehicles = useVehiclesInTown();
   console.log(players);
@@ -1047,7 +1128,7 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement, emitCreateVehicle, setNewConversation, myPlayerID);
+      const newGameScene = new CoveyGameScene(video, emitMovement, emitVehicleMovement, emitCreateVehicle, setNewConversation, myPlayerID);
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -1060,7 +1141,7 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement, emitCreateVehicle, setNewConversation, myPlayerID]);
+  }, [video, emitMovement, emitVehicleMovement, emitCreateVehicle, setNewConversation, myPlayerID]);
 
   // This side Effect does not influence the create stage.
   // This Side Effect only affect the movement of the Player during animation.
@@ -1073,6 +1154,17 @@ export default function WorldMap(): JSX.Element {
       playerMovementCallbacks.splice(playerMovementCallbacks.indexOf(movementDispatcher), 1);
     };
   }, [gameScene, playerMovementCallbacks]);
+
+  
+  useEffect(() => {
+    const movementDispatcher = (vehicle: ServerVehicle) => {
+      gameScene?.updateVehicleLocation(Vehicle.fromServerVehicle(vehicle));
+    };
+    vehicleMovementCallbacks.push(movementDispatcher);
+    return () => {
+      vehicleMovementCallbacks.splice(vehicleMovementCallbacks.indexOf(movementDispatcher), 1);
+    };
+  }, [gameScene, vehicleMovementCallbacks]);
 
   // When the town create, create the Player sprite according to the player list.
   // When the players list update, modify the Player sprite accordingly. 

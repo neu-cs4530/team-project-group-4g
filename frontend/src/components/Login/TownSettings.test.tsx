@@ -44,6 +44,8 @@ function wrappedTownSettings() {
     socket: null,
     emitMovement: () => {
     },
+    emitVehicleMovement: () => {
+    },
     emitCreateVehicle: () => {},
     apiClient: new TownsServiceClient(),
   }}>

@@ -399,10 +399,10 @@ export default class CoveyTownController {
    */
   updateVehicleLocation(vehicle: Vehicle | undefined, location: VehicleLocation): void {
     if (vehicle === undefined) {
-      return;
+      throw Error('There is no vehicle such a vehicle');
     }
     if (vehicle.passengers === undefined) {
-      return;
+      throw Error('There is no defined  passengers list');
     }
 
     vehicle.location = location;
@@ -414,11 +414,10 @@ export default class CoveyTownController {
       moving: location.moving,
     };
 
-    for (let i = 0, len = vehicle.passengers.length; i < len; i += 1) {
+    for (let i = 0; i < vehicle.passengers.length; i += 1) {
       const p = this.players.find(player => player.id === vehicle.passengers[i].id);
       if (p !== undefined) {
-        p.location = newUserLocation;
-        this.updatePlayerLocation(p, p.location);
+        this.updatePlayerLocation(p, newUserLocation);
       }
     }
 

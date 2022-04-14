@@ -323,6 +323,11 @@ export function townSubscriptionHandler(socket: Socket): void {
     townController.updatePlayerLocation(s.player, movementData);
   });
 
+  // // Xin Jin 2022/04/13
+  // socket.on('vehicleMovement', (movementData: VehicleLocation) => {
+  //   townController.updateVehicleLocation(s.player, movementData);
+  // });
+
   // Xin Jin 2022/04/12
   socket.on('newVehicle', (initLocation: UserLocation, vehicleType: string) => {
     townController.createInitVehicle(s.player, initLocation, vehicleType);

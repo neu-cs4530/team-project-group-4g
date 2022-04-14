@@ -33,6 +33,7 @@ import ConversationAreasContext from './contexts/ConversationAreasContext';
 import CoveyAppContext from './contexts/CoveyAppContext';
 import NearbyPlayersContext from './contexts/NearbyPlayersContext';
 import PlayerMovementContext, { PlayerMovementCallback } from './contexts/PlayerMovementContext';
+import VehicleMovementContext, { VehicleMovementCallback } from './contexts/VehicleMovementContext';
 import PlayersInTownContext from './contexts/PlayersInTownContext';
 import VehiclesInTownContext from './contexts/VehiclesInTownContext';
 import VideoContext from './contexts/VideoContext';
@@ -52,6 +53,7 @@ type CoveyAppUpdate =
         myPlayerID: string;
         socket: Socket;
         emitMovement: (location: UserLocation) => void;
+        emitVehicleMovement: (location: VehicleLocation) => void;
         emitCreateVehicle: (location: UserLocation, vehicleType: string) => void
       };
     }
@@ -67,6 +69,7 @@ function defaultAppState(): CoveyAppState {
     userName: '',
     socket: null,
     emitMovement: () => {},
+    emitVehicleMovement: ()=> {},
     emitCreateVehicle: () => {},
     apiClient: new TownsServiceClient(),
   };
@@ -81,6 +84,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     userName: state.userName,
     socket: state.socket,
     emitMovement: state.emitMovement,
+    emitVehicleMovement: state.emitVehicleMovement,
     emitCreateVehicle: state.emitCreateVehicle,
     apiClient: state.apiClient,
   };
@@ -94,6 +98,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.currentTownIsPubliclyListed = update.data.townIsPubliclyListed;
       nextState.userName = update.data.userName;
       nextState.emitMovement = update.data.emitMovement;
+      nextState.emitVehicleMovement = update.data.emitVehicleMovement;
       nextState.emitCreateVehicle = update.data.emitCreateVehicle;
       nextState.socket = update.data.socket;
       break;
@@ -132,6 +137,7 @@ function samePlayers(a1: Player[], a2: Player[]) {
 function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefined>> }) {
   const [appState, dispatchAppUpdate] = useReducer(appStateReducer, defaultAppState());
   const [playerMovementCallbacks] = useState<PlayerMovementCallback[]>([]);
+  const [vehicleMovementCallbacks] = useState<VehicleMovementCallback[]>([]);
   const [playersInTown, setPlayersInTown] = useState<Player[]>([]);
   const [vehiclesInTown, setVehiclesInTown] = useState<Vehicle[]>([]);
   const [nearbyPlayers, setNearbyPlayers] = useState<Player[]>([]);
@@ -191,6 +197,24 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           }
         }
       };
+      
+      const emitVehicleMovement = (location: VehicleLocation) => {
+        const now = Date.now();
+        // currentLocation = location;
+        if (now - lastMovement > MOVEMENT_UPDATE_DELAY_MS ) {
+        // if (now - lastMovement > MOVEMENT_UPDATE_DELAY_MS || !location.moving) {
+          // lastMovement = now;
+          socket.emit('vehicleMovement', location);
+          // if (
+          //   now - lastRecalculateNearbyPlayers > CALCULATE_NEARBY_PLAYERS_MOVING_DELAY_MS ||
+          //   !location.moving
+          // ) {
+          //   lastRecalculateNearbyPlayers = now;
+          //   recalculateNearbyPlayers();
+          // }
+        }
+      }
+
       // Something like that
       const emitCreateVehicle = (location: UserLocation, vehicleType: string) => {
         socket.emit('newVehicle', location, vehicleType )
@@ -224,6 +248,23 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           }
         }
       });
+      socket.on('vehicleMoved', (vehicle: ServerVehicle)=>{
+        // if (vehicle !== gamePlayerID) {
+          // const now = Date.now();
+          vehicleMovementCallbacks.forEach(cb => cb(vehicle));
+          if (
+            !vehicle.location.moving 
+          ) {
+            const updateVehicle = localVehicles.find(v => v.id === vehicle._id);
+            if (updateVehicle) {
+              updateVehicle.location = vehicle.location;
+            } else {
+              localVehicles = localVehicles.concat(Vehicle.fromServerVehicle(vehicle));
+              setVehiclesInTown(localVehicles);
+            }
+          }
+        // }
+      })
       socket.on('playerInvisible', (player: ServerPlayer) => {
         if (player._id !== gamePlayerID) {
           const updatePlayer = localPlayers.find(p => p.id === player._id);
@@ -279,6 +320,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           myPlayerID: gamePlayerID,
           townIsPubliclyListed: video.isPubliclyListed,
           emitMovement,
+          emitVehicleMovement,
           emitCreateVehicle,
           socket,
         },
@@ -289,6 +331,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
     [
       dispatchAppUpdate,
       playerMovementCallbacks,
+      vehicleMovementCallbacks,
       setPlayersInTown,
       setVehiclesInTown,
       setNearbyPlayers,
@@ -328,11 +371,13 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           <PlayerMovementContext.Provider value={playerMovementCallbacks}>
             <PlayersInTownContext.Provider value={playersInTown}>
               <NearbyPlayersContext.Provider value={nearbyPlayers}>
-                <VehiclesInTownContext.Provider value = {vehiclesInTown}>
-                  <ConversationAreasContext.Provider value={conversationAreas}>
-                    {page}
-                  </ConversationAreasContext.Provider>
-                </VehiclesInTownContext.Provider>
+                <VehicleMovementContext.Provider value = {vehicleMovementCallbacks}> 
+                  <VehiclesInTownContext.Provider value = {vehiclesInTown}>
+                    <ConversationAreasContext.Provider value={conversationAreas}>
+                      {page}
+                    </ConversationAreasContext.Provider>
+                  </VehiclesInTownContext.Provider>
+                </VehicleMovementContext.Provider> 
               </NearbyPlayersContext.Provider>
             </PlayersInTownContext.Provider>
           </PlayerMovementContext.Provider>
