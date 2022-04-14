@@ -117,6 +117,8 @@ class CoveyGameScene extends Phaser.Scene {
 
   private emitVehicleMovement: (loc: VehicleLocation) => void;
 
+  private emitDeleteVehicle: (vehicleID: string) => void;
+
   private emitCreateVehicle: (loc: UserLocation, type: string) => void;
 
   private currentConversationArea?: ConversationGameObjects;
@@ -144,6 +146,7 @@ class CoveyGameScene extends Phaser.Scene {
     video: Video,
     emitMovement: (loc: UserLocation) => void,
     emitVehicleMovement:(loc: VehicleLocation) => void,
+    emitDeleteVehicle: (vehicleID: string) => void,
     emitCreateVehicle: (loc: UserLocation, type: string) => void,
     setNewConversation: (conv: ConversationArea) => void,
     myPlayerID: string,
@@ -152,6 +155,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.video = video;
     this.emitMovement = emitMovement;
     this.emitVehicleMovement = emitVehicleMovement;
+    this.emitDeleteVehicle = emitDeleteVehicle;
     this.emitCreateVehicle = emitCreateVehicle;
     this.myPlayerID = myPlayerID;
     this.setNewConversation = setNewConversation;
@@ -262,6 +266,24 @@ class CoveyGameScene extends Phaser.Scene {
     vehicles.forEach(v => {
       this.updateVehicleLocation(v);
     });
+    // The following code do not affect the create and update of the sprite.
+    // Remove disconnected Vehicles from board
+    const disconnectedVehicles = this.vehicles.filter(
+      vehicle => !vehicles.find(v => v.id === vehicle.id),
+    );
+    disconnectedVehicles.forEach(disconnectedVehicle => {
+      if (disconnectedVehicle.sprite) {
+        disconnectedVehicle.sprite.destroy();
+        disconnectedVehicle.label?.destroy();
+      }
+    });
+    // Remove disconnected players from list
+    if (disconnectedVehicles.length) {
+      this.vehicles = this.vehicles.filter(
+        vehicle => !disconnectedVehicles.find(v => v.id === vehicle.id),
+      );
+    }
+    // console.log(players);
   }
 
   updatePlayerLocation(player: Player) {
@@ -322,6 +344,9 @@ class CoveyGameScene extends Phaser.Scene {
       myPlayer.sprite?.setVisible(false);
       myPlayer.label?.setVisible(false);
       // console.log(myPlayer.sprite);
+    } else {
+      myPlayer.sprite?.setVisible(true);
+      myPlayer.label?.setVisible(true);
     }
     console.log(myPlayer);
   }
@@ -411,7 +436,8 @@ class CoveyGameScene extends Phaser.Scene {
     }
     if (this.player && this.cursors) {
       const myPlayer = this.players.find(p => p.id === this.myPlayerID)
-      if(myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
+      const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
+      if(myVehicle && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
         // 下车的部分在这里
         // Do some socket thing here.
         // const vehicleID = this.emitGetOffVehicle();
@@ -421,14 +447,20 @@ class CoveyGameScene extends Phaser.Scene {
         //   // Go through the passenger to Make all Corresponding Player visible
         //   this.emitDeleteVehicle();
         // }
+        if (this.myPlayerID === myVehicle.gainDriverID()){
+          this.emitDeleteVehicle(myVehicle.id);
+        }; 
+        // The following should be the logic of passenger.
+        // else {
+
+        // };
         myPlayer.visible = true;
-        // this.player.sprite.setVisible(true);
         this.player.sprite
             .setTexture('atlas',`misa-${this.lastLocation?.rotation}`)
+            .setScale(1)
             .setSize(30, 40)
       }
 
-      const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
       let speed = 175;
       if (myPlayer?.visible === false && myVehicle){
         speed *= myVehicle.speed;
@@ -963,15 +995,15 @@ class CoveyGameScene extends Phaser.Scene {
     this.collideLayers.push(aboveLayer);
     this.physics.add.collider(sprite, onTheWallsLayer);
     this.collideLayers.push(onTheWallsLayer);
-    const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID)
-    console.log('Create Page')
-    if (myVehicle && myVehicle.sprite){
-      console.log('addCollider')
-      this.physics.add.collider(myVehicle.sprite, worldLayer);
-      this.physics.add.collider(myVehicle.sprite, wallsLayer);
-      this.physics.add.collider(myVehicle.sprite, wallsLayer);
-      this.physics.add.collider(myVehicle.sprite, wallsLayer);
-    }
+    // const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID)
+    // console.log('Create Page')
+    // if (myVehicle && myVehicle.sprite){
+    //   console.log('addCollider')
+    //   this.physics.add.collider(myVehicle.sprite, worldLayer);
+    //   this.physics.add.collider(myVehicle.sprite, wallsLayer);
+    //   this.physics.add.collider(myVehicle.sprite, wallsLayer);
+    //   this.physics.add.collider(myVehicle.sprite, wallsLayer);
+    // }
     
 
     // this.physics.add.collider(this.player.sprite, worldLayer);
@@ -1137,7 +1169,7 @@ class CoveyGameScene extends Phaser.Scene {
 
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
-  const { emitMovement, emitCreateVehicle, emitVehicleMovement, myPlayerID } = useCoveyAppState();
+  const { emitMovement, emitCreateVehicle, emitVehicleMovement, emitDeleteVehicle, myPlayerID } = useCoveyAppState();
   const conversationAreas = useConversationAreas();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   const [newConversation, setNewConversation] = useState<ConversationArea>();
@@ -1169,7 +1201,7 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement, emitVehicleMovement, emitCreateVehicle, setNewConversation, myPlayerID);
+      const newGameScene = new CoveyGameScene(video, emitMovement, emitVehicleMovement, emitDeleteVehicle, emitCreateVehicle, setNewConversation, myPlayerID);
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -1182,7 +1214,7 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement, emitVehicleMovement, emitCreateVehicle, setNewConversation, myPlayerID]);
+  }, [video, emitMovement, emitVehicleMovement, emitDeleteVehicle, emitCreateVehicle, setNewConversation, myPlayerID]);
 
   // This side Effect does not influence the create stage.
   // This Side Effect only affect the movement of the Player during animation.

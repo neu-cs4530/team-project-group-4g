@@ -27,6 +27,12 @@ export default interface CoveyTownListener {
   onPlayerInvisible(invisiblePlayer: Player):void;
 
   /**
+   * Called when a player change to visible.
+   * @param visiblePlayer
+   */
+  onPlayerVisible(visiblePlayer: Player):void;
+
+  /**
    * Called when a vehicle's location changes
    * @param movedVehicle the vehicle that moved 
    */
@@ -72,5 +78,7 @@ export default interface CoveyTownListener {
    * @param newVehicle the new vehicle
    */
   onVehicleCreated(newVehicle: Vehicle): void;
+
+  onVehicleDestroyed(destroyedVehicle: Vehicle): void;
 
 }

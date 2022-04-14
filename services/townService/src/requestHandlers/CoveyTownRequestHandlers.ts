@@ -249,6 +249,9 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     onPlayerInvisible(invisiblePlayer: Player) {
       socket.emit('playerInvisible', invisiblePlayer);
     },
+    onPlayerVisible(visiblePlayer: Player) {
+      socket.emit('playerVisible', visiblePlayer);
+    },
     onVehicleMoved(movedVehicle: Vehicle) {
       socket.emit('vehicleMoved', movedVehicle);
     },
@@ -274,6 +277,9 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     /** Add the emits for the listeners */
     onVehicleCreated(newVehicle: Vehicle) {
       socket.emit('VehicleCreated', newVehicle);
+    },
+    onVehicleDestroyed(destroyedVehicle: Vehicle){
+      socket.emit('VehicleDestroyed', destroyedVehicle);
     },
     onPlayerJoinedVehicle(passenger: Passenger) {
       socket.emit('PlayerJoined', passenger);
@@ -340,5 +346,9 @@ export function townSubscriptionHandler(socket: Socket): void {
     //   townController.updateVehicleLocation(s.player.vehicle, movementData);
     // }
     townController.updateVehicleLocation(townController.findVehicle(s.player.id), movementData);
+  });
+
+  socket.on('destroyVehicle', (vehicleID: string) =>{
+    townController.destroyVehicle(vehicleID);
   });
 }

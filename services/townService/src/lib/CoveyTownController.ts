@@ -231,6 +231,23 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
   }
 
+  destroyVehicle(vehicleID: string) : void {
+    const vehicle = this.vehicles.find(v => v.id === vehicleID);
+    if (!vehicle){
+      throw new Error('You could not destroy an unexist vehicle');
+    } else {
+      this._vehicles = this._vehicles.filter(v => v.id !== vehicle.id);
+      this._listeners.forEach(listener => listener.onVehicleDestroyed(vehicle));
+      for (let i = 0; i < vehicle.passengers.length; i += 1){
+        const player = this.players.find(p => p.id === vehicle.passengers[i].id);
+        if (player){
+          player.visible = true;
+          this._listeners.forEach(listener => listener.onPlayerVisible(player));
+        }
+      }
+    }
+  }
+
   /**
    * Removes a player from a conversation area, updating the conversation area's occupants list, 
    * and emitting the appropriate message (area updated or area destroyed)

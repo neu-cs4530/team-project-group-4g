@@ -46,6 +46,8 @@ function wrappedTownSettings() {
     },
     emitVehicleMovement: () => {
     },
+    emitDeleteVehicle: () => {
+    },
     emitCreateVehicle: () => {},
     apiClient: new TownsServiceClient(),
   }}>

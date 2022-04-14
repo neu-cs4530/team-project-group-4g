@@ -54,6 +54,7 @@ type CoveyAppUpdate =
         socket: Socket;
         emitMovement: (location: UserLocation) => void;
         emitVehicleMovement: (location: VehicleLocation) => void;
+        emitDeleteVehicle: (vehicleID: string) => void;
         emitCreateVehicle: (location: UserLocation, vehicleType: string) => void
       };
     }
@@ -70,6 +71,7 @@ function defaultAppState(): CoveyAppState {
     socket: null,
     emitMovement: () => {},
     emitVehicleMovement: ()=> {},
+    emitDeleteVehicle: ()=>{},
     emitCreateVehicle: () => {},
     apiClient: new TownsServiceClient(),
   };
@@ -85,6 +87,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     socket: state.socket,
     emitMovement: state.emitMovement,
     emitVehicleMovement: state.emitVehicleMovement,
+    emitDeleteVehicle: state.emitDeleteVehicle,
     emitCreateVehicle: state.emitCreateVehicle,
     apiClient: state.apiClient,
   };
@@ -99,6 +102,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.userName = update.data.userName;
       nextState.emitMovement = update.data.emitMovement;
       nextState.emitVehicleMovement = update.data.emitVehicleMovement;
+      nextState.emitDeleteVehicle = update.data.emitDeleteVehicle;
       nextState.emitCreateVehicle = update.data.emitCreateVehicle;
       nextState.socket = update.data.socket;
       break;
@@ -202,6 +206,10 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         socket.emit('vehicleMovement', location);
       }
 
+      const emitDeleteVehicle = (vehicleID: string) => {
+        socket.emit('destroyVehicle', vehicleID);
+      }
+
       // Something like that
       const emitCreateVehicle = (location: UserLocation, vehicleType: string) => {
         socket.emit('newVehicle', location, vehicleType )
@@ -213,6 +221,11 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       });
       socket.on('VehicleCreated', (vehicle: ServerVehicle)=>{
         localVehicles = localVehicles.concat(Vehicle.fromServerVehicle(vehicle));
+        setVehiclesInTown(localVehicles);
+      });
+
+      socket.on('VehicleDestroyed', (vehicle:ServerVehicle)=>{
+        localVehicles = localVehicles.filter(v => v.id !== vehicle._id);
         setVehiclesInTown(localVehicles);
       });
       socket.on('playerMoved', (player: ServerPlayer) => {
@@ -266,6 +279,22 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           }
         }
       });
+
+      socket.on('playerVisible', (player: ServerPlayer) => {
+        if (player._id !== gamePlayerID) {
+          const updatePlayer = localPlayers.find(p => p.id === player._id);
+          if (updatePlayer) {
+            updatePlayer.visible = true;
+            setPlayersInTown(localPlayers);
+          } else {
+            localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
+            setPlayersInTown(localPlayers);
+          }
+        }
+      });
+
+
+
       // add vehicleMoved() here ...
       socket.on('playerDisconnect', (disconnectedPlayer: ServerPlayer) => {
         localPlayers = localPlayers.filter(player => player.id !== disconnectedPlayer._id);
@@ -308,6 +337,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           townIsPubliclyListed: video.isPubliclyListed,
           emitMovement,
           emitVehicleMovement,
+          emitDeleteVehicle,
           emitCreateVehicle,
           socket,
         },

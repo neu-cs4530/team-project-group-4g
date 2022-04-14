@@ -93,6 +93,8 @@ function wrappedTownSelection() {
     },
     emitVehicleMovement: ()=>{
     },
+    emitDeleteVehicle: ()=>{
+    },
     emitCreateVehicle: () => {},
     apiClient: new TownsServiceClient(),
   }}><ChatProvider>
