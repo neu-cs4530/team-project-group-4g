@@ -9,7 +9,7 @@ export default class Car extends Vehicle{
   constructor() {
     super();
     this._capacity = 4;
-    this._speed = 10;
+    this._speed = 2;
     this._type = 'Car';
   }
 

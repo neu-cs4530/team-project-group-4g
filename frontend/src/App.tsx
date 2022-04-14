@@ -199,20 +199,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       };
       
       const emitVehicleMovement = (location: VehicleLocation) => {
-        const now = Date.now();
-        // currentLocation = location;
-        if (now - lastMovement > MOVEMENT_UPDATE_DELAY_MS ) {
-        // if (now - lastMovement > MOVEMENT_UPDATE_DELAY_MS || !location.moving) {
-          // lastMovement = now;
-          socket.emit('vehicleMovement', location);
-          // if (
-          //   now - lastRecalculateNearbyPlayers > CALCULATE_NEARBY_PLAYERS_MOVING_DELAY_MS ||
-          //   !location.moving
-          // ) {
-          //   lastRecalculateNearbyPlayers = now;
-          //   recalculateNearbyPlayers();
-          // }
-        }
+        socket.emit('vehicleMovement', location);
       }
 
       // Something like that
