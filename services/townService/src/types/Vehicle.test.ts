@@ -8,7 +8,7 @@ describe('check Car construction', () => {
     expect(car.capacity === 4).toBe(true);
   }); 
   it('should have 10 velocity', ()=>{
-    expect(car.speed === 10).toBe(true);
+    expect(car.speed === 2).toBe(true);
   });
   it('should return car string when call getVehicleType', () => {
     expect(car.getVehicleType() === 'Car').toBe(true);
@@ -21,7 +21,7 @@ describe('check SkateBoard construction', () => {
     expect(skateBoard.capacity === 1).toBe(true);
   });
   it('should have 2 velocity', ()=>{
-    expect(skateBoard.speed === 2).toBe(true);
+    expect(skateBoard.speed === 1.2).toBe(true);
   });
   it('should return skateBoard string when call getVehicleType', () => {
     expect(skateBoard.getVehicleType() === 'SkateBoard').toBe(true);
@@ -34,7 +34,7 @@ describe('check Dinosaur construction', () => {
     expect(dinosaur.capacity === 2).toBe(true);
   });
   it('should have 5 velocity', ()=>{
-    expect(dinosaur.speed === 5).toBe(true);
+    expect(dinosaur.speed === 1.5).toBe(true);
   });
   it('should return car string when call getVehicleType', () => {
     expect(dinosaur.getVehicleType() === 'Dinosaur').toBe(true);
