@@ -55,7 +55,9 @@ type CoveyAppUpdate =
         emitMovement: (location: UserLocation) => void;
         emitVehicleMovement: (location: VehicleLocation) => void;
         emitDeleteVehicle: (vehicleID: string) => void;
+        emitGetOffVehicle: (vehicleID: string) => void;
         emitCreateVehicle: (location: UserLocation, vehicleType: string) => void
+        emitGetOnVehicle: (vehicleID: string) => void;
       };
     }
   | { action: 'disconnect' };
@@ -72,7 +74,9 @@ function defaultAppState(): CoveyAppState {
     emitMovement: () => {},
     emitVehicleMovement: ()=> {},
     emitDeleteVehicle: ()=>{},
+    emitGetOffVehicle: ()=>{},
     emitCreateVehicle: () => {},
+    emitGetOnVehicle: () => {},
     apiClient: new TownsServiceClient(),
   };
 }
@@ -88,7 +92,9 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     emitMovement: state.emitMovement,
     emitVehicleMovement: state.emitVehicleMovement,
     emitDeleteVehicle: state.emitDeleteVehicle,
+    emitGetOffVehicle: state.emitGetOffVehicle,
     emitCreateVehicle: state.emitCreateVehicle,
+    emitGetOnVehicle: state.emitGetOnVehicle,
     apiClient: state.apiClient,
   };
 
@@ -103,7 +109,9 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.emitMovement = update.data.emitMovement;
       nextState.emitVehicleMovement = update.data.emitVehicleMovement;
       nextState.emitDeleteVehicle = update.data.emitDeleteVehicle;
+      nextState.emitGetOffVehicle = update.data.emitGetOffVehicle;
       nextState.emitCreateVehicle = update.data.emitCreateVehicle;
+      nextState.emitGetOnVehicle = update.data.emitGetOnVehicle;
       nextState.socket = update.data.socket;
       break;
     case 'disconnect':
@@ -203,6 +211,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       };
       
       const emitVehicleMovement = (location: VehicleLocation) => {
+        // console.log(localPlayers);
         socket.emit('vehicleMovement', location);
       }
 
@@ -210,10 +219,19 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         socket.emit('destroyVehicle', vehicleID);
       }
 
+      const emitGetOffVehicle = (vehicleID: string) => {
+        socket.emit('getOffVehicle', vehicleID)
+      }
+
       // Something like that
       const emitCreateVehicle = (location: UserLocation, vehicleType: string) => {
         socket.emit('newVehicle', location, vehicleType )
       };
+
+      const emitGetOnVehicle = (vehicleID: string) => {
+        socket.emit('getOnVehicle', vehicleID)
+      }
+      
       socket.on('newPlayer', (player: ServerPlayer) => {
         localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
         setPlayersInTown(localPlayers);
@@ -223,13 +241,114 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         localVehicles = localVehicles.concat(Vehicle.fromServerVehicle(vehicle));
         setVehiclesInTown(localVehicles);
       });
+      socket.on('VehicleUpdatePassengers', (vehicle: ServerVehicle, passengerPlayer: ServerPlayer) => {
+        // console.log(localPlayers);
+        // for (let i = 1; i < localPlayers.length; i += 1){
+        //   if (localPlayers[i].id === passengerPlayerID){
+        //     localPlayers[i].visible = false;
+        //   }
+        // }
+        // console.log(localPlayers);
+        // setPlayersInTown(localPlayers)
 
-      socket.on('VehicleDestroyed', (vehicle:ServerVehicle)=>{
+        // for (let i = 1; i < localVehicles.length; i += 1){
+        //   if (localVehicles[i].id === vehicle._id){
+        //     localVehicles[i].passengers = vehicle._passengers;
+        //   }
+        // }
+        // setVehiclesInTown(localVehicles);
+        
+        const updatedVehicle = localVehicles.find(v => v.id === vehicle._id);
+        if (updatedVehicle) {
+          updatedVehicle.passengers = vehicle._passengers;
+          // setVehiclesInTown(localVehicles);
+        } else {
+          localVehicles = localVehicles.concat(Vehicle.fromServerVehicle(vehicle));
+          setVehiclesInTown(localVehicles);
+        }
+
+        const updatedPlayer = localPlayers.find(p => p.id === passengerPlayer._id);
+        if (updatedPlayer) {
+          updatedPlayer.visible = false;
+          // setPlayersInTown(localPlayers);
+        } else {
+          localPlayers = localPlayers.concat(Player.fromServerPlayer(passengerPlayer))
+          setPlayersInTown(localPlayers);
+        }
+
+
+        // if ((localVehicles.find( v => v.id === vehicle._id)) && (localPlayers.find( p => p.id === passengerPlayerID))){
+        //   (localVehicles.find( v => v.id === vehicle._id)).passengers = vehicle._passengers;
+        //   passengerPlayer.visible = false;
+        //   console.log(localPlayers);
+        //   setPlayersInTown(localPlayers);
+        //   setVehiclesInTown(localVehicles);
+        //   console.log(localPlayers)
+        // } else {
+        //   throw new Error ('Did not find the vehicle || Did not find the passenger sPlayer');
+        // }
+      });
+
+      socket.on('VehicleGetOffPassengers', (vehicle: ServerVehicle, passengerPlayer: ServerPlayer) => {
+        const updatedVehicle = localVehicles.find(v => v.id === vehicle._id);
+        if (updatedVehicle) {
+          updatedVehicle.passengers = vehicle._passengers;
+          // setVehiclesInTown(localVehicles);
+        } else {
+          localVehicles = localVehicles.concat(Vehicle.fromServerVehicle(vehicle));
+          setVehiclesInTown(localVehicles);
+        }
+
+        const updatedPlayer = localPlayers.find(p => p.id === passengerPlayer._id);
+        if (updatedPlayer) {
+          updatedPlayer.visible = true;
+          // setPlayersInTown(localPlayers);
+        } else {
+          localPlayers = localPlayers.concat(Player.fromServerPlayer(passengerPlayer))
+          setPlayersInTown(localPlayers);
+        }
+      });
+
+      socket.on('VehicleDestroyed', (vehicle:ServerVehicle, passengerPlayerList: ServerPlayer[])=>{  
+        for (let i = 0; i < passengerPlayerList.length; i += 1 ) {
+          const updatedPlayer = localPlayers.find(p => p.id === passengerPlayerList[i]._id)
+          if (updatedPlayer) {
+            updatedPlayer.visible = true;
+          } else {
+            localPlayers = localPlayers.concat(Player.fromServerPlayer(passengerPlayerList[i]));
+            setPlayersInTown(localPlayers);
+          }
+        }
         localVehicles = localVehicles.filter(v => v.id !== vehicle._id);
         setVehiclesInTown(localVehicles);
+            
+        
+        // console.log(localPlayers);  
+        // for (let i = 0; i < vehicle._passengers.length; i += 1) {
+        //   // console.log(vehicle._passengers[i]);
+        //   const passengerPlayerID = vehicle._passengers[i]._player._id;
+        //   // console.log(passengerPlayerID);
+        //   const updatedPlayer = localPlayers.find(p => p.id === passengerPlayerID);
+        //   console.log(updatedPlayer);
+        //   if (updatedPlayer) {
+        //     updatedPlayer.visible = true;
+        //   }
+        // }
+        // localVehicles = localVehicles.filter(v => v.id !== vehicle._id);
+        // // const testUserLocation : UserLocation = {
+        // //   x : 0,
+        // //   y : 0,
+        // //   rotation : 'front',
+        // //   moving : true,
+        // // };
+        // // localPlayers.concat(new Player("test",'test', testUserLocation,));
+        // console.log(localPlayers);
+        // setPlayersInTown(localPlayers);
+        // console.log(3)
+        // setVehiclesInTown(localVehicles);
       });
       socket.on('playerMoved', (player: ServerPlayer) => {
-        if (player._id !== gamePlayerID) {
+        // if ((player._id !== gamePlayerID) || (player.visible === false)) {
           const now = Date.now();
           playerMovementCallbacks.forEach(cb => cb(player));
           if (
@@ -246,7 +365,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
             }
             recalculateNearbyPlayers();
           }
-        }
+        // }
       });
       socket.on('vehicleMoved', (vehicle: ServerVehicle)=>{
         // if (vehicle !== gamePlayerID) {
@@ -338,7 +457,9 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           emitMovement,
           emitVehicleMovement,
           emitDeleteVehicle,
+          emitGetOffVehicle,
           emitCreateVehicle,
+          emitGetOnVehicle,
           socket,
         },
       });

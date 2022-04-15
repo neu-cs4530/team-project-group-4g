@@ -119,7 +119,11 @@ class CoveyGameScene extends Phaser.Scene {
 
   private emitDeleteVehicle: (vehicleID: string) => void;
 
+  private emitGetOffVehicle: (vehicleID: string) => void;
+
   private emitCreateVehicle: (loc: UserLocation, type: string) => void;
+
+  private emitGetOnVehicle: (vehicleID: string) => void;
 
   private currentConversationArea?: ConversationGameObjects;
 
@@ -147,7 +151,9 @@ class CoveyGameScene extends Phaser.Scene {
     emitMovement: (loc: UserLocation) => void,
     emitVehicleMovement:(loc: VehicleLocation) => void,
     emitDeleteVehicle: (vehicleID: string) => void,
+    emitGetOffVehicle: (vehicleID: string) => void,
     emitCreateVehicle: (loc: UserLocation, type: string) => void,
+    emitGetOnVehicle: (vehicleID: string) => void,
     setNewConversation: (conv: ConversationArea) => void,
     myPlayerID: string,
   ) {
@@ -156,7 +162,9 @@ class CoveyGameScene extends Phaser.Scene {
     this.emitMovement = emitMovement;
     this.emitVehicleMovement = emitVehicleMovement;
     this.emitDeleteVehicle = emitDeleteVehicle;
+    this.emitGetOffVehicle = emitGetOffVehicle;
     this.emitCreateVehicle = emitCreateVehicle;
+    this.emitGetOnVehicle = emitGetOnVehicle;
     this.myPlayerID = myPlayerID;
     this.setNewConversation = setNewConversation;
   }
@@ -304,6 +312,7 @@ class CoveyGameScene extends Phaser.Scene {
     }
     // Update the visible field in the front end player list;
     myPlayer.visible = player.visible;
+
     if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
       let { sprite } = myPlayer;
       if (!sprite) {
@@ -312,7 +321,7 @@ class CoveyGameScene extends Phaser.Scene {
           // @ts-ignore - JB todo
           .sprite(0, 0, 'atlas', `misa-${player.location.rotation}`)
           .setSize(30, 40)
-          // .setOffset(0, 24);
+          .setOffset(0, 24);
         const label = this.add.text(0, 0, myPlayer.userName, {
           font: '18px monospace',
           color: '#000000',
@@ -339,16 +348,71 @@ class CoveyGameScene extends Phaser.Scene {
       //   myPlayer.label?.setVisible(false);
       //   // console.log(myPlayer.sprite);
       // }
+      // console.log(player.visible);
+      if (player.visible === false){
+        myPlayer.sprite?.setVisible(false);
+        myPlayer.label?.setVisible(false);
+        // console.log(myPlayer.sprite);
+      } else {
+        myPlayer.sprite?.setVisible(true);
+        myPlayer.label?.setVisible(true);
+      }
     }
-    if (player.visible === false){
-      myPlayer.sprite?.setVisible(false);
-      myPlayer.label?.setVisible(false);
-      // console.log(myPlayer.sprite);
-    } else {
-      myPlayer.sprite?.setVisible(true);
-      myPlayer.label?.setVisible(true);
+
+    const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
+    // if (this.myPlayerID === myPlayer.id && this.player && this.player.sprite.visible === false && myPlayer.visible === false && !myVehicle && player.visible === false && player.location && this.lastLocation){
+    //   console.log(0)
+    //   this.player.sprite.x = player.location.x;
+    //   this.player.sprite.y = player.location.y;
+    //   this.lastLocation.x = player.location.x;
+    //   this.lastLocation.y = player.location.y;
+    // }
+
+    // if (this.myPlayerID === myPlayer.id && this.player && this.player.sprite.visible === false && !myVehicle && player.location && this.lastLocation){
+    //   console.log(0)
+    //   this.player.sprite.x = player.location.x;
+    //   this.player.sprite.y = player.location.y;
+    //   this.lastLocation.x = player.location.x;
+    //   this.lastLocation.y = player.location.y;
+    //   console.log(player.visible)
+    //   if (player.visible === true) {
+    //     console.log(1)
+    //     this.player.sprite.setVisible(true);
+    //     this.player.label.setVisible(true);
+    //     myPlayer.visible = true;
+    //   }
+    // }
+
+    if (this.myPlayerID === myPlayer.id && this.player?.sprite.visible === false && player.location && this.lastLocation){
+      // console.log(player.visible);
+      this.player.sprite.x = player.location.x;
+      this.player.sprite.y = player.location.y;
+      this.lastLocation.x = player.location.x;
+      this.lastLocation.y = player.location.y;
+      if (player.visible === true) {
+        // console.log('go there')
+        this.player.sprite.setVisible(true);
+        this.player.label.setVisible(true);
+        myPlayer.visible = true;
+      }
     }
-    console.log(myPlayer);
+
+    // if (this.myPlayerID === myPlayer.id && this.player && this.player.sprite.visible === false && player.visible === true && !myVehicle) {
+    //   console.log(1)
+    //   this.player.sprite.setVisible(true);
+    //   this.player.label.setVisible(true);
+    //   myPlayer.visible = true;
+    // }
+
+    // if (player.visible === false){
+    //   myPlayer.sprite?.setVisible(false);
+    //   myPlayer.label?.setVisible(false);
+    //   // console.log(myPlayer.sprite);
+    // } else {
+    //   myPlayer.sprite?.setVisible(true);
+    //   myPlayer.label?.setVisible(true);
+    // }
+    // console.log(myPlayer);
   }
 
   updateVehicleLocation(vehicle: Vehicle) {
@@ -375,7 +439,7 @@ class CoveyGameScene extends Phaser.Scene {
 
       myVehicle = new Vehicle(vehicle.id, vehicle.vehicleType, vehicle.capacity, vehicle.speed, location, passengers);
       this.vehicles.push(myVehicle);
-      console.log(this.vehicles);
+      // console.log(this.vehicles);
     }
     // if (this.myPlayerID !== vehicle.gainDriverID() && this.physics && vehicle.location) {
     if (this.myPlayerID !== myVehicle.gainDriverID() && this.physics && vehicle.location) {
@@ -398,6 +462,28 @@ class CoveyGameScene extends Phaser.Scene {
         });
         myVehicle.label = label;
         myVehicle.sprite = sprite;
+
+        const cursorKeys = this.input.keyboard.createCursorKeys();
+        const myPlayer = this.players.find(p => p.id === this.myPlayerID);
+        if (this.player && this.player.sprite && myPlayer){
+          this.physics.add.overlap(
+            this.player.sprite,
+            sprite,
+            (overlappingPlayer) => {
+              if (cursorKeys.space.isDown){
+                if (this.player && myPlayer && myPlayer.visible === true && myVehicle){                  
+                  myPlayer.visible = false;
+                  this.player.sprite.setVisible(false);
+                  this.player.label.setVisible(false);
+                  this.emitGetOnVehicle(myVehicle.id);
+                }
+              }
+              if (myPlayer?.visible === true){
+                // this.infoTextBoxForVehicle?.setVisible(true);
+              }
+            },
+          );
+        }
       }
       if (!sprite.anims) return;
       // console.log(sprite);
@@ -449,156 +535,197 @@ class CoveyGameScene extends Phaser.Scene {
         // }
         if (this.myPlayerID === myVehicle.gainDriverID()){
           this.emitDeleteVehicle(myVehicle.id);
-        }; 
-        // The following should be the logic of passenger.
-        // else {
-
-        // };
+        }
         myPlayer.visible = true;
         this.player.sprite
             .setTexture('atlas',`misa-${this.lastLocation?.rotation}`)
             .setScale(1)
             .setSize(30, 40)
-      }
+        this.player.sprite.setVisible(true);
+      };
+
+      if(!myVehicle && myPlayer && myPlayer.visible === false && this.player.sprite.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
+        const vehicleAsPassenger = this.vehicles.find(v => v.includesPassenger(this.myPlayerID));
+        if (vehicleAsPassenger) {
+          this.emitGetOffVehicle(vehicleAsPassenger.id);
+        }
+        myPlayer.visible = true;
+        this.player.sprite
+            .setTexture('atlas',`misa-${this.lastLocation?.rotation}`)
+            .setScale(1)
+            .setSize(30, 40)
+        this.player.sprite.setVisible(true);
+      };
+
+      // if(this.player.sprite.visible === false && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
+      //   // 下车的部分在这里
+      //   // Do some socket thing here.
+      //   // const vehicleID = this.emitGetOffVehicle();
+      //   // const vehicle = this.vehicles.find(v => v.id === vehicleID)
+      //   // if (vehicle && vehicle.gainDriverID() === myPlayer.id){
+      //   //   this.vehicles = this.vehicles.filter(v => v.id !== vehicleID)
+      //   //   // Go through the passenger to Make all Corresponding Player visible
+      //   //   this.emitDeleteVehicle();
+      //   // }
+      //   if (this.myPlayerID === myVehicle?.gainDriverID()){
+      //     this.emitDeleteVehicle(myVehicle.id);
+      //   }else{
+      //     const vehicleAsPassenger = this.vehicles.find(v => v.includesPassenger(this.myPlayerID));
+      //     if (vehicleAsPassenger){
+      //       this.emitGetOffVehicle(vehicleAsPassenger.id);
+      //     }
+      //   }
+      //   myPlayer.visible = true;
+      //   this.player.sprite
+      //       .setTexture('atlas',`misa-${this.lastLocation?.rotation}`)
+      //       .setScale(1)
+      //       .setSize(30, 40)
+      // }
 
       let speed = 175;
       if (myPlayer?.visible === false && myVehicle){
         speed *= myVehicle.speed;
       }
 
-      const prevVelocity = this.player.sprite.body.velocity.clone();
-      const body = this.player.sprite.body as Phaser.Physics.Arcade.Body;
-
-      // Stop any previous movement from the last frame
-      body.setVelocity(0);
-
-      const primaryDirection = this.getNewMovementDirection();
-      switch (primaryDirection) {
-        case 'left':
-          body.setVelocityX(-speed);
-          if (myPlayer?.visible === true) {
-            this.player.sprite.anims.play('misa-left-walk', true);
-          } else {
-            this.player.sprite.anims.play('car-left-walk', true);
-          }
-          break;
-        case 'right':
-          body.setVelocityX(speed);
-          if (myPlayer?.visible === true) {
-            this.player.sprite.anims.play('misa-right-walk', true);
-          } else {
-            this.player.sprite.anims.play('car-right-walk', true);
-          }
-          break;
-        case 'front':
-          body.setVelocityY(speed);
-          if (myPlayer?.visible === true) {
-            this.player.sprite.anims.play('misa-front-walk', true);
-          } else {
-            this.player.sprite.anims.play('car-front-walk', true);
-          }
-          break;
-        case 'back':
-          body.setVelocityY(-speed);
-          if (myPlayer?.visible === true) {
-            this.player.sprite.anims.play('misa-back-walk', true);
-          } else {
-            this.player.sprite.anims.play('car-back-walk', true);
-          }
-          break;
-        default:
-          // Not moving
-          this.player.sprite.anims.stop();
-          // If we were moving, pick and idle frame to use
-          if (prevVelocity.x < 0) {
-            if (myPlayer?.visible === true) {
-              this.player.sprite.setTexture('atlas', 'misa-left');
-            } else {
-              this.player.sprite.setTexture('carAtlas', 'car-left');
-            }
-          } else if (prevVelocity.x > 0) {
-            if (myPlayer?.visible === true) {
-              this.player.sprite.setTexture('atlas', 'misa-right');
-            } else {
-              this.player.sprite.setTexture('carAtlas', 'car-right');
-            }
-          } else if (prevVelocity.y < 0) {
-            if (myPlayer?.visible === true) {
-              this.player.sprite.setTexture('atlas', 'misa-back');
-            } else{
-              this.player.sprite.setTexture('carAtlas', 'car-back');
-            }
-          } else if (prevVelocity.y > 0) {
-            if (myPlayer?.visible === true) {
-              this.player.sprite.setTexture('atlas', 'misa-front');
-            } else {
-              this.player.sprite.setTexture('carAtlas', 'car-front');
-            }
-          }
-          break;
+      if (myPlayer?.visible === false && !myVehicle) {
+        speed = 0;
       }
+      
+      if ((myPlayer?.visible === true) || myVehicle) {
+        const prevVelocity = this.player.sprite.body.velocity.clone();
+        const body = this.player.sprite.body as Phaser.Physics.Arcade.Body;
 
-      // Normalize and scale the velocity so that player can't move faster along a diagonal
-      this.player.sprite.body.velocity.normalize().scale(speed);
+        // Stop any previous movement from the last frame
+        body.setVelocity(0);
 
-      const isMoving = primaryDirection !== undefined;
-      this.player.label.setX(body.x);
-      this.player.label.setY(body.y - 20);
-      if (
-        !this.lastLocation ||
-        this.lastLocation.x !== body.x ||
-        this.lastLocation.y !== body.y ||
-        (isMoving && this.lastLocation.rotation !== primaryDirection) ||
-        this.lastLocation.moving !== isMoving
-      ) {
-        if (!this.lastLocation) {
-          this.lastLocation = {
-            x: body.x,
-            y: body.y,
-            rotation: primaryDirection || 'front',
-            moving: isMoving,
-          };
+        const primaryDirection = this.getNewMovementDirection();
+        switch (primaryDirection) {
+          case 'left':
+            body.setVelocityX(-speed);
+            if (myPlayer?.visible === true) {
+              this.player.sprite.anims.play('misa-left-walk', true);
+            } else {
+              this.player.sprite.anims.play('car-left-walk', true);
+            }
+            break;
+          case 'right':
+            body.setVelocityX(speed);
+            if (myPlayer?.visible === true) {
+              this.player.sprite.anims.play('misa-right-walk', true);
+            } else {
+              this.player.sprite.anims.play('car-right-walk', true);
+            }
+            break;
+          case 'front':
+            body.setVelocityY(speed);
+            if (myPlayer?.visible === true) {
+              this.player.sprite.anims.play('misa-front-walk', true);
+            } else {
+              this.player.sprite.anims.play('car-front-walk', true);
+            }
+            break;
+          case 'back':
+            body.setVelocityY(-speed);
+            if (myPlayer?.visible === true) {
+              this.player.sprite.anims.play('misa-back-walk', true);
+            } else {
+              this.player.sprite.anims.play('car-back-walk', true);
+            }
+            break;
+          default:
+            // Not moving
+            this.player.sprite.anims.stop();
+            // If we were moving, pick and idle frame to use
+            if (prevVelocity.x < 0) {
+              if (myPlayer?.visible === true) {
+                this.player.sprite.setTexture('atlas', 'misa-left');
+              } else {
+                this.player.sprite.setTexture('carAtlas', 'car-left');
+              }
+            } else if (prevVelocity.x > 0) {
+              if (myPlayer?.visible === true) {
+                this.player.sprite.setTexture('atlas', 'misa-right');
+              } else {
+                this.player.sprite.setTexture('carAtlas', 'car-right');
+              }
+            } else if (prevVelocity.y < 0) {
+              if (myPlayer?.visible === true) {
+                this.player.sprite.setTexture('atlas', 'misa-back');
+              } else{
+                this.player.sprite.setTexture('carAtlas', 'car-back');
+              }
+            } else if (prevVelocity.y > 0) {
+              if (myPlayer?.visible === true) {
+                this.player.sprite.setTexture('atlas', 'misa-front');
+              } else {
+                this.player.sprite.setTexture('carAtlas', 'car-front');
+              }
+            }
+            break;
         }
-        this.lastLocation.x = body.x;
-        this.lastLocation.y = body.y;
-        this.lastLocation.rotation = primaryDirection || 'front';
-        this.lastLocation.moving = isMoving;
-        if (this.currentConversationArea) {
-          if (this.currentConversationArea.conversationArea) {
-            this.lastLocation.conversationLabel = this.currentConversationArea.label;
-          }
-          if (
-            !Phaser.Geom.Rectangle.Overlaps(
-              this.currentConversationArea.sprite.getBounds(),
-              this.player.sprite.getBounds(),
-            )
-          ) {
-            this.infoTextBox?.setVisible(false);
-            this.currentConversationArea = undefined;
-            this.lastLocation.conversationLabel = undefined;
-          }
-        }
 
-        if (this.currentVehicleArea) {
-          if (
-            !Phaser.Geom.Rectangle.Overlaps(
-              this.currentVehicleArea.sprite.getBounds(),
-              this.player.sprite.getBounds(),
-            )
-          ) {
-            this.infoTextBoxForVehicleArea?.setVisible(false);
-          }
-        } 
-        this.emitMovement(this.lastLocation);
-        const vehicleLocation: VehicleLocation = {
-          x: this.lastLocation.x,
-          y: this.lastLocation.y,
-          rotation: this.lastLocation.rotation,
-          moving: this.lastLocation.moving
-        }
+        // Normalize and scale the velocity so that player can't move faster along a diagonal
+        this.player.sprite.body.velocity.normalize().scale(speed);
 
-        if (myPlayer?.visible === false){
-          this.emitVehicleMovement(vehicleLocation)
+        const isMoving = primaryDirection !== undefined;
+        this.player.label.setX(body.x);
+        this.player.label.setY(body.y - 20);
+        if (
+          !this.lastLocation ||
+          this.lastLocation.x !== body.x ||
+          this.lastLocation.y !== body.y ||
+          (isMoving && this.lastLocation.rotation !== primaryDirection) ||
+          this.lastLocation.moving !== isMoving
+        ) {
+          if (!this.lastLocation) {
+            this.lastLocation = {
+              x: body.x,
+              y: body.y,
+              rotation: primaryDirection || 'front',
+              moving: isMoving,
+            };
+          }
+          this.lastLocation.x = body.x;
+          this.lastLocation.y = body.y;
+          this.lastLocation.rotation = primaryDirection || 'front';
+          this.lastLocation.moving = isMoving;
+          if (this.currentConversationArea) {
+            if (this.currentConversationArea.conversationArea) {
+              this.lastLocation.conversationLabel = this.currentConversationArea.label;
+            }
+            if (
+              !Phaser.Geom.Rectangle.Overlaps(
+                this.currentConversationArea.sprite.getBounds(),
+                this.player.sprite.getBounds(),
+              )
+            ) {
+              this.infoTextBox?.setVisible(false);
+              this.currentConversationArea = undefined;
+              this.lastLocation.conversationLabel = undefined;
+            }
+          }
+
+          if (this.currentVehicleArea) {
+            if (
+              !Phaser.Geom.Rectangle.Overlaps(
+                this.currentVehicleArea.sprite.getBounds(),
+                this.player.sprite.getBounds(),
+              )
+            ) {
+              this.infoTextBoxForVehicleArea?.setVisible(false);
+            }
+          } 
+          this.emitMovement(this.lastLocation);
+          const vehicleLocation: VehicleLocation = {
+            x: this.lastLocation.x,
+            y: this.lastLocation.y,
+            rotation: this.lastLocation.rotation,
+            moving: this.lastLocation.moving
+          }
+
+          if (myPlayer?.visible === false){
+            this.emitVehicleMovement(vehicleLocation)
+          }
         }
       }
 
@@ -684,6 +811,7 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
   create() {
+    // console.log('create time');
     const map = this.make.tilemap({ key: 'map' });
 
     /* Parameters are the name you gave the tileset in Tiled and then the key of the
@@ -874,7 +1002,7 @@ class CoveyGameScene extends Phaser.Scene {
     const sprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', `misa-front`)
       .setSize(30, 40)
-      // .setOffset(0, 24);
+      .setOffset(0, 24);
       // .setScale(0.1)
       // .setSize(10, 10)
       // .setOffset(0,0);
@@ -937,7 +1065,7 @@ class CoveyGameScene extends Phaser.Scene {
             );
             this.setNewConversation(newConversation);
           }
-          this.infoTextBox?.setVisible(true);
+          this.infoTextBox?.setVisible(true && this.player?.sprite.visible === true);
         }
       },
     );
@@ -973,7 +1101,7 @@ class CoveyGameScene extends Phaser.Scene {
         //     this.player.label.setVisible(true);
         //   }
         // }
-        this.infoTextBoxForVehicleArea?.setVisible(true);
+        this.infoTextBoxForVehicleArea?.setVisible(true && this.player?.sprite.visible === true);
       },
     );
 
@@ -1169,7 +1297,7 @@ class CoveyGameScene extends Phaser.Scene {
 
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
-  const { emitMovement, emitCreateVehicle, emitVehicleMovement, emitDeleteVehicle, myPlayerID } = useCoveyAppState();
+  const { emitMovement, emitCreateVehicle, emitGetOnVehicle, emitVehicleMovement, emitDeleteVehicle, emitGetOffVehicle, myPlayerID } = useCoveyAppState();
   const conversationAreas = useConversationAreas();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   const [newConversation, setNewConversation] = useState<ConversationArea>();
@@ -1178,7 +1306,7 @@ export default function WorldMap(): JSX.Element {
   const players = usePlayersInTown();
   const vehicles = useVehiclesInTown();
   console.log(players);
-  console.log(vehicles);
+  // console.log(vehicles);
 
   useEffect(() => {
     const config = {
@@ -1201,7 +1329,7 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement, emitVehicleMovement, emitDeleteVehicle, emitCreateVehicle, setNewConversation, myPlayerID);
+      const newGameScene = new CoveyGameScene(video, emitMovement, emitVehicleMovement, emitDeleteVehicle, emitGetOffVehicle, emitCreateVehicle, emitGetOnVehicle, setNewConversation, myPlayerID);
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -1214,7 +1342,7 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement, emitVehicleMovement, emitDeleteVehicle, emitCreateVehicle, setNewConversation, myPlayerID]);
+  }, [video, emitMovement, emitVehicleMovement, emitDeleteVehicle, emitGetOffVehicle, emitCreateVehicle, emitGetOnVehicle, setNewConversation, myPlayerID]);
 
   // This side Effect does not influence the create stage.
   // This Side Effect only affect the movement of the Player during animation.

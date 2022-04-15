@@ -63,6 +63,18 @@ import { ServerPlayer } from "./Player";
       }
       throw Error('No Driver on the vehicle');
     }
+
+    includesPassenger(passengerID: string): boolean {
+      const passengerList = this.passengers;
+      if (passengerList){
+        for (let i = 0; i < passengerList.length; i += 1){
+          if (passengerList[i]._player._id === passengerID){
+            return true;
+          }
+        }
+      }
+      return false;
+    }
   
 
     gainDriverUserName() : string {

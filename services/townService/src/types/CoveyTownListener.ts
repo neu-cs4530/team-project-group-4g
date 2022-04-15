@@ -79,6 +79,10 @@ export default interface CoveyTownListener {
    */
   onVehicleCreated(newVehicle: Vehicle): void;
 
-  onVehicleDestroyed(destroyedVehicle: Vehicle): void;
+  onVehicleUpdatePassengers(updatedVehicle: Vehicle, passengerPlayer: Player): void;
+
+  onVehicleGetOffPassenger(updatedVehicle: Vehicle, passengerPlayer: Player): void;
+
+  onVehicleDestroyed(destroyedVehicle: Vehicle, passengerPlayerList: Player[]): void;
 
 }

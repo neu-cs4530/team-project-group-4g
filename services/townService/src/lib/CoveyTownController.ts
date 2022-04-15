@@ -231,20 +231,46 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
   }
 
+  getOnVehicle(passengerPlayer: Player, vehicleID: string) : void {
+    passengerPlayer.visible = false;
+    // Plan to delete the onPlayerInvisible(). Delegate the functionality to the onVehicleUpdatePassengers.
+    // this._listeners.forEach(listener => listener.onPlayerInvisible(passengerPlayer));
+    const vehicle = this._vehicles.find(v => v.id === vehicleID);
+    if (vehicle){
+      const passenger = new Passenger(passengerPlayer, vehicleID, false);
+      vehicle.passengers.push(passenger);
+      this._listeners.forEach(listener => listener.onVehicleUpdatePassengers(vehicle, passengerPlayer));
+    } else {
+      throw new Error('Could not find the Vehicle');
+    }
+   
+  }
+
+  getOffVehicle(passengerPlayer: Player, vehicleID: string) : void {
+    passengerPlayer.visible = true;
+    const vehicle = this._vehicles.find(v => v.id === vehicleID);
+    if (vehicle){
+      vehicle.passengers = vehicle.passengers.filter(p => p.id !== passengerPlayer.id);
+      this._listeners.forEach(listener => listener.onVehicleGetOffPassenger(vehicle, passengerPlayer));
+    }
+  }
+
   destroyVehicle(vehicleID: string) : void {
-    const vehicle = this.vehicles.find(v => v.id === vehicleID);
+    const vehicle = this._vehicles.find(v => v.id === vehicleID);
     if (!vehicle){
       throw new Error('You could not destroy an unexist vehicle');
     } else {
-      this._vehicles = this._vehicles.filter(v => v.id !== vehicle.id);
-      this._listeners.forEach(listener => listener.onVehicleDestroyed(vehicle));
+      const passengerPlayerList : Player[] = [];
       for (let i = 0; i < vehicle.passengers.length; i += 1){
         const player = this.players.find(p => p.id === vehicle.passengers[i].id);
         if (player){
           player.visible = true;
-          this._listeners.forEach(listener => listener.onPlayerVisible(player));
+          // this._listeners.forEach(listener => listener.onPlayerVisible(player));
+          passengerPlayerList.push(player);
         }
       }
+      this._vehicles = this._vehicles.filter(v => v.id !== vehicle.id);
+      this._listeners.forEach(listener => listener.onVehicleDestroyed(vehicle, passengerPlayerList));
     }
   }
 
