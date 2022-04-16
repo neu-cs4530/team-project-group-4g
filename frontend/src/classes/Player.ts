@@ -1,9 +1,9 @@
-export enum PlayerType {
-  Human,
-  Car,
-  SkateBoard,
-  Dinasour,
-}
+// export enum PlayerType {
+//   Human,
+//   Car,
+//   SkateBoard,
+//   Dinasour,
+// }
 
 export default class Player {
   public location?: UserLocation;
@@ -16,16 +16,16 @@ export default class Player {
 
   public label?: Phaser.GameObjects.Text;
 
-  // Might be useless in the later version. Do not use this field!
-  public playerType: PlayerType;
+  // // Might be useless in the later version. Do not use this field!
+  // public playerType: PlayerType;
 
   public visible: boolean;
 
-  constructor(id: string, userName: string, location: UserLocation, playerType: PlayerType = PlayerType.Human, visible = true) {
+  constructor(id: string, userName: string, location: UserLocation, visible = true) {
     this._id = id;
     this._userName = userName;
     this.location = location;
-    this.playerType = playerType;
+    // this.playerType = playerType;
     this.visible = visible;
   }
 
@@ -38,10 +38,10 @@ export default class Player {
   }
 
   static fromServerPlayer(playerFromServer: ServerPlayer): Player {
-    return new Player(playerFromServer._id, playerFromServer._userName, playerFromServer.location, playerFromServer.playerType);
+    return new Player(playerFromServer._id, playerFromServer._userName, playerFromServer.location, playerFromServer.visible);
   }
 }
-export type ServerPlayer = { _id: string, _userName: string, location: UserLocation, playerType: PlayerType };
+export type ServerPlayer = { _id: string, _userName: string, location: UserLocation, visible: boolean };
 
 export type Direction = 'front'|'back'|'left'|'right';
 

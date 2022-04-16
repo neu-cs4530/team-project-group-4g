@@ -9,7 +9,7 @@ import {
   townListHandler,
   townSubscriptionHandler,
   townUpdateHandler,
-  addVehicleHandler,
+  // addVehicleHandler,
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
 
@@ -128,28 +128,28 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   });
 
 
-  /**
-   * Adds a vehicle to a town
-   */
-  app.post('/towns/:townID/vehicle', express.json(), async (req, res) => {
-    try {
-      const result = addVehicleHandler({
-        coveyTownID: req.params.townID,
-        sessionToken: req.body.sessionToken,
-        conversationArea: req.body.conversationArea,
-        playerId: req.body.playerId,
-        vehicleType: req.body.vehicleType,
-      });
-      res.status(StatusCodes.OK)
-        .json(result);
-    } catch (err) {
-      logError(err);
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({
-          message: 'Internal server error, please see log in server for more details',
-        });
-    }
-  });
+  // /**
+  //  * Adds a vehicle to a town
+  //  */
+  // app.post('/towns/:townID/vehicle', express.json(), async (req, res) => {
+  //   try {
+  //     const result = addVehicleHandler({
+  //       coveyTownID: req.params.townID,
+  //       sessionToken: req.body.sessionToken,
+  //       conversationArea: req.body.conversationArea,
+  //       playerId: req.body.playerId,
+  //       vehicleType: req.body.vehicleType,
+  //     });
+  //     res.status(StatusCodes.OK)
+  //       .json(result);
+  //   } catch (err) {
+  //     logError(err);
+  //     res.status(StatusCodes.INTERNAL_SERVER_ERROR)
+  //       .json({
+  //         message: 'Internal server error, please see log in server for more details',
+  //       });
+  //   }
+  // });
 
   /**
    * Deletes a vehicle from a town

@@ -9,7 +9,7 @@ import { UserLocation } from '../CoveyTypes';
 import { BoundingBox, ServerConversationArea } from './TownsServiceClient';
 
 export type RemoteServerPlayer = {
-  location: UserLocation, _userName: string, _id: string
+  location: UserLocation, _userName: string, _id: string, visible: boolean
 };
 const createdSocketClients: Socket[] = [];
 

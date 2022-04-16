@@ -9,7 +9,7 @@ export default class Dinosaur extends Vehicle{
   constructor() {
     super();
     this._capacity = 2;
-    this._speed = 5;
+    this._speed = 1.5;
     this._type = 'Dinosaur';
   }
 

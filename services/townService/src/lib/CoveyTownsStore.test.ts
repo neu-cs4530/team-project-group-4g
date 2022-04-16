@@ -8,29 +8,29 @@ import { ChatMessage } from '../CoveyTypes';
 const mockCoveyListenerTownDestroyed = jest.fn();
 const mockCoveyListenerOtherFns = jest.fn();
 
-function mockCoveyListener(): CoveyTownListener {
-  return {
-    onPlayerDisconnected(removedPlayer: Player): void {
-      mockCoveyListenerOtherFns(removedPlayer);
-    },
-    onPlayerMoved(movedPlayer: Player): void {
-      mockCoveyListenerOtherFns(movedPlayer);
-    },
-    onTownDestroyed() {
-      mockCoveyListenerTownDestroyed();
-    },
-    onPlayerJoined(newPlayer: Player) {
-      mockCoveyListenerOtherFns(newPlayer);
-    }, onConversationAreaDestroyed(_conversationArea : ServerConversationArea){
-      mockCoveyListenerOtherFns(_conversationArea);
-    }, onConversationAreaUpdated(_conversationArea: ServerConversationArea){
-      mockCoveyListenerOtherFns(_conversationArea);
-    },
-    onChatMessage(message: ChatMessage){
-      mockCoveyListenerOtherFns(message);
-    },
-  };
-}
+// function mockCoveyListener(): CoveyTownListener {
+//   return {
+//     onPlayerDisconnected(removedPlayer: Player): void {
+//       mockCoveyListenerOtherFns(removedPlayer);
+//     },
+//     onPlayerMoved(movedPlayer: Player): void {
+//       mockCoveyListenerOtherFns(movedPlayer);
+//     },
+//     onTownDestroyed() {
+//       mockCoveyListenerTownDestroyed();
+//     },
+//     onPlayerJoined(newPlayer: Player) {
+//       mockCoveyListenerOtherFns(newPlayer);
+//     }, onConversationAreaDestroyed(_conversationArea : ServerConversationArea){
+//       mockCoveyListenerOtherFns(_conversationArea);
+//     }, onConversationAreaUpdated(_conversationArea: ServerConversationArea){
+//       mockCoveyListenerOtherFns(_conversationArea);
+//     },
+//     onChatMessage(message: ChatMessage){
+//       mockCoveyListenerOtherFns(message);
+//     },
+//   };
+// }
 
 function createTownForTesting(friendlyNameToUse?: string, isPublic = false) {
   const friendlyName = friendlyNameToUse !== undefined ? friendlyNameToUse :
@@ -143,34 +143,34 @@ describe('CoveyTownsStore', () => {
     });
   });
 
-  describe('deleteTown', () => {
-    it('Should check the password before deleting the town', () => {
-      const town = createTownForTesting();
-      const res = CoveyTownsStore.getInstance()
-        .deleteTown(town.coveyTownID, `${town.townUpdatePassword}*`);
-      expect(res)
-        .toBe(false);
-    });
-    it('Should fail if the townID does not exist', async () => {
-      const res = CoveyTownsStore.getInstance()
-        .deleteTown('abcdef', 'efg');
-      expect(res)
-        .toBe(false);
-    });
-    it('Should disconnect all players', async () => {
-      const town = createTownForTesting();
-      town.addTownListener(mockCoveyListener());
-      town.addTownListener(mockCoveyListener());
-      town.addTownListener(mockCoveyListener());
-      town.addTownListener(mockCoveyListener());
-      town.disconnectAllPlayers();
+  // describe('deleteTown', () => {
+  //   it('Should check the password before deleting the town', () => {
+  //     const town = createTownForTesting();
+  //     const res = CoveyTownsStore.getInstance()
+  //       .deleteTown(town.coveyTownID, `${town.townUpdatePassword}*`);
+  //     expect(res)
+  //       .toBe(false);
+  //   });
+  //   it('Should fail if the townID does not exist', async () => {
+  //     const res = CoveyTownsStore.getInstance()
+  //       .deleteTown('abcdef', 'efg');
+  //     expect(res)
+  //       .toBe(false);
+  //   });
+  //   it('Should disconnect all players', async () => {
+  //     const town = createTownForTesting();
+  //     town.addTownListener(mockCoveyListener());
+  //     town.addTownListener(mockCoveyListener());
+  //     town.addTownListener(mockCoveyListener());
+  //     town.addTownListener(mockCoveyListener());
+  //     town.disconnectAllPlayers();
 
-      expect(mockCoveyListenerOtherFns.mock.calls.length)
-        .toBe(0);
-      expect(mockCoveyListenerTownDestroyed.mock.calls.length)
-        .toBe(4);
-    });
-  });
+  //     expect(mockCoveyListenerOtherFns.mock.calls.length)
+  //       .toBe(0);
+  //     expect(mockCoveyListenerTownDestroyed.mock.calls.length)
+  //       .toBe(4);
+  //   });
+  // });
 
   describe('listTowns', () => {
     it('Should include public towns', async () => {

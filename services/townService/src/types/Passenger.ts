@@ -7,13 +7,13 @@ import { ServerConversationArea } from '../client/TownsServiceClient';
 export default class Passenger {
 
   /** Whether or not this passenger is a driver, if being in a vehicle */
-  private _isDriver: boolean;
+  private readonly _isDriver: boolean;
 
   /** The corresponding Player */
-  private _player: Player;
+  private readonly _player: Player;
 
   /** The vehicle this passenger is currently in, if any */
-  private _vehicleByID: string;
+  private readonly _vehicleByID: string;
 
   constructor(player: Player, vehicleByID: string, isDriver = true) {
     this._player = player;
@@ -25,17 +25,17 @@ export default class Passenger {
     return this._vehicleByID;
   }
 
-  set vehicleByID(vehicleByID: string) {
-    this._vehicleByID = vehicleByID;
-  }
+  // set vehicleByID(vehicleByID: string) {
+  //   this._vehicleByID = vehicleByID;
+  // }
 
   get isDriver(): boolean {
     return this._isDriver;
   }
 
-  set isDriver(isDriver: boolean) {
-    this._isDriver = isDriver;
-  }
+  // set isDriver(isDriver: boolean) {
+  //   this._isDriver = isDriver;
+  // }
 
   get userName(): string {
     return this._player.userName;

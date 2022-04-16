@@ -89,7 +89,7 @@ export default class CoveyTownController {
   private _capacity: number;
 
   // private _vehicles: Vehicle[] = [];
-  private _vehicles: Vehicle[] = [new Car(), new Dinosaur(), new SkateBoard()];
+  private _vehicles: Vehicle[] = [];
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();
@@ -189,6 +189,89 @@ export default class CoveyTownController {
     }
 
     this._listeners.forEach(listener => listener.onPlayerMoved(player));
+  }
+
+  createInitVehicle(driver: Player, initLocation: UserLocation, vehicleType: string): void{
+    let newVehicle: Vehicle;
+    switch (vehicleType) {
+      case 'Car':
+        newVehicle = new Car();
+        newVehicle.location = {
+          x: initLocation.x,
+          y: initLocation.y,
+          moving: initLocation.moving,
+          rotation: initLocation.rotation,
+        };
+        break;
+      case 'Dinasour':
+        newVehicle = new Dinosaur();
+        newVehicle.location = {
+          x: initLocation.x,
+          y: initLocation.y,
+          moving: initLocation.moving,
+          rotation: initLocation.rotation,
+        };
+        break;
+      case 'SkateBoard':
+        newVehicle = new SkateBoard();
+        newVehicle.location = {
+          x: initLocation.x,
+          y: initLocation.y,
+          moving: initLocation.moving,
+          rotation: initLocation.rotation,
+        };
+        break;
+      default:
+        throw new Error('The vehicle type is not applicable');
+    }
+    driver.visible = false;
+    newVehicle.addPassenger(new Passenger(driver, newVehicle.id, true));
+    this._vehicles.push(newVehicle);
+    this._listeners.forEach(listener => listener.onPlayerInvisible(driver));
+    this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
+  }
+
+  getOnVehicle(passengerPlayer: Player, vehicleID: string) : void {
+    passengerPlayer.visible = false;
+    // Plan to delete the onPlayerInvisible(). Delegate the functionality to the onVehicleUpdatePassengers.
+    // this._listeners.forEach(listener => listener.onPlayerInvisible(passengerPlayer));
+    const vehicle = this._vehicles.find(v => v.id === vehicleID);
+    if (vehicle){
+      const passenger = new Passenger(passengerPlayer, vehicleID, false);
+      vehicle.passengers.push(passenger);
+      this._listeners.forEach(listener => listener.onVehicleUpdatePassengers(vehicle, passengerPlayer));
+    } else {
+      throw new Error('Could not find the Vehicle');
+    }
+   
+  }
+
+  getOffVehicle(passengerPlayer: Player, vehicleID: string) : void {
+    passengerPlayer.visible = true;
+    const vehicle = this._vehicles.find(v => v.id === vehicleID);
+    if (vehicle){
+      vehicle.passengers = vehicle.passengers.filter(p => p.id !== passengerPlayer.id);
+      this._listeners.forEach(listener => listener.onVehicleGetOffPassenger(vehicle, passengerPlayer));
+    }
+  }
+
+  destroyVehicle(vehicleID: string) : void {
+    const vehicle = this._vehicles.find(v => v.id === vehicleID);
+    if (!vehicle){
+      throw new Error('You could not destroy an unexist vehicle');
+    } else {
+      const passengerPlayerList : Player[] = [];
+      for (let i = 0; i < vehicle.passengers.length; i += 1){
+        const player = this.players.find(p => p.id === vehicle.passengers[i].id);
+        if (player){
+          player.visible = true;
+          // this._listeners.forEach(listener => listener.onPlayerVisible(player));
+          passengerPlayerList.push(player);
+        }
+      }
+      this._vehicles = this._vehicles.filter(v => v.id !== vehicle.id);
+      this._listeners.forEach(listener => listener.onVehicleDestroyed(vehicle, passengerPlayerList));
+    }
   }
 
   /**
@@ -299,54 +382,54 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onTownDestroyed());
   }
 
-  /**
-   * Adds a vehicle to this CoveyTown, checking that the player can enter(add) vehicles and this vehicle can be added at this specified location 
-   *
-   * @param _conversationArea the conversation area in the vehicle
-   * @param newPlayer the player to add to the vehicle
-   * @param vehicleType the vehicle type 
-   */
-  addVehicle(player: Player, conversationArea: ServerConversationArea, vehicleType = 'car'): boolean {
+  // /**
+  //  * Adds a vehicle to this CoveyTown, checking that the player can enter(add) vehicles and this vehicle can be added at this specified location 
+  //  *
+  //  * @param _conversationArea the conversation area in the vehicle
+  //  * @param newPlayer the player to add to the vehicle
+  //  * @param vehicleType the vehicle type 
+  //  */
+  // addVehicle(player: Player, conversationArea: ServerConversationArea, vehicleType = 'car'): boolean {
 
-    const addConversationArea = this.addConversationArea(conversationArea);
+  //   const addConversationArea = this.addConversationArea(conversationArea);
 
-    if (!addConversationArea) {
-      return false;
-    }
+  //   if (!addConversationArea) {
+  //     return false;
+  //   }
 
-    let newVehicle: Vehicle;
+  //   let newVehicle: Vehicle;
 
-    if (vehicleType === 'dinasour') {
-      newVehicle = new Dinosaur();
-    } else if (vehicleType === 'car') {
-      newVehicle = new Car();
-    } else if (vehicleType === 'skateboard') {
-      newVehicle = new SkateBoard();
-    } else {
-      return false;
-    }
+  //   if (vehicleType === 'dinasour') {
+  //     newVehicle = new Dinosaur();
+  //   } else if (vehicleType === 'car') {
+  //     newVehicle = new Car();
+  //   } else if (vehicleType === 'skateboard') {
+  //     newVehicle = new SkateBoard();
+  //   } else {
+  //     return false;
+  //   }
 
-    this._vehicles.push(newVehicle);
+  //   this._vehicles.push(newVehicle);
 
-    newVehicle.conversationArea = conversationArea;
+  //   newVehicle.conversationArea = conversationArea;
 
-    // Create a new passenger instance
-    const newPassenger = new Passenger(player, newVehicle.id, true);
+  //   // Create a new passenger instance
+  //   const newPassenger = new Passenger(player, newVehicle.id, true);
 
-    // newVehicle.addPassenger(newPassenger);
-    /** Add the passenger to the vehicle */
-    newVehicle.addPassenger(newPassenger);
+  //   // newVehicle.addPassenger(newPassenger);
+  //   /** Add the passenger to the vehicle */
+  //   newVehicle.addPassenger(newPassenger);
 
-    // notify town listener that a vehicle was added
-    this._listeners.forEach(listener => {
-      listener.onVehicleCreated(newVehicle);
-    });
+  //   // notify town listener that a vehicle was added
+  //   this._listeners.forEach(listener => {
+  //     listener.onVehicleCreated(newVehicle);
+  //   });
 
-    // notify
-    this._listeners.forEach(listener => listener.onPlayerJoinedVehicle(newPassenger));
+  //   // notify
+  //   this._listeners.forEach(listener => listener.onPlayerJoinedVehicle(newPassenger));
 
-    return true;
-  }
+  //   return true;
+  // }
 
   /**
    * Updates the location for this vehicle and the location of all passengers in it within the town.
@@ -359,10 +442,10 @@ export default class CoveyTownController {
    */
   updateVehicleLocation(vehicle: Vehicle | undefined, location: VehicleLocation): void {
     if (vehicle === undefined) {
-      return;
+      throw Error('There is no vehicle such a vehicle');
     }
     if (vehicle.passengers === undefined) {
-      return;
+      throw Error('There is no defined  passengers list');
     }
 
     vehicle.location = location;
@@ -374,11 +457,10 @@ export default class CoveyTownController {
       moving: location.moving,
     };
 
-    for (let i = 0, len = vehicle.passengers.length; i < len; i += 1) {
+    for (let i = 0; i < vehicle.passengers.length; i += 1) {
       const p = this.players.find(player => player.id === vehicle.passengers[i].id);
       if (p !== undefined) {
-        p.location = newUserLocation;
-        this.updatePlayerLocation(p, p.location);
+        this.updatePlayerLocation(p, newUserLocation);
       }
     }
 

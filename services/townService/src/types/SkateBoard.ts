@@ -9,7 +9,7 @@ export default class SkateBoard extends Vehicle{
   constructor() {
     super();
     this._capacity = 1;
-    this._speed = 2;
+    this._speed = 1.2;
     this._type = 'SkateBoard';
   }
 
