@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import React, { useEffect, useMemo, useState } from 'react';
 import BoundingBox from '../../classes/BoundingBox';
 import ConversationArea from '../../classes/ConversationArea';
-import Vehicle from '../../classes/Vehicle';
 import Player, { ServerPlayer, UserLocation, PlayerType } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import useConversationAreas from '../../hooks/useConversationAreas';
@@ -13,7 +12,6 @@ import useVehiclesInTown from '../../hooks/useVehiclesInTown';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import NewConversationModal from './NewCoversationModal';
-import NewVehicleModal from './NewVehicleModal';
 
 // Original inspiration and code from:
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
@@ -119,8 +117,6 @@ class CoveyGameScene extends Phaser.Scene {
 
   private setNewConversation: (conv: ConversationArea) => void;
 
-  private setNewVehicle: (vehicle: Vehicle) => void;
-
   private _onGameReadyListeners: Callback[] = [];
 
   private getMyPlayerByID() : Player{
@@ -136,7 +132,6 @@ class CoveyGameScene extends Phaser.Scene {
     video: Video,
     emitMovement: (loc: UserLocation) => void,
     setNewConversation: (conv: ConversationArea) => void,
-    setNewVehicle: (vehicle: Vehicle) => void,
     myPlayerID: string,
   ) {
     super('PlayGame');
@@ -144,7 +139,6 @@ class CoveyGameScene extends Phaser.Scene {
     this.emitMovement = emitMovement;
     this.myPlayerID = myPlayerID;
     this.setNewConversation = setNewConversation;
-    this.setNewVehicle = setNewVehicle;
   }
 
   preload() {
@@ -688,21 +682,12 @@ class CoveyGameScene extends Phaser.Scene {
         if (cursorKeys.space.isDown){
           const myPlayer = this.players.find(p => p.id === this.myPlayerID);
           if (this.player && myPlayer?.location && myPlayer.playerType === PlayerType.Human && this.lastLocation){
-            const newConversation = new ConversationArea(
-              carAreaLabel,
-              BoundingBox.fromSprite(carAreaSprite as Phaser.GameObjects.Sprite),
-            );
-            const newVehicle = new Vehicle(newConversation);
-            this.setNewVehicle(newVehicle);
-
-            // myPlayer.playerType = PlayerType.Car;
-            // this.player.sprite
-            //   .setTexture('carAtlas',`${getPlayerAtlasType(myPlayer)}-${myPlayer.location.rotation}`)
-            //   .setScale(0.1)
-            //   .setSize(10, 10)
-            //   .setOffset(0,0);
-            console.log(BoundingBox.fromSprite(carAreaSprite as Phaser.GameObjects.Sprite));
-            console.log(this.lastLocation);
+            myPlayer.playerType = PlayerType.Car;
+            this.player.sprite
+              .setTexture('carAtlas',`${getPlayerAtlasType(myPlayer)}-${myPlayer.location.rotation}`)
+              .setScale(0.1)
+              .setSize(10, 10)
+              .setOffset(0,0);
             this.emitMovement(this.lastLocation);
           }
         }
@@ -882,9 +867,10 @@ export default function WorldMap(): JSX.Element {
   const conversationAreas = useConversationAreas();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   const [newConversation, setNewConversation] = useState<ConversationArea>();
-  const [newVehicle, setNewVehicle] = useState<Vehicle>();
   const playerMovementCallbacks = usePlayerMovement();
   const players = usePlayersInTown();
+  const vehicles = useVehiclesInTown();
+  console.log(vehicles);
 
   useEffect(() => {
     const config = {
@@ -907,7 +893,7 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement, setNewConversation, setNewVehicle, myPlayerID);
+      const newGameScene = new CoveyGameScene(video, emitMovement, setNewConversation, myPlayerID);
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -920,7 +906,7 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement, setNewConversation, setNewVehicle, myPlayerID]);
+  }, [video, emitMovement, setNewConversation, myPlayerID]);
 
   useEffect(() => {
     const movementDispatcher = (player: ServerPlayer) => {
@@ -966,36 +952,8 @@ export default function WorldMap(): JSX.Element {
     return <></>;
   }, [video, newConversation, setNewConversation]);
 
-  const newVehicleModalOpen = newVehicle !== undefined;
-  useEffect(() => {
-    if (newVehicleModalOpen) {
-      video?.pauseGame();
-    } else {
-      video?.unPauseGame();
-    }
-  }, [video, newVehicleModalOpen]);
-
-  const newVehicleModal = useMemo(() => {
-    if (newVehicle) {
-      video?.pauseGame();
-      return (
-        <NewVehicleModal
-          isOpen={newVehicle !== undefined}
-          closeModal={() => {
-            video?.unPauseGame();
-            setNewVehicle(undefined);
-          }}
-          newVehicle={newVehicle}
-          playerID={myPlayerID}
-        />
-      );
-    }
-    return <></>;
-  }, [video, newVehicle, setNewConversation]);
-
   return (
     <div id='app-container'>
-      {newVehicleModal}
       {newConversationModal}
       <div id='map-container' />
       <div id='social-container'>

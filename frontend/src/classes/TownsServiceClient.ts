@@ -88,14 +88,6 @@ export interface ConversationCreateRequest {
   conversationArea: ServerConversationArea;
 }
 
-export interface VehicleCreateRequest {
-  coveyTownID: string;
-  sessionToken: string;
-  conversationArea: ServerConversationArea;
-  playerId: string;
-  vehicleType: string;
-}
-
 /**
  * Envelope that wraps any response from the server
  */
@@ -167,8 +159,4 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  async createVehicle(requestData: VehicleCreateRequest) : Promise<void>{
-    const responseWrapper = await this._axios.post(`/towns/${requestData.coveyTownID}/vehicle`, requestData);
-    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-  }
 }
