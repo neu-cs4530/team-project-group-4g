@@ -12,8 +12,6 @@ The frontend implements video chat using the [Twilio Programmable Video](https:/
 
 A backend service (in the `services/townService` directory) implements the application logic: tracking which "towns" are available to be joined, and the state of each of those towns.
 
-![Covey.Town Backend Service](docs/backendService.png)
-
 ## Important Links
 
 [Repository](https://github.com/neu-cs4530-s22/team-project-group-4g) <br />

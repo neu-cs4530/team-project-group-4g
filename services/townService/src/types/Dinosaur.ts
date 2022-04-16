@@ -3,8 +3,8 @@ import Vehicle from './Vehicle';
 /**
  * One type of the vehicle, which is a car vehicle. 
  */
-export default class Dinosaur extends Vehicle {
-  private _type: string;
+export default class Dinosaur extends Vehicle{
+  private _type : string;
 
   constructor() {
     super();
@@ -15,5 +15,5 @@ export default class Dinosaur extends Vehicle {
 
   getVehicleType(): string {
     return this._type;
-  }
+  }   
 }
