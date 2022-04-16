@@ -4,7 +4,7 @@ import { UserLocation, VehicleLocation } from '../CoveyTypes';
 
 
 export type ServerPlayer = { _id: string, _userName: string, location: UserLocation };
-export type ServerVehicle = { _id: string, _type: string, _capacity: number, _speed: number, location: VehicleLocation, _passengers: Passenger[] };
+export type ServerVehicle = { _id: string, _vehicleType: string, _capacity: number, _speed: number, location: VehicleLocation, passengers: Passenger[] };
 export type Passenger = { player: ServerPlayer, isDriver: boolean, vehicleByID: string };
 
 /**
