@@ -66,6 +66,7 @@ import { ServerPlayer } from "./Player";
 
     includesPassenger(passengerID: string): boolean {
       const passengerList = this.passengers;
+      // console.log(passengerList);
       if (passengerList){
         for (let i = 0; i < passengerList.length; i += 1){
           if (passengerList[i]._player._id === passengerID){

@@ -295,7 +295,7 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
   updatePlayerLocation(player: Player) {
-    console.log(player)
+    // console.log(player)
     let myPlayer = this.players.find(p => p.id === player.id);
     if (!myPlayer) {
       let { location } = player;
@@ -441,6 +441,9 @@ class CoveyGameScene extends Phaser.Scene {
       this.vehicles.push(myVehicle);
       // console.log(this.vehicles);
     }
+    // Actually we use this method to update the passenger list.
+    myVehicle.passengers = vehicle.passengers;
+
     // if (this.myPlayerID !== vehicle.gainDriverID() && this.physics && vehicle.location) {
     if (this.myPlayerID !== myVehicle.gainDriverID() && this.physics && vehicle.location) {
       let { sprite } = myVehicle;
@@ -524,6 +527,7 @@ class CoveyGameScene extends Phaser.Scene {
       const myPlayer = this.players.find(p => p.id === this.myPlayerID)
       const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
       if(myVehicle && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
+        // console.log('Should not log this when the passenger get off the car')
         // 下车的部分在这里
         // Do some socket thing here.
         // const vehicleID = this.emitGetOffVehicle();
@@ -545,7 +549,10 @@ class CoveyGameScene extends Phaser.Scene {
       };
 
       if(!myVehicle && myPlayer && myPlayer.visible === false && this.player.sprite.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
+        // console.log('Should log this when the passenger get off the car')
+        // console.log(this.vehicles)
         const vehicleAsPassenger = this.vehicles.find(v => v.includesPassenger(this.myPlayerID));
+        // console.log(vehicleAsPassenger)
         if (vehicleAsPassenger) {
           this.emitGetOffVehicle(vehicleAsPassenger.id);
         }
@@ -1305,7 +1312,7 @@ export default function WorldMap(): JSX.Element {
   const vehicleMovementCallbacks = useVehicleMovement();
   const players = usePlayersInTown();
   const vehicles = useVehiclesInTown();
-  console.log(players);
+  // console.log(players);
   // console.log(vehicles);
 
   useEffect(() => {
