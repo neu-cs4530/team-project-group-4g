@@ -359,6 +359,7 @@ export function townSubscriptionHandler(socket: Socket): void {
   });
 
   socket.on('getOffVehicle', (vehicleID: string)=> {
+    // console.log('receive');
     townController.getOffVehicle(s.player, vehicleID);
   });
 

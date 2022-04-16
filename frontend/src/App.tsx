@@ -220,6 +220,8 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       }
 
       const emitGetOffVehicle = (vehicleID: string) => {
+        // console.log('trigger');
+        // console.log(vehicleID);
         socket.emit('getOffVehicle', vehicleID)
       }
 
@@ -261,7 +263,8 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         const updatedVehicle = localVehicles.find(v => v.id === vehicle._id);
         if (updatedVehicle) {
           updatedVehicle.passengers = vehicle._passengers;
-          // setVehiclesInTown(localVehicles);
+          // console.log(updatedVehicle)
+          setVehiclesInTown(localVehicles);
         } else {
           localVehicles = localVehicles.concat(Vehicle.fromServerVehicle(vehicle));
           setVehiclesInTown(localVehicles);
@@ -290,6 +293,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       });
 
       socket.on('VehicleGetOffPassengers', (vehicle: ServerVehicle, passengerPlayer: ServerPlayer) => {
+        // console.log(passengerPlayer);
         const updatedVehicle = localVehicles.find(v => v.id === vehicle._id);
         if (updatedVehicle) {
           updatedVehicle.passengers = vehicle._passengers;
@@ -299,13 +303,15 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           setVehiclesInTown(localVehicles);
         }
 
-        const updatedPlayer = localPlayers.find(p => p.id === passengerPlayer._id);
-        if (updatedPlayer) {
-          updatedPlayer.visible = true;
-          // setPlayersInTown(localPlayers);
-        } else {
-          localPlayers = localPlayers.concat(Player.fromServerPlayer(passengerPlayer))
-          setPlayersInTown(localPlayers);
+        if (passengerPlayer._id !== gamePlayerID) {
+          const updatedPlayer = localPlayers.find(p => p.id === passengerPlayer._id);
+          if (updatedPlayer) {
+            updatedPlayer.visible = true;
+            setPlayersInTown(localPlayers);
+          } else {
+            localPlayers = localPlayers.concat(Player.fromServerPlayer(passengerPlayer))
+            setPlayersInTown(localPlayers);
+          }
         }
       });
 
@@ -390,11 +396,11 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           if (updatePlayer) {
             updatePlayer.visible = false;
             setPlayersInTown(localPlayers);
-            console.log(localPlayers);
+            // console.log(localPlayers);
           } else {
             localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
             setPlayersInTown(localPlayers);
-            console.log(localPlayers);
+            // console.log(localPlayers);
           }
         }
       });
