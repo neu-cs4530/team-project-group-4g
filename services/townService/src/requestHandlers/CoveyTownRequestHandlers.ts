@@ -232,7 +232,7 @@ export function addVehicleHandler(_requestData: VehicleAddRequest): ResponseEnve
   return {
     isOK: success === undefined,
     response: {},
-    message: !success ? `Unable to create vehicle ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}` : undefined,
+    message: !success ? `Unable to create conversation area ${_requestData.conversationArea.label} with topic ${_requestData.conversationArea.topic}` : undefined,
   };
 }
 

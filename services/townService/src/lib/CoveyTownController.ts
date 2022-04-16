@@ -146,65 +146,6 @@ export default class CoveyTownController {
     return theSession;
   }
 
-  findVehicle(passengerID: string) : Vehicle | undefined {
-    const vehicleList = this._vehicles;
-    let vehicleWithPassengerID;
-    for (let i = 0; i < vehicleList.length; i += 1) {
-      if (vehicleList[i].gainDriverID() === passengerID) {
-        vehicleWithPassengerID = vehicleList[i];
-        break;
-      }
-    }
-    return vehicleWithPassengerID;
-  }
-
-  /**
-     * Adds a vehicle to this Covey Town when a user hit "enter" to get a car, provisioning the necessary credentials for the
-     * vehicle, and returning them
-     *
-     * @param newVehicle The new vehicle to add to the town
-     * @param newPlayer The new player to add to the vehicle
-     */
-  addVehicle(newPlayer: Player, _conversationArea: ServerConversationArea, vehicleType = 'car'): boolean {
-
-    const addConversationArea = this.addConversationArea(_conversationArea);
-
-    if (!addConversationArea) {
-      return false;
-    }
-
-    let newVehicle: Vehicle;
-
-    if (vehicleType === 'dinasour') {
-      newVehicle = new Dinosaur();
-    } else if (vehicleType === 'car') {
-      newVehicle = new Car();
-    } else if (vehicleType === 'skateboard') {
-      newVehicle = new SkateBoard();
-    } else {
-      return false;
-    }
-
-    this._vehicles.push(newVehicle);
-
-    newVehicle.conversationArea = _conversationArea;
-
-
-
-    /** Create a new passenger instance */
-    const newPassenger = new Passenger(newPlayer, newVehicle.id, true);
-
-    // newVehicle.addPassenger(newPassenger);
-    /** Add the passenger to the vehicle */
-    newVehicle.addPassenger(newPassenger);
-
-    this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
-    this._listeners.forEach(listener => listener.onPlayerJoinedVehicle(newPassenger));
-
-    return true;
-  }
-
-
   /**
    * Destroys all data related to a player in this town.
    *

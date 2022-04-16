@@ -14,17 +14,14 @@ import { ServerPlayer } from "./Player";
     private readonly _speed: number;
   
     public sprite?: Phaser.GameObjects.Sprite;
-    
-    private _conversationArea: ConversationArea;
   
-    constructor(id: string, vehicleType: string, capacity: number, speed: number, location: VehicleLocation, passengers: Passenger[], conversationArea: ConversationArea) {
+    constructor(id: string, vehicleType: string, capacity: number, speed: number, location: VehicleLocation, passengers: Passenger[]) {
       this._id = id;
       this._vehicleType = vehicleType;
       this._capacity = capacity;
       this._speed = speed;
       this.location = location;
       this.passengers = passengers;
-      this._conversationArea = conversationArea;
     }
   
     get id(): string {
@@ -41,10 +38,6 @@ import { ServerPlayer } from "./Player";
 
     get speed(): number{
         return this._speed;
-    }
-    
-    get conversationArea() {
-      return this._conversationArea;
     }
   
     static fromServerVehicle(vehicleFromServer: ServerVehicle): Vehicle {
