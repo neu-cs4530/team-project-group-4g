@@ -135,9 +135,9 @@ class CoveyGameScene extends Phaser.Scene {
 
   private infoTextBoxForVehicleArea?: Phaser.GameObjects.Text;
 
-  // private infoTextBoxForLockNotification?: Phaser.GameObjects.Text;
+  private infoTextBoxForGetOnFailedDueCapacity?: Phaser.GameObjects.Text;
 
-  // private infoTextBoxForUnLockNotification?: Phaser.GameObjects.Text;
+  private infoTextBoxForGetOnFailedDueLock?: Phaser.GameObjects.Text;
 
   private setNewConversation: (conv: ConversationArea) => void;
 
@@ -484,11 +484,17 @@ class CoveyGameScene extends Phaser.Scene {
             sprite,
             (overlappingPlayer) => {
               if (cursorKeys.space.isDown) {
-                if (this.player && myPlayer && myPlayer.visible === true && myVehicle) {
-                  myPlayer.visible = false;
-                  this.player.sprite.setVisible(false);
-                  this.player.label.setVisible(false);
-                  this.emitGetOnVehicle(myVehicle.id);
+                if (this.player && myPlayer && myPlayer.visible === true && myVehicle && myVehicle.passengers) {
+                  if (myVehicle.passengers.length >= myVehicle.capacity){
+                    this.infoTextBoxForGetOnFailedDueCapacity?.setVisible(true);
+                  } else if (myVehicle.lock === true){
+                    this.infoTextBoxForGetOnFailedDueLock?.setVisible(true);
+                  } else {
+                    myPlayer.visible = false;
+                    this.player.sprite.setVisible(false);
+                    this.player.label.setVisible(false);
+                    this.emitGetOnVehicle(myVehicle.id);
+                  }
                 }
               }
               if (myPlayer?.visible === true) {
@@ -499,13 +505,13 @@ class CoveyGameScene extends Phaser.Scene {
         }
       }
       if(vehicle.lock === true){
-        console.log('VehicleLocked')
+        // console.log('VehicleLocked')
         myVehicle.label?.setText(`Driver: ${vehicle.gainDriverUserName()}\nLocked`)
       } else {
-        console.log('VehicleUnlocked')
+        // console.log('VehicleUnlocked')
         myVehicle.label?.setText(`Driver: ${vehicle.gainDriverUserName()}\nUnLocked`)
       }
-      console.log(myVehicle);
+      // console.log(myVehicle);
 
 
       if (!sprite.anims) return;
@@ -769,8 +775,8 @@ class CoveyGameScene extends Phaser.Scene {
             }
           }
           this.emitMovement(this.lastLocation);
-          // this.infoTextBoxForLockNotification?.setVisible(false);
-          // this.infoTextBoxForUnLockNotification?.setVisible(false);
+          this.infoTextBoxForGetOnFailedDueCapacity?.setVisible(false);
+          this.infoTextBoxForGetOnFailedDueLock?.setVisible(false);
           const vehicleLocation: VehicleLocation = {
             x: this.lastLocation.x,
             y: this.lastLocation.y,
@@ -782,7 +788,7 @@ class CoveyGameScene extends Phaser.Scene {
             this.emitVehicleMovement(vehicleLocation)
             // this.infoTextBoxForLockNotification?.setVisible(false);
             // this.infoTextBoxForUnLockNotification?.setVisible(false);
-            console.log(myVehicle);
+            // console.log(myVehicle);
           }
         }
       }
@@ -972,29 +978,29 @@ class CoveyGameScene extends Phaser.Scene {
     this.infoTextBoxForVehicleArea.setVisible(false);
     this.infoTextBoxForVehicleArea.x = this.game.scale.width / 2 - this.infoTextBoxForVehicleArea.width / 2;
 
-    // this.infoTextBoxForLockNotification = this.add
-    //   .text(
-    //     this.game.scale.width / 2,
-    //     this.game.scale.height / 2,
-    //     "You've Locked the vehicle!\nJust Move to let the notification disappear.",
-    //     { color: '#000000', backgroundColor: '#FFFFFF' },
-    //   )
-    //   .setScrollFactor(0)
-    //   .setDepth(30);
-    // this.infoTextBoxForLockNotification.setVisible(false);
-    // this.infoTextBoxForLockNotification.x = this.game.scale.width / 2 - this.infoTextBoxForLockNotification.width / 2;
+    this.infoTextBoxForGetOnFailedDueCapacity = this.add
+      .text(
+        this.game.scale.width / 2,
+        this.game.scale.height / 2,
+        "You Could Not Get On the Vehicle With Full Passengers!\nJust Move to let the notification disappear.",
+        { color: '#000000', backgroundColor: '#FFFFFF' },
+      )
+      .setScrollFactor(0)
+      .setDepth(30);
+    this.infoTextBoxForGetOnFailedDueCapacity.setVisible(false);
+    this.infoTextBoxForGetOnFailedDueCapacity.x = this.game.scale.width / 2 - this.infoTextBoxForGetOnFailedDueCapacity.width / 2;
 
-    // this.infoTextBoxForUnLockNotification = this.add
-    //   .text(
-    //     this.game.scale.width / 2,
-    //     this.game.scale.height / 2,
-    //     "You've Unlocked the vehicle!\nJust Move to let the notification disappear.",
-    //     { color: '#000000', backgroundColor: '#FFFFFF' },
-    //   )
-    //   .setScrollFactor(0)
-    //   .setDepth(30);
-    // this.infoTextBoxForUnLockNotification.setVisible(false);
-    // this.infoTextBoxForUnLockNotification.x = this.game.scale.width / 2 - this.infoTextBoxForUnLockNotification.width / 2;
+    this.infoTextBoxForGetOnFailedDueLock = this.add
+      .text(
+        this.game.scale.width / 2,
+        this.game.scale.height / 2,
+        "You Could Not Get On the Locked Vehicle!\nJust Move to let the notification disappear.",
+        { color: '#000000', backgroundColor: '#FFFFFF' },
+      )
+      .setScrollFactor(0)
+      .setDepth(30);
+    this.infoTextBoxForGetOnFailedDueLock.setVisible(false);
+    this.infoTextBoxForGetOnFailedDueLock.x = this.game.scale.width / 2 - this.infoTextBoxForGetOnFailedDueLock.width / 2;
 
     const conversationAreaObjects = map.filterObjects(
       'Objects',
@@ -1453,7 +1459,7 @@ export default function WorldMap(): JSX.Element {
   const players = usePlayersInTown();
   const vehicles = useVehiclesInTown();
   // console.log(players);
-  console.log(vehicles);
+  // console.log(vehicles);
 
   useEffect(() => {
     const config = {
