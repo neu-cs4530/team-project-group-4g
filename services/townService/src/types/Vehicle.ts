@@ -26,6 +26,8 @@ export default abstract class Vehicle {
   private _passengers: Passenger[];
   // private _passengersByID: string[];
 
+  private _lock: boolean;
+
   /**
    * The vehicle's unique conversation area
    * extends conversation area?
@@ -44,6 +46,7 @@ export default abstract class Vehicle {
     // this._passengers = [];
     // testUsage
     this._passengers = [];
+    this._lock = false;
   }
 
   get id(): string {
@@ -64,6 +67,14 @@ export default abstract class Vehicle {
 
   set passengers(passengers: Passenger[]) {
     this._passengers = passengers;
+  }
+
+  get lock(): boolean {
+    return this._lock;
+  }
+
+  set lock(isLock: boolean) {
+    this._lock = isLock;
   }
 
   get conversationArea(): ServerConversationArea | undefined {

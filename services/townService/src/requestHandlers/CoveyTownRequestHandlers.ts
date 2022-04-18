@@ -255,6 +255,9 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     onVehicleMoved(movedVehicle: Vehicle) {
       socket.emit('vehicleMoved', movedVehicle);
     },
+    onVehicleChangeLockSituation(updatedVehicle: Vehicle) {
+      socket.emit('vehicleChangedLockSituation', updatedVehicle);
+    },
     onPlayerDisconnected(removedPlayer: Player) {
       socket.emit('playerDisconnect', removedPlayer);
     },
@@ -352,6 +355,10 @@ export function townSubscriptionHandler(socket: Socket): void {
     //   townController.updateVehicleLocation(s.player.vehicle, movementData);
     // }
     townController.updateVehicleLocation(townController.findVehicle(s.player.id), movementData);
+  });
+
+  socket.on('vehicleChangeLockSituation', (vehicleID: string) => {
+    townController.changeVehicleLockSituation(vehicleID);
   });
 
   socket.on('destroyVehicle', (vehicleID: string) =>{
