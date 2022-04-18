@@ -4,6 +4,8 @@ import { ServerPlayer } from "./Player";
     public location?: VehicleLocation;
 
     public passengers?: Passenger[];
+
+    public lock: boolean;
   
     private readonly _id: string;
   
@@ -17,13 +19,14 @@ import { ServerPlayer } from "./Player";
 
     public label?: Phaser.GameObjects.Text;
   
-    constructor(id: string, vehicleType: string, capacity: number, speed: number, location: VehicleLocation, passengers: Passenger[]) {
+    constructor(id: string, vehicleType: string, capacity: number, speed: number, location: VehicleLocation, passengers: Passenger[], lock: boolean) {
       this._id = id;
       this._vehicleType = vehicleType;
       this._capacity = capacity;
       this._speed = speed;
       this.location = location;
       this.passengers = passengers;
+      this.lock = lock;
     }
   
     get id(): string {
@@ -45,7 +48,7 @@ import { ServerPlayer } from "./Player";
     static fromServerVehicle(vehicleFromServer: ServerVehicle): Vehicle {
       return new Vehicle(vehicleFromServer._id, vehicleFromServer._type, 
         vehicleFromServer._capacity, vehicleFromServer._speed,
-        vehicleFromServer.location, vehicleFromServer._passengers);
+        vehicleFromServer.location, vehicleFromServer._passengers, vehicleFromServer._lock);
     }
 
     gainDriverID() : string {
@@ -95,7 +98,7 @@ import { ServerPlayer } from "./Player";
   }
 
   // Might need to add conversatoin in the next week.
-  export type ServerVehicle = { _id: string, _type: string, _capacity: number, _speed: number, location: VehicleLocation, _passengers: Passenger[]};
+  export type ServerVehicle = { _id: string, _type: string, _capacity: number, _speed: number, location: VehicleLocation, _passengers: Passenger[], _lock: boolean};
   
   export type Direction = 'front'|'back'|'left'|'right';
   

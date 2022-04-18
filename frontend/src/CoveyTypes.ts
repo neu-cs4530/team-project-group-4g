@@ -22,6 +22,7 @@ export type CoveyAppState = {
   myPlayerID: string,
   emitMovement: (location: UserLocation) => void,
   emitVehicleMovement: (location: VehicleLocation) => void,
+  emitChangeVehicleLockSituation: (vehicleID: string) => void,
   emitDeleteVehicle: (vehicleID: string) => void,
   emitGetOffVehicle: (vehicleID: string) => void,
   emitCreateVehicle: (location: UserLocation, vehicleType: string) => void,

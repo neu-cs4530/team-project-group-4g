@@ -117,6 +117,8 @@ class CoveyGameScene extends Phaser.Scene {
 
   private emitVehicleMovement: (loc: VehicleLocation) => void;
 
+  private emitChangeVehicleLockSituation: (vehicleID: string) => void;
+
   private emitDeleteVehicle: (vehicleID: string) => void;
 
   private emitGetOffVehicle: (vehicleID: string) => void;
@@ -132,6 +134,10 @@ class CoveyGameScene extends Phaser.Scene {
   private infoTextBox?: Phaser.GameObjects.Text;
 
   private infoTextBoxForVehicleArea?: Phaser.GameObjects.Text;
+
+  private infoTextBoxForLockNotification?: Phaser.GameObjects.Text;
+
+  private infoTextBoxForUnLockNotification?: Phaser.GameObjects.Text;
 
   private setNewConversation: (conv: ConversationArea) => void;
 
@@ -150,6 +156,7 @@ class CoveyGameScene extends Phaser.Scene {
     video: Video,
     emitMovement: (loc: UserLocation) => void,
     emitVehicleMovement: (loc: VehicleLocation) => void,
+    emitChangeVehicleLockSituation: (vehicleID: string) => void,
     emitDeleteVehicle: (vehicleID: string) => void,
     emitGetOffVehicle: (vehicleID: string) => void,
     emitCreateVehicle: (loc: UserLocation, type: string) => void,
@@ -161,6 +168,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.video = video;
     this.emitMovement = emitMovement;
     this.emitVehicleMovement = emitVehicleMovement;
+    this.emitChangeVehicleLockSituation = emitChangeVehicleLockSituation;
     this.emitDeleteVehicle = emitDeleteVehicle;
     this.emitGetOffVehicle = emitGetOffVehicle;
     this.emitCreateVehicle = emitCreateVehicle;
@@ -437,12 +445,14 @@ class CoveyGameScene extends Phaser.Scene {
         passengers = [];
       }
 
-      myVehicle = new Vehicle(vehicle.id, vehicle.vehicleType, vehicle.capacity, vehicle.speed, location, passengers);
+      myVehicle = new Vehicle(vehicle.id, vehicle.vehicleType, vehicle.capacity, vehicle.speed, location, passengers, vehicle.lock);
       this.vehicles.push(myVehicle);
       // console.log(this.vehicles);
     }
-    // Actually we use this method to update the passenger list.
+    // Actually we use this method to update the passenger list and the lock situation;
     myVehicle.passengers = vehicle.passengers;
+    myVehicle.lock = vehicle.lock;
+    // console.log(myVehicle.lock);
 
     // if (this.myPlayerID !== vehicle.gainDriverID() && this.physics && vehicle.location) {
     if (this.myPlayerID !== myVehicle.gainDriverID() && this.physics && vehicle.location) {
@@ -459,7 +469,7 @@ class CoveyGameScene extends Phaser.Scene {
         // .setOffset(0,0);
         // console.log(sprite);
         const label = this.add.text(0, 0, `Driver: ${vehicle.gainDriverUserName()}`, {
-          font: '18px monospace',
+          font: '10px monospace',
           color: '#000000',
           backgroundColor: '#ffffff',
         });
@@ -488,6 +498,16 @@ class CoveyGameScene extends Phaser.Scene {
           );
         }
       }
+      if(vehicle.lock === true){
+        console.log('VehicleLocked')
+        myVehicle.label?.setText(`Driver: ${vehicle.gainDriverUserName()}\nLocked`)
+      } else {
+        console.log('VehicleUnlocked')
+        myVehicle.label?.setText(`Driver: ${vehicle.gainDriverUserName()}\nUnLocked`)
+      }
+      console.log(myVehicle);
+
+
       if (!sprite.anims) return;
       // console.log(sprite);
       sprite.setX(vehicle.location.x);
@@ -526,6 +546,18 @@ class CoveyGameScene extends Phaser.Scene {
     if (this.player && this.cursors) {
       const myPlayer = this.players.find(p => p.id === this.myPlayerID)
       const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
+      // Lock/Unlock the car
+      if (myVehicle && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.space?.isDown)) {
+        if (myVehicle.lock === false) {
+          this.infoTextBoxForUnLockNotification?.setVisible(false);
+          this.infoTextBoxForLockNotification?.setVisible(true);
+        } else {
+          this.infoTextBoxForLockNotification?.setVisible(false);
+          this.infoTextBoxForUnLockNotification?.setVisible(true);
+        }
+        this.emitChangeVehicleLockSituation(myVehicle.id);
+      }
+
       if (myVehicle && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)) {
         // console.log('Should not log this when the passenger get off the car')
         // 下车的部分在这里
@@ -546,6 +578,8 @@ class CoveyGameScene extends Phaser.Scene {
           .setScale(1)
           .setSize(30, 40)
         this.player.sprite.setVisible(true);
+        this.infoTextBoxForLockNotification?.setVisible(false);
+        this.infoTextBoxForUnLockNotification?.setVisible(false);
       };
 
       if (!myVehicle && myPlayer && myPlayer.visible === false && this.player.sprite.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)) {
@@ -562,6 +596,8 @@ class CoveyGameScene extends Phaser.Scene {
           .setScale(1)
           .setSize(30, 40)
         this.player.sprite.setVisible(true);
+        this.infoTextBoxForLockNotification?.setVisible(false);
+        this.infoTextBoxForUnLockNotification?.setVisible(false);
       };
 
       // if(this.player.sprite.visible === false && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
@@ -723,6 +759,8 @@ class CoveyGameScene extends Phaser.Scene {
             }
           }
           this.emitMovement(this.lastLocation);
+          this.infoTextBoxForLockNotification?.setVisible(false);
+          this.infoTextBoxForUnLockNotification?.setVisible(false);
           const vehicleLocation: VehicleLocation = {
             x: this.lastLocation.x,
             y: this.lastLocation.y,
@@ -732,6 +770,9 @@ class CoveyGameScene extends Phaser.Scene {
 
           if (myPlayer?.visible === false) {
             this.emitVehicleMovement(vehicleLocation)
+            this.infoTextBoxForLockNotification?.setVisible(false);
+            this.infoTextBoxForUnLockNotification?.setVisible(false);
+            console.log(myVehicle);
           }
         }
       }
@@ -815,6 +856,7 @@ class CoveyGameScene extends Phaser.Scene {
       //  }
       // }
     }
+    
   }
 
   create() {
@@ -920,6 +962,30 @@ class CoveyGameScene extends Phaser.Scene {
     this.infoTextBoxForVehicleArea.setVisible(false);
     this.infoTextBoxForVehicleArea.x = this.game.scale.width / 2 - this.infoTextBoxForVehicleArea.width / 2;
 
+    this.infoTextBoxForLockNotification = this.add
+      .text(
+        this.game.scale.width / 2,
+        this.game.scale.height / 2,
+        "You've Locked the vehicle!\nJust Move to let the notification disappear.",
+        { color: '#000000', backgroundColor: '#FFFFFF' },
+      )
+      .setScrollFactor(0)
+      .setDepth(30);
+    this.infoTextBoxForLockNotification.setVisible(false);
+    this.infoTextBoxForLockNotification.x = this.game.scale.width / 2 - this.infoTextBoxForLockNotification.width / 2;
+
+    this.infoTextBoxForUnLockNotification = this.add
+      .text(
+        this.game.scale.width / 2,
+        this.game.scale.height / 2,
+        "You've Unlocked the vehicle!\nJust Move to let the notification disappear.",
+        { color: '#000000', backgroundColor: '#FFFFFF' },
+      )
+      .setScrollFactor(0)
+      .setDepth(30);
+    this.infoTextBoxForUnLockNotification.setVisible(false);
+    this.infoTextBoxForUnLockNotification.x = this.game.scale.width / 2 - this.infoTextBoxForUnLockNotification.width / 2;
+
     const conversationAreaObjects = map.filterObjects(
       'Objects',
       obj => obj.type === 'conversation',
@@ -1002,6 +1068,16 @@ class CoveyGameScene extends Phaser.Scene {
         false,
       ) as Phaser.Types.Input.Keyboard.CursorKeys,
     );
+    // this.cursors.push(
+    //   this.input.keyboard.addKeys(
+    //     {
+    //       lock: Phaser.Input.Keyboard.KeyCodes.I,
+    //       unlock: Phaser.Input.Keyboard.KeyCodes.U,
+    //     },
+    //     false,
+    //   ) as Phaser.Types.Input.Keyboard.CursorKeys,
+    // );
+    // console.log(this.cursors);
 
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
@@ -1358,7 +1434,7 @@ class CoveyGameScene extends Phaser.Scene {
 
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
-  const { emitMovement, emitCreateVehicle, emitGetOnVehicle, emitVehicleMovement, emitDeleteVehicle, emitGetOffVehicle, myPlayerID } = useCoveyAppState();
+  const { emitMovement, emitCreateVehicle, emitGetOnVehicle, emitVehicleMovement, emitChangeVehicleLockSituation, emitDeleteVehicle, emitGetOffVehicle, myPlayerID } = useCoveyAppState();
   const conversationAreas = useConversationAreas();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   const [newConversation, setNewConversation] = useState<ConversationArea>();
@@ -1367,7 +1443,7 @@ export default function WorldMap(): JSX.Element {
   const players = usePlayersInTown();
   const vehicles = useVehiclesInTown();
   // console.log(players);
-  // console.log(vehicles);
+  console.log(vehicles);
 
   useEffect(() => {
     const config = {
@@ -1390,7 +1466,7 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement, emitVehicleMovement, emitDeleteVehicle, emitGetOffVehicle, emitCreateVehicle, emitGetOnVehicle, setNewConversation, myPlayerID);
+      const newGameScene = new CoveyGameScene(video, emitMovement, emitVehicleMovement, emitChangeVehicleLockSituation, emitDeleteVehicle, emitGetOffVehicle, emitCreateVehicle, emitGetOnVehicle, setNewConversation, myPlayerID);
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -1403,7 +1479,7 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement, emitVehicleMovement, emitDeleteVehicle, emitGetOffVehicle, emitCreateVehicle, emitGetOnVehicle, setNewConversation, myPlayerID]);
+  }, [video, emitMovement, emitVehicleMovement, emitChangeVehicleLockSituation, emitDeleteVehicle, emitGetOffVehicle, emitCreateVehicle, emitGetOnVehicle, setNewConversation, myPlayerID]);
 
   // This side Effect does not influence the create stage.
   // This Side Effect only affect the movement of the Player during animation.

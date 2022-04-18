@@ -98,6 +98,8 @@ function wrappedTownSelection() {
     },
     emitVehicleMovement: () => {
     },
+    emitChangeVehicleLockSituation: () => {
+    },
     emitDeleteVehicle: () => {
     },
     emitGetOffVehicle: () => {

@@ -46,6 +46,8 @@ function wrappedTownSettings() {
     },
     emitVehicleMovement: () => {
     },
+    emitChangeVehicleLockSituation: () => {
+    },
     emitDeleteVehicle: () => {
     },
     emitGetOffVehicle:() => {

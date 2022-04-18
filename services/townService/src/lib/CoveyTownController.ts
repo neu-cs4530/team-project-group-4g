@@ -467,6 +467,16 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onVehicleMoved(vehicle));
   }
 
+  changeVehicleLockSituation(vehicleID: string): void {
+    const vehicle = this._vehicles.find(v => v.id === vehicleID);
+    if (!vehicle){
+      throw new Error('There is no such vehicle with the specific vehicle ID.');
+    } else {
+      vehicle.lock = !vehicle.lock;
+      this._listeners.forEach(listener => listener.onVehicleChangeLockSituation(vehicle));
+    }
+  }
+
   // /**
   //  * Update the passenger's status and the corresponding veicle's status, when a player enters a vehicle.
   //  * 

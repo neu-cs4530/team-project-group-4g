@@ -38,6 +38,8 @@ export default interface CoveyTownListener {
    */
   onVehicleMoved(movedVehicle: Vehicle): void;
 
+  onVehicleChangeLockSituation(updatedVehicle: Vehicle): void;
+
   /**
    * Called when a player disconnects from the town
    * @param removedPlayer the player that disconnected

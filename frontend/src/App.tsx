@@ -54,6 +54,7 @@ type CoveyAppUpdate =
       socket: Socket;
       emitMovement: (location: UserLocation) => void;
       emitVehicleMovement: (location: VehicleLocation) => void;
+      emitChangeVehicleLockSituation: (vehicleID: string) => void;
       emitDeleteVehicle: (vehicleID: string) => void;
       emitGetOffVehicle: (vehicleID: string) => void;
       emitCreateVehicle: (location: UserLocation, vehicleType: string) => void
@@ -73,6 +74,7 @@ function defaultAppState(): CoveyAppState {
     socket: null,
     emitMovement: () => { },
     emitVehicleMovement: () => { },
+    emitChangeVehicleLockSituation: () => { },
     emitDeleteVehicle: () => { },
     emitGetOffVehicle: () => { },
     emitCreateVehicle: () => { },
@@ -91,6 +93,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     socket: state.socket,
     emitMovement: state.emitMovement,
     emitVehicleMovement: state.emitVehicleMovement,
+    emitChangeVehicleLockSituation: state.emitChangeVehicleLockSituation,
     emitDeleteVehicle: state.emitDeleteVehicle,
     emitGetOffVehicle: state.emitGetOffVehicle,
     emitCreateVehicle: state.emitCreateVehicle,
@@ -108,6 +111,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.userName = update.data.userName;
       nextState.emitMovement = update.data.emitMovement;
       nextState.emitVehicleMovement = update.data.emitVehicleMovement;
+      nextState.emitChangeVehicleLockSituation = update.data.emitChangeVehicleLockSituation;
       nextState.emitDeleteVehicle = update.data.emitDeleteVehicle;
       nextState.emitGetOffVehicle = update.data.emitGetOffVehicle;
       nextState.emitCreateVehicle = update.data.emitCreateVehicle;
@@ -215,6 +219,10 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         socket.emit('vehicleMovement', location);
       }
 
+      const emitChangeVehicleLockSituation = (vehicleID: string) => {
+        socket.emit('vehicleChangeLockSituation', vehicleID);
+      }
+
       const emitDeleteVehicle = (vehicleID: string) => {
         socket.emit('destroyVehicle', vehicleID);
       }
@@ -290,6 +298,16 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         // } else {
         //   throw new Error ('Did not find the vehicle || Did not find the passenger sPlayer');
         // }
+      });
+
+      socket.on('vehicleChangedLockSituation', (vehicle: ServerVehicle) => {
+        const updateVehicle = localVehicles.find(v => v.id === vehicle._id);
+        if(updateVehicle) {
+          updateVehicle.lock = vehicle._lock;
+        } else {
+          localVehicles = localVehicles.concat(Vehicle.fromServerVehicle(vehicle));
+          setVehiclesInTown(localVehicles);
+        }
       });
 
       socket.on('VehicleGetOffPassengers', (vehicle: ServerVehicle, passengerPlayer: ServerPlayer) => {
@@ -462,6 +480,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           townIsPubliclyListed: video.isPubliclyListed,
           emitMovement,
           emitVehicleMovement,
+          emitChangeVehicleLockSituation,
           emitDeleteVehicle,
           emitGetOffVehicle,
           emitCreateVehicle,
