@@ -549,11 +549,15 @@ class CoveyGameScene extends Phaser.Scene {
       // Lock/Unlock the car
       if (myVehicle && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.space?.isDown)) {
         if (myVehicle.lock === false) {
+          // If original lock situation is unlock. We just locked it.
           this.infoTextBoxForUnLockNotification?.setVisible(false);
           this.infoTextBoxForLockNotification?.setVisible(true);
+          this.player.label.setText((`Driver: You\nLocked`));
         } else {
+          // If original lock istuation is unlock. We just locked it.
           this.infoTextBoxForLockNotification?.setVisible(false);
           this.infoTextBoxForUnLockNotification?.setVisible(true);
+          this.player.label.setText((`Driver: You\nUnLocked`));
         }
         this.emitChangeVehicleLockSituation(myVehicle.id);
       }
