@@ -135,9 +135,9 @@ class CoveyGameScene extends Phaser.Scene {
 
   private infoTextBoxForVehicleArea?: Phaser.GameObjects.Text;
 
-  private infoTextBoxForLockNotification?: Phaser.GameObjects.Text;
+  // private infoTextBoxForLockNotification?: Phaser.GameObjects.Text;
 
-  private infoTextBoxForUnLockNotification?: Phaser.GameObjects.Text;
+  // private infoTextBoxForUnLockNotification?: Phaser.GameObjects.Text;
 
   private setNewConversation: (conv: ConversationArea) => void;
 
@@ -521,6 +521,10 @@ class CoveyGameScene extends Phaser.Scene {
         sprite.setTexture('carAtlas', `car-${vehicle.location.rotation}`);
       }
     }
+
+    if (this.myPlayerID === myVehicle.gainDriverID()) {
+      this.player?.label.setText((`Driver: You\nLock: ${myVehicle.lock}`));
+    }
   }
 
   getNewMovementDirection() {
@@ -548,17 +552,17 @@ class CoveyGameScene extends Phaser.Scene {
       const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
       // Lock/Unlock the car
       if (myVehicle && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.space?.isDown)) {
-        if (myVehicle.lock === false) {
-          // If original lock situation is unlock. We just locked it.
-          this.infoTextBoxForUnLockNotification?.setVisible(false);
-          this.infoTextBoxForLockNotification?.setVisible(true);
-          this.player.label.setText((`Driver: You\nLocked`));
-        } else {
-          // If original lock istuation is unlock. We just locked it.
-          this.infoTextBoxForLockNotification?.setVisible(false);
-          this.infoTextBoxForUnLockNotification?.setVisible(true);
-          this.player.label.setText((`Driver: You\nUnLocked`));
-        }
+        // if (myVehicle.lock === false) {
+        //   // If original lock situation is unlock. We just locked it.
+        //   // this.infoTextBoxForUnLockNotification?.setVisible(false);
+        //   // this.infoTextBoxForLockNotification?.setVisible(true);
+        //   // this.player.label.setText((`Driver: You\nLocked`));
+        // } else {
+        //   // If original lock istuation is unlock. We just locked it.
+        //   // this.infoTextBoxForLockNotification?.setVisible(false);
+        //   // this.infoTextBoxForUnLockNotification?.setVisible(true);
+        //   // this.player.label.setText((`Driver: You\nUnLocked`));
+        // }
         this.emitChangeVehicleLockSituation(myVehicle.id);
       }
 
@@ -582,8 +586,9 @@ class CoveyGameScene extends Phaser.Scene {
           .setScale(1)
           .setSize(30, 40)
         this.player.sprite.setVisible(true);
-        this.infoTextBoxForLockNotification?.setVisible(false);
-        this.infoTextBoxForUnLockNotification?.setVisible(false);
+        this.player.label.setText('You');
+        // this.infoTextBoxForLockNotification?.setVisible(false);
+        // this.infoTextBoxForUnLockNotification?.setVisible(false);
       };
 
       if (!myVehicle && myPlayer && myPlayer.visible === false && this.player.sprite.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)) {
@@ -600,8 +605,9 @@ class CoveyGameScene extends Phaser.Scene {
           .setScale(1)
           .setSize(30, 40)
         this.player.sprite.setVisible(true);
-        this.infoTextBoxForLockNotification?.setVisible(false);
-        this.infoTextBoxForUnLockNotification?.setVisible(false);
+        this.player.label.setVisible(true);
+        // this.infoTextBoxForLockNotification?.setVisible(false);
+        // this.infoTextBoxForUnLockNotification?.setVisible(false);
       };
 
       // if(this.player.sprite.visible === false && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
@@ -763,8 +769,8 @@ class CoveyGameScene extends Phaser.Scene {
             }
           }
           this.emitMovement(this.lastLocation);
-          this.infoTextBoxForLockNotification?.setVisible(false);
-          this.infoTextBoxForUnLockNotification?.setVisible(false);
+          // this.infoTextBoxForLockNotification?.setVisible(false);
+          // this.infoTextBoxForUnLockNotification?.setVisible(false);
           const vehicleLocation: VehicleLocation = {
             x: this.lastLocation.x,
             y: this.lastLocation.y,
@@ -774,8 +780,8 @@ class CoveyGameScene extends Phaser.Scene {
 
           if (myPlayer?.visible === false) {
             this.emitVehicleMovement(vehicleLocation)
-            this.infoTextBoxForLockNotification?.setVisible(false);
-            this.infoTextBoxForUnLockNotification?.setVisible(false);
+            // this.infoTextBoxForLockNotification?.setVisible(false);
+            // this.infoTextBoxForUnLockNotification?.setVisible(false);
             console.log(myVehicle);
           }
         }
@@ -966,29 +972,29 @@ class CoveyGameScene extends Phaser.Scene {
     this.infoTextBoxForVehicleArea.setVisible(false);
     this.infoTextBoxForVehicleArea.x = this.game.scale.width / 2 - this.infoTextBoxForVehicleArea.width / 2;
 
-    this.infoTextBoxForLockNotification = this.add
-      .text(
-        this.game.scale.width / 2,
-        this.game.scale.height / 2,
-        "You've Locked the vehicle!\nJust Move to let the notification disappear.",
-        { color: '#000000', backgroundColor: '#FFFFFF' },
-      )
-      .setScrollFactor(0)
-      .setDepth(30);
-    this.infoTextBoxForLockNotification.setVisible(false);
-    this.infoTextBoxForLockNotification.x = this.game.scale.width / 2 - this.infoTextBoxForLockNotification.width / 2;
+    // this.infoTextBoxForLockNotification = this.add
+    //   .text(
+    //     this.game.scale.width / 2,
+    //     this.game.scale.height / 2,
+    //     "You've Locked the vehicle!\nJust Move to let the notification disappear.",
+    //     { color: '#000000', backgroundColor: '#FFFFFF' },
+    //   )
+    //   .setScrollFactor(0)
+    //   .setDepth(30);
+    // this.infoTextBoxForLockNotification.setVisible(false);
+    // this.infoTextBoxForLockNotification.x = this.game.scale.width / 2 - this.infoTextBoxForLockNotification.width / 2;
 
-    this.infoTextBoxForUnLockNotification = this.add
-      .text(
-        this.game.scale.width / 2,
-        this.game.scale.height / 2,
-        "You've Unlocked the vehicle!\nJust Move to let the notification disappear.",
-        { color: '#000000', backgroundColor: '#FFFFFF' },
-      )
-      .setScrollFactor(0)
-      .setDepth(30);
-    this.infoTextBoxForUnLockNotification.setVisible(false);
-    this.infoTextBoxForUnLockNotification.x = this.game.scale.width / 2 - this.infoTextBoxForUnLockNotification.width / 2;
+    // this.infoTextBoxForUnLockNotification = this.add
+    //   .text(
+    //     this.game.scale.width / 2,
+    //     this.game.scale.height / 2,
+    //     "You've Unlocked the vehicle!\nJust Move to let the notification disappear.",
+    //     { color: '#000000', backgroundColor: '#FFFFFF' },
+    //   )
+    //   .setScrollFactor(0)
+    //   .setDepth(30);
+    // this.infoTextBoxForUnLockNotification.setVisible(false);
+    // this.infoTextBoxForUnLockNotification.x = this.game.scale.width / 2 - this.infoTextBoxForUnLockNotification.width / 2;
 
     const conversationAreaObjects = map.filterObjects(
       'Objects',
@@ -1094,7 +1100,7 @@ class CoveyGameScene extends Phaser.Scene {
     // .setSize(10, 10)
     // .setOffset(0,0);
     const label = this.add.text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
-      font: '18px monospace',
+      font: '10px monospace',
       color: '#000000',
       // padding: {x: 20, y: 10},
       backgroundColor: '#ffffff',
