@@ -485,9 +485,9 @@ class CoveyGameScene extends Phaser.Scene {
             (overlappingPlayer) => {
               if (cursorKeys.space.isDown) {
                 if (this.player && myPlayer && myPlayer.visible === true && myVehicle && myVehicle.passengers) {
-                  if (myVehicle.passengers.length >= myVehicle.capacity){
+                  if (myVehicle.passengers.length >= myVehicle.capacity) {
                     this.infoTextBoxForGetOnFailedDueCapacity?.setVisible(true);
-                  } else if (myVehicle.lock === true){
+                  } else if (myVehicle.lock === true) {
                     this.infoTextBoxForGetOnFailedDueLock?.setVisible(true);
                   } else {
                     myPlayer.visible = false;
@@ -504,7 +504,7 @@ class CoveyGameScene extends Phaser.Scene {
           );
         }
       }
-      if(vehicle.lock === true){
+      if (vehicle.lock === true) {
         // console.log('VehicleLocked')
         myVehicle.label?.setText(`Driver: ${vehicle.gainDriverUserName()}\nLocked`)
       } else {
@@ -731,8 +731,8 @@ class CoveyGameScene extends Phaser.Scene {
         this.player.label.setY(body.y - 20);
         if (
           !this.lastLocation ||
-          this.lastLocation.x !== body.x ||
-          this.lastLocation.y !== body.y ||
+          this.lastLocation.x !== (body.right + body.left) / 2 ||
+          this.lastLocation.y !== (body.top + body.bottom) / 2 ||
           (isMoving && this.lastLocation.rotation !== primaryDirection) ||
           this.lastLocation.moving !== isMoving
         ) {
@@ -744,9 +744,9 @@ class CoveyGameScene extends Phaser.Scene {
               moving: isMoving,
             };
           }
-          this.lastLocation.x = body.x;
-          this.lastLocation.y = body.y;
-          this.lastLocation.rotation = primaryDirection || 'front';
+          this.lastLocation.x = (body.right + body.left) / 2;
+          this.lastLocation.y = (body.top + body.bottom) / 2;
+          this.lastLocation.rotation = primaryDirection || this.lastLocation.rotation || 'front';
           this.lastLocation.moving = isMoving;
           if (this.currentConversationArea) {
             if (this.currentConversationArea.conversationArea) {
@@ -872,7 +872,7 @@ class CoveyGameScene extends Phaser.Scene {
       //  }
       // }
     }
-    
+
   }
 
   create() {
