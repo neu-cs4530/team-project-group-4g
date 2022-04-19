@@ -223,7 +223,8 @@ export default class CoveyTownController {
         };
         break;
       default:
-        throw new Error('The vehicle type is not applicable');
+        // throw new Error('The vehicle type is not applicable');
+        return;
     }
     driver.visible = false;
     newVehicle.addPassenger(new Passenger(driver, newVehicle.id, true));
@@ -249,7 +250,7 @@ export default class CoveyTownController {
       vehicle.passengers.push(passenger);
       this._listeners.forEach(listener => listener.onVehicleUpdatePassengers(vehicle, passengerPlayer));
     } else {
-      throw new Error('Could not find the Vehicle');
+      // throw new Error('Could not find the Vehicle');
     }
    
   }
@@ -275,7 +276,7 @@ export default class CoveyTownController {
   destroyVehicle(vehicleID: string) : void {
     const vehicle = this._vehicles.find(v => v.id === vehicleID);
     if (!vehicle){
-      throw new Error('You could not destroy an unexist vehicle');
+      // throw new Error('You could not destroy an unexist vehicle');
     } else {
       const passengerPlayerList : Player[] = [];
       for (let i = 0; i < vehicle.passengers.length; i += 1){
@@ -410,10 +411,12 @@ export default class CoveyTownController {
    */
   updateVehicleLocation(vehicle: Vehicle | undefined, location: VehicleLocation): void {
     if (vehicle === undefined) {
-      throw Error('There is no vehicle such a vehicle');
+      // throw Error('There is no vehicle such a vehicle');
+      return;
     }
     if (vehicle.passengers === undefined) {
-      throw Error('There is no defined  passengers list');
+      // throw Error('There is no defined  passengers list');
+      return;
     }
 
     vehicle.location = location;
@@ -442,7 +445,7 @@ export default class CoveyTownController {
   changeVehicleLockSituation(vehicleID: string): void {
     const vehicle = this._vehicles.find(v => v.id === vehicleID);
     if (!vehicle){
-      throw new Error('There is no such vehicle with the specific vehicle ID.');
+      // throw new Error('There is no such vehicle with the specific vehicle ID.');
     } else {
       vehicle.lock = !vehicle.lock;
       this._listeners.forEach(listener => listener.onVehicleChangeLockSituation(vehicle));
