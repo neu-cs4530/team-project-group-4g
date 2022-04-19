@@ -2,7 +2,6 @@ import { nanoid } from 'nanoid';
 import { ServerConversationArea } from '../client/TownsServiceClient';
 import { VehicleLocation } from '../CoveyTypes';
 import Passenger from './Passenger';
-import Player from './Player';
 
 /**
  * Each vehicle which is connected to a town is represented by a Vehicle object.
@@ -43,8 +42,6 @@ export default abstract class Vehicle {
     };
 
     this._id = nanoid();
-    // this._passengers = [];
-    // testUsage
     this._passengers = [];
     this._lock = false;
   }
@@ -92,6 +89,10 @@ export default abstract class Vehicle {
     this._passengers.push(passenger);
   }
 
+  /**
+   * 
+   * @returns 
+   */
   gainDriverID() : string {
     const passengerList = this.passengers;
     for (let i = 0; i < passengerList.length; i += 1){

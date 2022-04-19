@@ -25,17 +25,10 @@ export default class Passenger {
     return this._vehicleByID;
   }
 
-  // set vehicleByID(vehicleByID: string) {
-  //   this._vehicleByID = vehicleByID;
-  // }
 
   get isDriver(): boolean {
     return this._isDriver;
   }
-
-  // set isDriver(isDriver: boolean) {
-  //   this._isDriver = isDriver;
-  // }
 
   get userName(): string {
     return this._player.userName;
