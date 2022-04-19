@@ -100,7 +100,8 @@ export default abstract class Vehicle {
         return passengerList[i].id;
       }
     }
-    throw Error('No Driver on the vehicle');
+    // throw Error('No Driver on the vehicle');
+    return '';
   }
 
 }
