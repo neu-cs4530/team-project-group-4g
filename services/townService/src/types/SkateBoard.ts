@@ -13,6 +13,10 @@ export default class SkateBoard extends Vehicle{
     this._type = 'SkateBoard';
   }
 
+  /**
+   * 
+   * @returns 
+   */
   getVehicleType(): string {
     return this._type;
   }   

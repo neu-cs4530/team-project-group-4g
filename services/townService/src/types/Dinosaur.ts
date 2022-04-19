@@ -13,6 +13,10 @@ export default class Dinosaur extends Vehicle{
     this._type = 'Dinosaur';
   }
 
+  /**
+   * 
+   * @returns 
+   */
   getVehicleType(): string {
     return this._type;
   }   

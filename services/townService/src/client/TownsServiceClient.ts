@@ -127,37 +127,6 @@ export type CoveyTownInfo = {
   maximumOccupancy: number
 };
 
-/**
- * Payload sent by the client to add a vehicle to a town
- */
-export interface VehicleAddRequest {
-  coveyTownID: string;
-  sessionToken: string;
-  conversationArea: ServerConversationArea;
-  playerId: string;
-  vehicleType: string;
-}
-
-/**
- * Response from the server for a VehicleAddRequest
- */
-export interface VehicleAddResponse {
-  vehicleID: string;
-  location: VehicleLocation;
-}
-
-/**
- * Payload sent by the client to delete a vehicle from a town
- */
-export interface VehicleDeleteRequest {
-  coveyTownID: string;
-  location: VehicleLocation;
-}
-
-/** Payload sent by the client to retrieve vehicles from a town */
-export interface VehicleListRequest {
-  coveyTownID: string;
-}
 
 export default class TownsServiceClient {
   private _axios: AxiosInstance;

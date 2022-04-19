@@ -97,12 +97,6 @@ export default class CoveyTownController {
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
-    // test whether or not the vehicle could be sent to fronted
-    // this._vehicles.push(new Car());
-    // this.vehicles.push(new Dinosaur());
-    // this.vehicles.push(new SkateBoard());
-    // this._vehicles = [];
-    // console.log(this._vehicles);
   }
 
   /**
@@ -191,6 +185,13 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onPlayerMoved(player));
   }
 
+  // 需要JS Doc
+  /**
+   * 
+   * @param driver 
+   * @param initLocation 
+   * @param vehicleType 
+   */
   createInitVehicle(driver: Player, initLocation: UserLocation, vehicleType: string): void{
     let newVehicle: Vehicle;
     switch (vehicleType) {
@@ -231,6 +232,13 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
   }
 
+  // 需要JS Doc.
+  /**
+   * 
+   * 
+   * @param passengerPlayer 
+   * @param vehicleID 
+   */
   getOnVehicle(passengerPlayer: Player, vehicleID: string) : void {
     passengerPlayer.visible = false;
     // Plan to delete the onPlayerInvisible(). Delegate the functionality to the onVehicleUpdatePassengers.
@@ -246,6 +254,11 @@ export default class CoveyTownController {
    
   }
 
+  /**
+   * 
+   * @param passengerPlayer 
+   * @param vehicleID 
+   */
   getOffVehicle(passengerPlayer: Player, vehicleID: string) : void {
     passengerPlayer.visible = true;
     const vehicle = this._vehicles.find(v => v.id === vehicleID);
@@ -255,6 +268,10 @@ export default class CoveyTownController {
     }
   }
 
+  /**
+   * 
+   * @param vehicleID 
+   */
   destroyVehicle(vehicleID: string) : void {
     const vehicle = this._vehicles.find(v => v.id === vehicleID);
     if (!vehicle){
@@ -382,55 +399,6 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onTownDestroyed());
   }
 
-  // /**
-  //  * Adds a vehicle to this CoveyTown, checking that the player can enter(add) vehicles and this vehicle can be added at this specified location 
-  //  *
-  //  * @param _conversationArea the conversation area in the vehicle
-  //  * @param newPlayer the player to add to the vehicle
-  //  * @param vehicleType the vehicle type 
-  //  */
-  // addVehicle(player: Player, conversationArea: ServerConversationArea, vehicleType = 'car'): boolean {
-
-  //   const addConversationArea = this.addConversationArea(conversationArea);
-
-  //   if (!addConversationArea) {
-  //     return false;
-  //   }
-
-  //   let newVehicle: Vehicle;
-
-  //   if (vehicleType === 'dinasour') {
-  //     newVehicle = new Dinosaur();
-  //   } else if (vehicleType === 'car') {
-  //     newVehicle = new Car();
-  //   } else if (vehicleType === 'skateboard') {
-  //     newVehicle = new SkateBoard();
-  //   } else {
-  //     return false;
-  //   }
-
-  //   this._vehicles.push(newVehicle);
-
-  //   newVehicle.conversationArea = conversationArea;
-
-  //   // Create a new passenger instance
-  //   const newPassenger = new Passenger(player, newVehicle.id, true);
-
-  //   // newVehicle.addPassenger(newPassenger);
-  //   /** Add the passenger to the vehicle */
-  //   newVehicle.addPassenger(newPassenger);
-
-  //   // notify town listener that a vehicle was added
-  //   this._listeners.forEach(listener => {
-  //     listener.onVehicleCreated(newVehicle);
-  //   });
-
-  //   // notify
-  //   this._listeners.forEach(listener => listener.onPlayerJoinedVehicle(newPassenger));
-
-  //   return true;
-  // }
-
   /**
    * Updates the location for this vehicle and the location of all passengers in it within the town.
    * 
@@ -467,6 +435,10 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onVehicleMoved(vehicle));
   }
 
+  /**
+   * 
+   * @param vehicleID 
+   */
   changeVehicleLockSituation(vehicleID: string): void {
     const vehicle = this._vehicles.find(v => v.id === vehicleID);
     if (!vehicle){
@@ -476,26 +448,5 @@ export default class CoveyTownController {
       this._listeners.forEach(listener => listener.onVehicleChangeLockSituation(vehicle));
     }
   }
-
-  // /**
-  //  * Update the passenger's status and the corresponding veicle's status, when a player enters a vehicle.
-  //  * 
-  //  * @param vehicle Vehicle to update status for
-  //  * @param player New passenger for this vehicle
-  //  */
-  // enterVehicle(vehicle: Vehicle, player: Player): void {
-
-  // }
-
-  // /**
-  //  * Update the passenger's status and the corresponding vehicle's status, when a passenger leaves a vehicle.
-  //  * 
-  //  * @param vehicle Vehicle to update status for
-  //  * @param passenger Passenger who leaves the vehicle
-  //  */
-  // leaveVehicle(vehicle: Vehicle, passenger: Passenger): void {
-
-  // }
-
 }
 
