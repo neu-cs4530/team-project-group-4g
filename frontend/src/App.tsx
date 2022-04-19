@@ -128,8 +128,33 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
   return nextState;
 }
 
-function calculateNearbyPlayers(players: Player[], currentLocation: UserLocation) {
+function calculateNearbyPlayers(players: Player[], currentLocation: UserLocation, gamePlayerID: string, localVehicles: Vehicle[]) {
+  const isInSpecificVehicle = (p: Player, specificVehicle: Vehicle) => {
+    if (specificVehicle.includesPassenger(p.id)) {
+      return true;
+    }
+    return false;
+  }
+
+  let passengersIDList : string[] = [];
+  for (let i = 0; i < localVehicles.length; i+=1) {
+    const specificVehicle = localVehicles[i];
+    if (!specificVehicle.includesPassenger(gamePlayerID)){
+      // console.log('Not In The Car');
+      // console.log(specificVehicle.gainAllPassengersID());
+      passengersIDList = passengersIDList.concat(specificVehicle.gainAllPassengersID());
+    } else {
+      // console.log('In The Car');
+      return players.filter(p => isInSpecificVehicle(p, specificVehicle));
+    }
+  }
+  // console.log(passengersIDList);
+
   const isWithinCallRadius = (p: Player, location: UserLocation) => {
+    // The passengers should not be called if gamePlayer is out of the specific vehicle.
+    if (passengersIDList.includes(p.id)) {
+      return false;
+    }
     if (p.location && location) {
       if (location.conversationLabel || p.location.conversationLabel) {
         return p.location.conversationLabel === location.conversationLabel;
@@ -192,7 +217,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       setNearbyPlayers(localNearbyPlayers);
 
       const recalculateNearbyPlayers = () => {
-        const newNearbyPlayers = calculateNearbyPlayers(localPlayers, currentLocation);
+        const newNearbyPlayers = calculateNearbyPlayers(localPlayers, currentLocation, gamePlayerID, localVehicles);
         if (!samePlayers(localNearbyPlayers, newNearbyPlayers)) {
           localNearbyPlayers = newNearbyPlayers;
           setNearbyPlayers(localNearbyPlayers);
