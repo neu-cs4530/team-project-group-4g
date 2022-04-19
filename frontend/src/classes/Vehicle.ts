@@ -95,6 +95,16 @@ import { ServerPlayer } from "./Player";
       }
       throw Error('No Driver on the vehicle');
     }
+
+    gainAllPassengersID() : string[] {
+      const passengersIDList : string[] = [];
+      if (this.passengers){
+        for (let i = 0; i<this.passengers?.length; i+=1){
+          passengersIDList.push(this.passengers[i]._player._id);
+        }
+      }
+      return passengersIDList;
+    }
   }
 
   // Might need to add conversatoin in the next week.
