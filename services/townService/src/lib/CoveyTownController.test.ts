@@ -5,7 +5,7 @@ import TwilioVideo from './TwilioVideo';
 import Player from '../types/Player';
 import CoveyTownController from './CoveyTownController';
 import CoveyTownListener from '../types/CoveyTownListener';
-import { UserLocation } from '../CoveyTypes';
+import { UserLocation, VehicleLocation } from '../CoveyTypes';
 import PlayerSession from '../types/PlayerSession';
 import { townSubscriptionHandler } from '../requestHandlers/CoveyTownRequestHandlers';
 import CoveyTownsStore from './CoveyTownsStore';
@@ -287,6 +287,402 @@ describe('CoveyTownController', () => {
       const newLocation:UserLocation = { moving: false, rotation: 'front', x: 25, y: 25, conversationLabel: newConversationArea.label };
       testingTown.updatePlayerLocation(player, newLocation);
       expect(mockListener.onConversationAreaUpdated).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('createInitVehicle', () =>{
+    let testingTown: CoveyTownController;
+    beforeEach(() => {
+      const townName = `createInitVehicle test town ${nanoid()}`;
+      testingTown = new CoveyTownController(townName, false);
+    });
+    it('should create a dinosaur as the player requested', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      const userInitLocation : UserLocation = { moving: false, rotation: 'front', x: 0, y: 0, conversationLabel: newConversationArea.label };
+      player.location = userInitLocation;
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Dinosaur';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      expect(testingTown.vehicles[0].speed).toBe(1.5);
+    });
+    it('should create a skateboard as the player requested', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      const userInitLocation : UserLocation = { moving: false, rotation: 'front', x: 0, y: 0, conversationLabel: newConversationArea.label };
+      player.location = userInitLocation;
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Skateboard';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      expect(testingTown.vehicles[0].speed).toBe(1.2);
+    });
+    it('should create a car as the player requested', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      const userInitLocation : UserLocation = { moving: false, rotation: 'front', x: 0, y: 0, conversationLabel: newConversationArea.label };
+      player.location = userInitLocation;
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      expect(testingTown.vehicles[0].speed).toBe(2.0);
+    });
+    it('should add new vehicle into the list of current vehicles in town', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      expect(testingTown.vehicles.length).toBe(1);
+    });
+    it('should add player into the list of current players in the new vehicle', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      expect(testingTown.vehicles[0].passengers.length).toBe(1);
+    });
+    it('should emit onPlayerInvisible event when player switches to a vehicle', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      expect(mockListener.onPlayerInvisible).toHaveBeenCalledTimes(1);
+    });
+    it('should emit onVehicleCreated event when player switches to a vehicle', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      expect(mockListener.onVehicleCreated).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('getOnVehicle', () =>{
+    let testingTown: CoveyTownController;
+    beforeEach(() => {
+      const townName = `getOnVehicle test town ${nanoid()}`;
+      testingTown = new CoveyTownController(townName, false);
+    });
+    it('should add player as a passenger of the given vehicle', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+      expect(testingTown.vehicles[0].passengers.length).toBe(1);
+
+      const vehicleID = testingTown.vehicles[0].id;
+      testingTown.getOnVehicle(player, vehicleID);
+      expect(testingTown.vehicles[0].passengers.length).toBe(2);
+    });
+    it('should emit onVehicleUpdatePassengers when player gets in a vehicle', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      const vehicleID = testingTown.vehicles[0].id;
+      testingTown.getOnVehicle(player, vehicleID);
+      expect(mockListener.onVehicleUpdatePassengers).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('findVehicle', () =>{
+    let testingTown: CoveyTownController;
+    beforeEach(() => {
+      const townName = `findVehicle test town ${nanoid()}`;
+      testingTown = new CoveyTownController(townName, false);
+    });
+    it('should return undefined given a invalid passenger id', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      expect(testingTown.findVehicle('1234')).toBeUndefined();
+    });
+    it('should find the correct vehicle given a valid passenger id', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      const playerID = player.id;
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      expect(testingTown.findVehicle(playerID)).toEqual(testingTown.vehicles[0]);
+    });
+  });
+  describe('updateVehicleLocation', () =>{
+    let testingTown: CoveyTownController;
+    beforeEach(() => {
+      const townName = `updateVehicleLocation test town ${nanoid()}`;
+      testingTown = new CoveyTownController(townName, false);
+    });
+    it('should update the locations of all passengers to where the vehicle moved to', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      const userInitLocation : UserLocation = { moving: false, rotation: 'front', x: 0, y: 0, conversationLabel: newConversationArea.label };
+      player.location = userInitLocation;
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const newLocation : VehicleLocation = { moving: false, rotation: 'front', x: 25, y: 25 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      testingTown.updateVehicleLocation(testingTown.vehicles[0], newLocation);
+      expect(testingTown.players[0].location.x).toEqual(25);
+      expect(mockListener.onVehicleMoved).toHaveBeenCalledTimes(1);
+    });
+    it('should emit onVehicleMoved event when vehicle moves to a new location', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const newLocation : VehicleLocation = { moving: false, rotation: 'front', x: 25, y: 25 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      testingTown.updateVehicleLocation(testingTown.vehicles[0], newLocation);
+      expect(mockListener.onVehicleMoved).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('getOffVehicle', () =>{
+    let testingTown: CoveyTownController;
+    beforeEach(() => {
+      const townName = `getOffVehicle test town ${nanoid()}`;
+      testingTown = new CoveyTownController(townName, false);
+    });
+    it('should delete player as a passenger of the given vehicle', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+      expect(testingTown.vehicles[0].passengers.length).toBe(1);
+
+      const vehicleID = testingTown.vehicles[0].id;
+      testingTown.getOffVehicle(player, vehicleID);
+      expect(testingTown.vehicles[0].passengers.length).toBe(0);
+    });
+    it('should emit onVehicleGetOffPassenger when player gets off a vehicle', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      const vehicleID = testingTown.vehicles[0].id;
+      testingTown.getOffVehicle(player, vehicleID);
+      expect(mockListener.onVehicleGetOffPassenger).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('destroyVehicle', () =>{
+    let testingTown: CoveyTownController;
+    beforeEach(() => {
+      const townName = `destroyVehicle test town ${nanoid()}`;
+      testingTown = new CoveyTownController(townName, false);
+    });
+    it('should emit onVehicleDestroyed when player gets off a vehicle', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      const vehicleID = testingTown.vehicles[0].id;
+      testingTown.destroyVehicle(vehicleID);
+      expect(mockListener.onVehicleDestroyed).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('changeVehicleLockSituation', () =>{
+    let testingTown: CoveyTownController;
+    beforeEach(() => {
+      const townName = `changeVehicleLockSituation test town ${nanoid()}`;
+      testingTown = new CoveyTownController(townName, false);
+    });
+    it('should switch to locked when driver locks the vehicle', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+      expect(testingTown.vehicles[0].passengers.length).toBe(1);
+
+      const vehicleID = testingTown.vehicles[0].id;
+      expect(testingTown.vehicles[0].lock).toBe(false);
+      testingTown.changeVehicleLockSituation(vehicleID);
+      expect(testingTown.vehicles[0].lock).toBe(true);
+    });
+    it('should emit onVehicleChangeLockSituation when driver locks a vehicle', async () =>{
+
+      const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
+      const result = testingTown.addConversationArea(newConversationArea);
+      expect(result).toBe(true);
+
+      const mockListener = mock<CoveyTownListener>();
+      testingTown.addTownListener(mockListener);
+
+      const player = new Player(nanoid());
+      await testingTown.addPlayer(player);
+
+      const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
+      const vehicleType  = 'Car';
+      testingTown.createInitVehicle(player, initLocation, vehicleType);
+
+      const vehicleID = testingTown.vehicles[0].id;
+      testingTown.changeVehicleLockSituation(vehicleID);
+      expect(mockListener.onVehicleChangeLockSituation).toHaveBeenCalledTimes(1);
     });
   });
 });
