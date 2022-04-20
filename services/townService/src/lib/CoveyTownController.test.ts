@@ -330,7 +330,7 @@ describe('CoveyTownController', () => {
       await testingTown.addPlayer(player);
 
       const initLocation: VehicleLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
-      const vehicleType  = 'Skateboard';
+      const vehicleType  = 'SkateBoard';
       testingTown.createInitVehicle(player, initLocation, vehicleType);
 
       expect(testingTown.vehicles[0].speed).toBe(1.2);

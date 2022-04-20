@@ -214,7 +214,7 @@ export default class CoveyTownController {
           rotation: initLocation.rotation,
         };
         break;
-      case 'Skateboard':
+      case 'SkateBoard':
         newVehicle = new SkateBoard();
         newVehicle.location = {
           x: initLocation.x,
