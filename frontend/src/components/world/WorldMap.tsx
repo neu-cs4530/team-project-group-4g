@@ -32,49 +32,55 @@ type CarAreaGameObjects = {
   label: string;
 }
 
-// function getPlayerAtlasType(player: Player) : string{
-// let atlasType = 'misa';
-// switch (player.playerType) {
-//   case PlayerType.Human:
-//     atlasType = 'misa';
-//     break;
-//   case PlayerType.Car:
-//     atlasType = 'car';
-//     break;
-//   case PlayerType.SkateBoard:
-//     atlasType = 'skateBoard';
-//     break;
-//   case PlayerType.Dinasour:
-//     atlasType = 'dinasour';
-//     break;
-//   default:
-//     throw new Error('The PlayerAtlasType is undefined');
-//     break;
-// }
-// return 'misa';
-// }
+type SkateboardAreaGameObjects = {
+  labelText: Phaser.GameObjects.Text;
+  sprite: Phaser.GameObjects.Sprite;
+  label: string;
+}
 
-// function getPlayerAtlasName(player: Player) : string{
-// let atlasName = 'atlas';
-// switch (player.playerType) {
-//   case PlayerType.Human:
-//     atlasName = 'atlas';
-//     break;
-//   case PlayerType.Car:
-//     atlasName = 'carAtlas';
-//     break;
-//   case PlayerType.SkateBoard:
-//     atlasName = 'skateBoardAtlas';
-//     break;
-//   case PlayerType.Dinasour:
-//     atlasName = 'dinasourAtlas';
-//     break;
-//   default:
-//     throw new Error('The PlayerNameType is undefined');
-//     break;
-// }
-// return 'atlas';
-// }
+type DinosaurAreaGameObjects = {
+  labelText: Phaser.GameObjects.Text;
+  sprite: Phaser.GameObjects.Sprite;
+  label: string;
+}
+
+function getAtlasType(vehicle: Vehicle) : string{
+  let atlasType = 'car'
+  switch (vehicle.vehicleType) {
+    case 'Car':
+      atlasType = 'car'
+      break;
+    case 'SkateBoard':
+      atlasType = 'skateboard';
+      break;
+    case 'Dinosaur':
+      atlasType = 'dinosaur';
+      break;
+    default:
+      throw new Error('The AtlasType is undefined');
+      break;
+    }
+  return atlasType;
+}
+
+function getAtlasName(vehicle: Vehicle) : string{
+  let atlasName = 'carAtlas';
+  switch (vehicle.vehicleType) {
+    case 'Car':
+      atlasName = 'carAtlas';
+      break;
+    case 'SkateBoard':
+      atlasName = 'skateboardAtlas';
+      break;
+    case 'Dinosaur':
+      atlasName = 'dinosaurAtlas';
+      break;
+    default:
+      throw new Error('The NameType is undefined');
+      break;
+  }
+  return atlasName;
+}
 
 class CoveyGameScene extends Phaser.Scene {
   private player?: {
@@ -93,6 +99,10 @@ class CoveyGameScene extends Phaser.Scene {
   private conversationAreas: ConversationGameObjects[] = [];
 
   private carAreas: CarAreaGameObjects[] = [];
+
+  private skateboardAreas: SkateboardAreaGameObjects[] = [];
+
+  private dinosaurAreas: DinosaurAreaGameObjects[] = [];
 
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys[] = [];
 
@@ -131,6 +141,10 @@ class CoveyGameScene extends Phaser.Scene {
 
   private currentVehicleArea?: CarAreaGameObjects;
 
+  private currentSkateboardArea?: SkateboardAreaGameObjects;
+
+  private currentDinosaurArea?: DinosaurAreaGameObjects;
+
   private infoTextBox?: Phaser.GameObjects.Text;
 
   private infoTextBoxForVehicleArea?: Phaser.GameObjects.Text;
@@ -143,14 +157,6 @@ class CoveyGameScene extends Phaser.Scene {
 
   private _onGameReadyListeners: Callback[] = [];
 
-  // private getMyPlayerByID() : Player{
-  //   const myPlayerWithID = this.players.find(p => p.id === this.myPlayerID)
-  //   if (!myPlayerWithID) {
-  //     throw new Error('Current Player is undefined');
-  //   } else{
-  //     return myPlayerWithID;
-  //   }
-  // }
 
   constructor(
     video: Video,
@@ -192,9 +198,13 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('16_Grocery_store_32x32', '/assets/tilesets/16_Grocery_store_32x32.png');
     // this.load.image('parking_spot_32x32','/assets/tilesets/parking_spot_32x32.png');
     this.load.image('car_32x32', '/assets/tilesets/car_32x32.png');
+    this.load.image('skateboard_32x32', '/assets/tilesets/skateboard_32x32.png')
+    this.load.image('dinosaur_32x32', '/assets/tilesets/dinosaur_32x32.png')
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/indoors.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
     this.load.atlas('carAtlas', '/assets/carAtlas/atlas.png', '/assets/carAtlas/atlas.json');
+    this.load.atlas('skateboardAtlas', '/assets/skateboardAtlas/atlas.png', '/assets/skateboardAtlas/atlas.json');
+    this.load.atlas('dinosaurAtlas', '/assets/dinosaurAtlas/atlas.png', '/assets/dinosaurAtlas/atlas.json');
   }
 
   /**
@@ -206,12 +216,6 @@ class CoveyGameScene extends Phaser.Scene {
    */
   updateConversationAreas(conversationAreas: ConversationArea[]) {
     if (!this.ready) {
-      /*
-       * Due to the asynchronous nature of setting up a Phaser game scene (it requires gathering
-       * some resources using asynchronous operations), it is possible that this could be called
-       * in the period between when the player logs in and when the game is ready. Hence, we
-       * register a callback to complete the initialization once the game is ready
-       */
       this._onGameReadyListeners.push(() => {
         this.updateConversationAreas(conversationAreas);
       });
@@ -351,16 +355,9 @@ class CoveyGameScene extends Phaser.Scene {
         sprite.setTexture('atlas', `misa-${player.location.rotation}`);
       }
 
-      // if (myPlayer.visible === false){
-      //   sprite.setAlpha(0);
-      //   myPlayer.label?.setVisible(false);
-      //   // console.log(myPlayer.sprite);
-      // }
-      // console.log(player.visible);
       if (player.visible === false) {
         myPlayer.sprite?.setVisible(false);
         myPlayer.label?.setVisible(false);
-        // console.log(myPlayer.sprite);
       } else {
         myPlayer.sprite?.setVisible(true);
         myPlayer.label?.setVisible(true);
@@ -368,28 +365,6 @@ class CoveyGameScene extends Phaser.Scene {
     }
 
     const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
-    // if (this.myPlayerID === myPlayer.id && this.player && this.player.sprite.visible === false && myPlayer.visible === false && !myVehicle && player.visible === false && player.location && this.lastLocation){
-    //   console.log(0)
-    //   this.player.sprite.x = player.location.x;
-    //   this.player.sprite.y = player.location.y;
-    //   this.lastLocation.x = player.location.x;
-    //   this.lastLocation.y = player.location.y;
-    // }
-
-    // if (this.myPlayerID === myPlayer.id && this.player && this.player.sprite.visible === false && !myVehicle && player.location && this.lastLocation){
-    //   console.log(0)
-    //   this.player.sprite.x = player.location.x;
-    //   this.player.sprite.y = player.location.y;
-    //   this.lastLocation.x = player.location.x;
-    //   this.lastLocation.y = player.location.y;
-    //   console.log(player.visible)
-    //   if (player.visible === true) {
-    //     console.log(1)
-    //     this.player.sprite.setVisible(true);
-    //     this.player.label.setVisible(true);
-    //     myPlayer.visible = true;
-    //   }
-    // }
 
     if (this.myPlayerID === myPlayer.id && this.player?.sprite.visible === false && player.location && this.lastLocation) {
       // console.log(player.visible);
@@ -405,22 +380,6 @@ class CoveyGameScene extends Phaser.Scene {
       }
     }
 
-    // if (this.myPlayerID === myPlayer.id && this.player && this.player.sprite.visible === false && player.visible === true && !myVehicle) {
-    //   console.log(1)
-    //   this.player.sprite.setVisible(true);
-    //   this.player.label.setVisible(true);
-    //   myPlayer.visible = true;
-    // }
-
-    // if (player.visible === false){
-    //   myPlayer.sprite?.setVisible(false);
-    //   myPlayer.label?.setVisible(false);
-    //   // console.log(myPlayer.sprite);
-    // } else {
-    //   myPlayer.sprite?.setVisible(true);
-    //   myPlayer.label?.setVisible(true);
-    // }
-    // console.log(myPlayer);
   }
 
   updateVehicleLocation(vehicle: Vehicle) {
@@ -461,13 +420,18 @@ class CoveyGameScene extends Phaser.Scene {
         sprite = this.physics.add
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - JB todo
-          .sprite(0, 0, 'carAtlas', `car-${vehicle.location.rotation}`)
-          // .setSize(30, 40)
-          // .setOffset(0, 24)
-          .setScale(0.1)
-          .setSize(10, 10)
-        // .setOffset(0,0);
-        // console.log(sprite);
+          // .sprite(0, 0, 'carAtlas', `car-${vehicle.location.rotation}`)
+          .sprite(0, 0, getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-${vehicle.location.rotation}`)
+        if (myVehicle.vehicleType === 'Car'){
+          sprite
+            .setScale(0.1)
+            .setSize(10, 10)
+        } else {
+          sprite
+            .setScale(1)
+            .setSize(20,20)
+        }
+
         const label = this.add.text(0, 0, `Driver: ${vehicle.gainDriverUserName()}`, {
           font: '10px monospace',
           color: '#000000',
@@ -485,10 +449,14 @@ class CoveyGameScene extends Phaser.Scene {
             (overlappingPlayer) => {
               if (cursorKeys.space.isDown) {
                 if (this.player && myPlayer && myPlayer.visible === true && myVehicle && myVehicle.passengers) {
-                  if (myVehicle.passengers.length >= myVehicle.capacity) {
-                    this.infoTextBoxForGetOnFailedDueCapacity?.setVisible(true);
-                  } else if (myVehicle.lock === true) {
+                  // if (myVehicle.passengers.length >= myVehicle.capacity) {
+                  //   this.infoTextBoxForGetOnFailedDueCapacity?.setVisible(true);
+                  // } else if (myVehicle.lock === true) {
+                  //   this.infoTextBoxForGetOnFailedDueLock?.setVisible(true);
+                  if (myVehicle.lock === true ) {
                     this.infoTextBoxForGetOnFailedDueLock?.setVisible(true);
+                  } else if (myVehicle.passengers.length >= myVehicle.capacity) {
+                    this.infoTextBoxForGetOnFailedDueCapacity?.setVisible(true);
                   } else {
                     myPlayer.visible = false;
                     this.player.sprite.setVisible(false);
@@ -521,10 +489,12 @@ class CoveyGameScene extends Phaser.Scene {
       myVehicle.label?.setX(vehicle.location.x);
       myVehicle.label?.setY(vehicle.location.y - 20);
       if (vehicle.location.moving) {
-        sprite.anims.play(`car-${vehicle.location.rotation}-walk`, true);
+        // sprite.anims.play(`car-${vehicle.location.rotation}-walk`, true);
+        sprite.anims.play(`${getAtlasType(myVehicle)}-${vehicle.location.rotation}-walk`, true);
       } else {
         sprite.anims.stop();
-        sprite.setTexture('carAtlas', `car-${vehicle.location.rotation}`);
+        // sprite.setTexture('carAtlas', `car-${vehicle.location.rotation}`);
+        sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-${vehicle.location.rotation}`);
       }
     }
 
@@ -558,31 +528,10 @@ class CoveyGameScene extends Phaser.Scene {
       const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
       // Lock/Unlock the car
       if (myVehicle && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.space?.isDown)) {
-        // if (myVehicle.lock === false) {
-        //   // If original lock situation is unlock. We just locked it.
-        //   // this.infoTextBoxForUnLockNotification?.setVisible(false);
-        //   // this.infoTextBoxForLockNotification?.setVisible(true);
-        //   // this.player.label.setText((`Driver: You\nLocked`));
-        // } else {
-        //   // If original lock istuation is unlock. We just locked it.
-        //   // this.infoTextBoxForLockNotification?.setVisible(false);
-        //   // this.infoTextBoxForUnLockNotification?.setVisible(true);
-        //   // this.player.label.setText((`Driver: You\nUnLocked`));
-        // }
         this.emitChangeVehicleLockSituation(myVehicle.id);
       }
 
       if (myVehicle && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)) {
-        // console.log('Should not log this when the passenger get off the car')
-        // 下车的部分在这里
-        // Do some socket thing here.
-        // const vehicleID = this.emitGetOffVehicle();
-        // const vehicle = this.vehicles.find(v => v.id === vehicleID)
-        // if (vehicle && vehicle.gainDriverID() === myPlayer.id){
-        //   this.vehicles = this.vehicles.filter(v => v.id !== vehicleID)
-        //   // Go through the passenger to Make all Corresponding Player visible
-        //   this.emitDeleteVehicle();
-        // }
         if (this.myPlayerID === myVehicle.gainDriverID()) {
           this.emitDeleteVehicle(myVehicle.id);
         }
@@ -616,30 +565,6 @@ class CoveyGameScene extends Phaser.Scene {
         // this.infoTextBoxForUnLockNotification?.setVisible(false);
       };
 
-      // if(this.player.sprite.visible === false && myPlayer && myPlayer.visible === false && this.cursors.find(keySet => keySet.shift?.isDown)){
-      //   // 下车的部分在这里
-      //   // Do some socket thing here.
-      //   // const vehicleID = this.emitGetOffVehicle();
-      //   // const vehicle = this.vehicles.find(v => v.id === vehicleID)
-      //   // if (vehicle && vehicle.gainDriverID() === myPlayer.id){
-      //   //   this.vehicles = this.vehicles.filter(v => v.id !== vehicleID)
-      //   //   // Go through the passenger to Make all Corresponding Player visible
-      //   //   this.emitDeleteVehicle();
-      //   // }
-      //   if (this.myPlayerID === myVehicle?.gainDriverID()){
-      //     this.emitDeleteVehicle(myVehicle.id);
-      //   }else{
-      //     const vehicleAsPassenger = this.vehicles.find(v => v.includesPassenger(this.myPlayerID));
-      //     if (vehicleAsPassenger){
-      //       this.emitGetOffVehicle(vehicleAsPassenger.id);
-      //     }
-      //   }
-      //   myPlayer.visible = true;
-      //   this.player.sprite
-      //       .setTexture('atlas',`misa-${this.lastLocation?.rotation}`)
-      //       .setScale(1)
-      //       .setSize(30, 40)
-      // }
 
       let speed = 175;
       if (myPlayer?.visible === false && myVehicle) {
@@ -664,7 +589,8 @@ class CoveyGameScene extends Phaser.Scene {
             if (myPlayer?.visible === true) {
               this.player.sprite.anims.play('misa-left-walk', true);
             } else {
-              this.player.sprite.anims.play('car-left-walk', true);
+              // this.player.sprite.anims.play('car-left-walk', true);
+              if (myVehicle) {this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-left-walk`, true)};
             }
             break;
           case 'right':
@@ -672,7 +598,8 @@ class CoveyGameScene extends Phaser.Scene {
             if (myPlayer?.visible === true) {
               this.player.sprite.anims.play('misa-right-walk', true);
             } else {
-              this.player.sprite.anims.play('car-right-walk', true);
+              // this.player.sprite.anims.play('car-right-walk', true);
+              if (myVehicle) {this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-right-walk`, true)};
             }
             break;
           case 'front':
@@ -680,7 +607,8 @@ class CoveyGameScene extends Phaser.Scene {
             if (myPlayer?.visible === true) {
               this.player.sprite.anims.play('misa-front-walk', true);
             } else {
-              this.player.sprite.anims.play('car-front-walk', true);
+              // this.player.sprite.anims.play('car-front-walk', true);
+              if (myVehicle) {this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-front-walk`, true)};
             }
             break;
           case 'back':
@@ -688,7 +616,8 @@ class CoveyGameScene extends Phaser.Scene {
             if (myPlayer?.visible === true) {
               this.player.sprite.anims.play('misa-back-walk', true);
             } else {
-              this.player.sprite.anims.play('car-back-walk', true);
+              // this.player.sprite.anims.play('car-back-walk', true);
+              if (myVehicle) {this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-back-walk`, true)};
             }
             break;
           default:
@@ -699,25 +628,29 @@ class CoveyGameScene extends Phaser.Scene {
               if (myPlayer?.visible === true) {
                 this.player.sprite.setTexture('atlas', 'misa-left');
               } else {
-                this.player.sprite.setTexture('carAtlas', 'car-left');
+                // this.player.sprite.setTexture('carAtlas', 'car-left');
+                if (myVehicle) { this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-left`)};
               }
             } else if (prevVelocity.x > 0) {
               if (myPlayer?.visible === true) {
                 this.player.sprite.setTexture('atlas', 'misa-right');
               } else {
-                this.player.sprite.setTexture('carAtlas', 'car-right');
+                // this.player.sprite.setTexture('carAtlas', 'car-right');
+                if (myVehicle) {this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-right`)};
               }
             } else if (prevVelocity.y < 0) {
               if (myPlayer?.visible === true) {
                 this.player.sprite.setTexture('atlas', 'misa-back');
               } else {
-                this.player.sprite.setTexture('carAtlas', 'car-back');
+                // this.player.sprite.setTexture('carAtlas', 'car-back');
+                if (myVehicle) {this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-back`)};
               }
             } else if (prevVelocity.y > 0) {
               if (myPlayer?.visible === true) {
                 this.player.sprite.setTexture('atlas', 'misa-front');
               } else {
-                this.player.sprite.setTexture('carAtlas', 'car-front');
+                // this.player.sprite.setTexture('carAtlas', 'car-front');
+                if (myVehicle) {this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-front`)};
               }
             }
             break;
@@ -774,6 +707,29 @@ class CoveyGameScene extends Phaser.Scene {
               this.infoTextBoxForVehicleArea?.setVisible(false);
             }
           }
+
+          if (this.currentSkateboardArea) {
+            if (
+              !Phaser.Geom.Rectangle.Overlaps(
+                this.currentSkateboardArea.sprite.getBounds(),
+                this.player.sprite.getBounds(),
+              )
+            ) {
+              this.infoTextBoxForVehicleArea?.setVisible(false);
+            }
+          }
+
+          if (this.currentDinosaurArea) {
+            if (
+              !Phaser.Geom.Rectangle.Overlaps(
+                this.currentDinosaurArea.sprite.getBounds(),
+                this.player.sprite.getBounds(),
+              )
+            ) {
+              this.infoTextBoxForVehicleArea?.setVisible(false);
+            }
+          }
+
           this.emitMovement(this.lastLocation);
           this.infoTextBoxForGetOnFailedDueCapacity?.setVisible(false);
           this.infoTextBoxForGetOnFailedDueLock?.setVisible(false);
@@ -792,85 +748,6 @@ class CoveyGameScene extends Phaser.Scene {
           }
         }
       }
-
-      // // const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID)
-      // if (myVehicle && myPlayer && myPlayer.visible === false){
-      //   // console.log(1);
-      //   // Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-      //   // for (let i = 0; i <= this.collideLayers.length; i+=1){
-      //   //   console.log('add');
-      //   //   this.physics.add.collider(myVehicle.sprite, this.collideLayers[i]);
-      //   // }
-      //   const vehicleSpeed = 175 * myVehicle.speed;
-      //   const vehilceSprite = myVehicle.sprite as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-      //   const preVehicleVelocity = vehilceSprite.body.velocity.clone();
-      //   const vehicleBody = vehilceSprite.body as Phaser.Physics.Arcade.Body;
-      //   vehicleBody.setVelocity(0);
-      //   // console.log(this.collideLayers);
-      //   // for (let i = 0; i <= this.collideLayers.length; i+=1){
-      //   //   // console.log('add');
-      //   //   this.physics.add.collider(vehilceSprite, this.collideLayers[i]);
-      //   // }
-      //   let lastVehicleLocation = myVehicle.location;
-      //   vehicleBody.setVelocity(0);
-      //   switch(primaryDirection) {
-      //     case 'left':
-      //       vehicleBody.setVelocityX(-vehicleSpeed);
-      //       vehilceSprite.anims.play('car-left-walk', true);
-      //       break;
-      //     case 'right':
-      //       vehicleBody.setVelocityX(vehicleSpeed);
-      //       vehilceSprite.anims.play('car-right-walk', true);
-      //       break;
-      //     case 'front':
-      //       vehicleBody.setVelocityY(vehicleSpeed);
-      //       vehilceSprite.anims.play('car-front-walk', true);
-      //       break;
-      //     case 'back':
-      //       vehicleBody.setVelocityY(-vehicleSpeed);
-      //       vehilceSprite.anims.play('car-back-walk', true);
-      //       break;
-      //     default:
-      //       // Not moving
-      //       vehilceSprite.anims.stop();
-      //       // If we were moving, pick and idle frame to use
-      //       if (preVehicleVelocity.x < 0) {
-      //         vehilceSprite.setTexture('carAtlas', 'car-left');
-      //       } else if (preVehicleVelocity.x > 0) {
-      //         vehilceSprite.setTexture('carAtlas', 'car-right');
-      //       } else if (preVehicleVelocity.y < 0) {
-      //         vehilceSprite.setTexture('carAtlas', 'car-back');
-      //       } else if (preVehicleVelocity.y > 0) vehilceSprite.setTexture('carAtlas', 'car-front');
-      //       break;
-      //   }
-      //   // vehilceSprite.body.velocity.normalize().scale(playerSpeed);
-      //   const isVehicleMoving = primaryDirection !== undefined;
-      //   myVehicle.label?.setX(vehicleBody.x);
-      //   myVehicle.label?.setY(vehicleBody.y - 20);
-
-      //   if (
-      //     !lastVehicleLocation ||
-      //     lastVehicleLocation.x !== vehicleBody.x ||
-      //     lastVehicleLocation.y !== vehicleBody.y ||
-      //     (isVehicleMoving && lastVehicleLocation.rotation !== primaryDirection) ||
-      //     lastVehicleLocation.moving !== isVehicleMoving
-      //   ) {
-      //     if (!lastVehicleLocation) {
-      //       lastVehicleLocation = {
-      //         x: vehicleBody.x,
-      //         y: vehicleBody.y,
-      //         rotation: primaryDirection || 'front',
-      //         moving: isVehicleMoving,
-      //       };
-      //     }
-      //     lastVehicleLocation.x = vehicleBody.x;
-      //     lastVehicleLocation.y = vehicleBody.y;
-      //     lastVehicleLocation.rotation = primaryDirection || 'front';
-      //     lastVehicleLocation.moving = isVehicleMoving;
-
-      //   this.emitVehicleMovement(lastVehicleLocation);
-      //  }
-      // }
     }
 
   }
@@ -892,7 +769,8 @@ class CoveyGameScene extends Phaser.Scene {
       '14_Basement_32x32',
       '16_Grocery_store_32x32',
       'car_32x32',
-      // 'parking_spot',
+      'skateboard_32x32',
+      'dinosaur_32x32',
     ].map(v => map.addTilesetImage(v));
 
     // Parameters: layer name (or index) from Tiled, tileset, x, y
@@ -963,6 +841,62 @@ class CoveyGameScene extends Phaser.Scene {
         labelText,
         sprite,
         label: carArea.name,
+      });
+    });
+
+    const skateboardAreaObject = map.filterObjects(
+      'Objects',
+      obj => obj.type === 'skateboard_vehicle_area',
+    );
+    const skateboardAreaSprites = map.createFromObjects(
+      'Objects',
+      skateboardAreaObject.map(obj => ({ id: obj.id })),
+    );
+    this.physics.world.enable(skateboardAreaSprites);
+    skateboardAreaSprites.forEach(skateboardArea => {
+      const sprite = skateboardArea as Phaser.GameObjects.Sprite;
+      sprite.y += sprite.displayHeight;
+      const labelText = this.add.text(
+        sprite.x - sprite.displayWidth / 2,
+        sprite.y - sprite.displayHeight / 2,
+        skateboardArea.name,
+        { color: '#FFFFFF', backgroundColor: '#000000' },
+      );
+      sprite.setTintFill();
+      sprite.setAlpha(0.3);
+
+      this.skateboardAreas.push({
+        labelText,
+        sprite,
+        label: skateboardArea.name,
+      });
+    });
+
+    const dinosaurAreaObject = map.filterObjects(
+      'Objects',
+      obj => obj.type === 'dinosaur_vehicle_area',
+    );
+    const dinosaurAreaSprites = map.createFromObjects(
+      'Objects',
+      dinosaurAreaObject.map(obj => ({ id: obj.id })),
+    );
+    this.physics.world.enable(dinosaurAreaSprites);
+    dinosaurAreaSprites.forEach(dinosaurArea => {
+      const sprite = dinosaurArea as Phaser.GameObjects.Sprite;
+      sprite.y += sprite.displayHeight;
+      const labelText = this.add.text(
+        sprite.x - sprite.displayWidth / 2,
+        sprite.y - sprite.displayHeight / 2,
+        dinosaurArea.name,
+        { color: '#FFFFFF', backgroundColor: '#000000' },
+      );
+      sprite.setTintFill();
+      sprite.setAlpha(0.3);
+
+      this.dinosaurAreas.push({
+        labelText,
+        sprite,
+        label: dinosaurArea.name,
       });
     });
 
@@ -1084,16 +1018,6 @@ class CoveyGameScene extends Phaser.Scene {
         false,
       ) as Phaser.Types.Input.Keyboard.CursorKeys,
     );
-    // this.cursors.push(
-    //   this.input.keyboard.addKeys(
-    //     {
-    //       lock: Phaser.Input.Keyboard.KeyCodes.I,
-    //       unlock: Phaser.Input.Keyboard.KeyCodes.U,
-    //     },
-    //     false,
-    //   ) as Phaser.Types.Input.Keyboard.CursorKeys,
-    // );
-    // console.log(this.cursors);
 
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
@@ -1179,27 +1103,58 @@ class CoveyGameScene extends Phaser.Scene {
         const myPlayer = this.players.find(p => p.id === this.myPlayerID);
         if (cursorKeys.space.isDown) {
           if (this.player && this.lastLocation && myPlayer && myPlayer.visible === true && myPlayer.location) {
-            // 上车逻辑
-            // 要点一：自身发出的请求自身不更新
-            // 1. 作为发出方：将this.player的贴图变为vehicle的贴图。
-            // 2. 在此基础，接受方人能正常渲染Vehicle。且更具visible 不渲染Player。
-
             myPlayer.visible = false;
             this.emitCreateVehicle(this.lastLocation, 'Car');
             this.player.sprite
               .setTexture('carAtlas', `car-${myPlayer.location.rotation}`)
               .setScale(0.1)
               .setSize(10, 10)
-            // console.log(this.player.sprite.body);
           }
         }
-        // if (cursorKeys.shift.isDown){
-        //   if (this.player && this.lastLocation && myPlayer && !myPlayer.visible ){
-        //     myPlayer.visible = true;
-        //     this.player.sprite.setVisible(true);
-        //     this.player.label.setVisible(true);
-        //   }
-        // }
+        this.infoTextBoxForVehicleArea?.setVisible(true && this.player?.sprite.visible === true);
+      },
+    );
+
+    this.physics.add.overlap(
+      sprite,
+      skateboardAreaSprites,
+      (overlappingPlayer, skateboardAreaSprite) => {
+        const skateboardAreaLabel = skateboardAreaSprite.name;
+        const skateboardArea = this.skateboardAreas.find(area => area.label === skateboardAreaLabel);
+        this.currentSkateboardArea = skateboardArea;
+        const myPlayer = this.players.find(p => p.id === this.myPlayerID);
+        if (cursorKeys.space.isDown) {
+          if (this.player && this.lastLocation && myPlayer && myPlayer.visible === true && myPlayer.location) {
+            myPlayer.visible = false;
+            this.emitCreateVehicle(this.lastLocation, 'SkateBoard');
+            this.player.sprite
+              .setTexture('skateboardAtlas', `skateboard-${myPlayer.location.rotation}`)
+              .setScale(1)
+              .setSize(20, 20)
+          }
+        }
+        this.infoTextBoxForVehicleArea?.setVisible(true && this.player?.sprite.visible === true);
+      },
+    );
+
+    this.physics.add.overlap(
+      sprite,
+      dinosaurAreaSprites,
+      (overlappingPlayer, dinosaurAreaSprite) => {
+        const dinosaurAreaLabel = dinosaurAreaSprite.name;
+        const dinosaurArea = this.dinosaurAreas.find(area => area.label === dinosaurAreaLabel);
+        this.currentDinosaurArea = dinosaurArea;
+        const myPlayer = this.players.find(p => p.id === this.myPlayerID);
+        if (cursorKeys.space.isDown) {
+          if (this.player && this.lastLocation && myPlayer && myPlayer.visible === true && myPlayer.location) {
+            myPlayer.visible = false;
+            this.emitCreateVehicle(this.lastLocation, 'Dinosaur');
+            this.player.sprite
+              .setTexture('dinosaurAtlas', `dinosaur-${myPlayer.location.rotation}`)
+              .setScale(1)
+              .setSize(20, 20)
+          }
+        }
         this.infoTextBoxForVehicleArea?.setVisible(true && this.player?.sprite.visible === true);
       },
     );
@@ -1222,21 +1177,6 @@ class CoveyGameScene extends Phaser.Scene {
     this.collideLayers.push(aboveLayer);
     this.physics.add.collider(sprite, onTheWallsLayer);
     this.collideLayers.push(onTheWallsLayer);
-    // const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID)
-    // console.log('Create Page')
-    // if (myVehicle && myVehicle.sprite){
-    //   console.log('addCollider')
-    //   this.physics.add.collider(myVehicle.sprite, worldLayer);
-    //   this.physics.add.collider(myVehicle.sprite, wallsLayer);
-    //   this.physics.add.collider(myVehicle.sprite, wallsLayer);
-    //   this.physics.add.collider(myVehicle.sprite, wallsLayer);
-    // }
-
-
-    // this.physics.add.collider(this.player.sprite, worldLayer);
-    // this.physics.add.collider(this.player.sprite, wallsLayer);
-    // this.physics.add.collider(this.player.sprite, aboveLayer);
-    // this.physics.add.collider(this.player.sprite, onTheWallsLayer);
 
     // Create the player's walking animations from the texture atlas. These are stored in the global
     // animation manager so any sprite can access them.
@@ -1322,6 +1262,94 @@ class CoveyGameScene extends Phaser.Scene {
       key: 'car-back-walk',
       frames: anims.generateFrameNames('carAtlas', {
         prefix: 'car-back-walk.',
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: 'skateboard-left-walk',
+      frames: anims.generateFrameNames('skateboardAtlas', {
+        prefix: 'skateboard-left-walk.',
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: 'skateboard-right-walk',
+      frames: anims.generateFrameNames('skateboardAtlas', {
+        prefix: 'skateboard-right-walk.',
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: 'skateboard-front-walk',
+      frames: anims.generateFrameNames('skateboardAtlas', {
+        prefix: 'skateboard-front-walk.',
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: 'skateboard-back-walk',
+      frames: anims.generateFrameNames('skateboardAtlas', {
+        prefix: 'skateboard-back-walk.',
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: 'dinosaur-left-walk',
+      frames: anims.generateFrameNames('dinosaurAtlas', {
+        prefix: 'dinosaur-left-walk.',
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: 'dinosaur-right-walk',
+      frames: anims.generateFrameNames('dinosaurAtlas', {
+        prefix: 'dinosaur-right-walk.',
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: 'dinosaur-front-walk',
+      frames: anims.generateFrameNames('dinosaurAtlas', {
+        prefix: 'dinosaur-front-walk.',
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: 'dinosaur-back-walk',
+      frames: anims.generateFrameNames('dinosaurAtlas', {
+        prefix: 'dinosaur-back-walk.',
         start: 0,
         end: 3,
         zeroPad: 3,
