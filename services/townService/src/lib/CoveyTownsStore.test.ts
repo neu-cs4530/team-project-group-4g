@@ -4,33 +4,63 @@ import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 import { ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage } from '../CoveyTypes';
+import Vehicle from '../types/Vehicle';
+import Passenger from '../types/Passenger';
 
 const mockCoveyListenerTownDestroyed = jest.fn();
 const mockCoveyListenerOtherFns = jest.fn();
 
-// function mockCoveyListener(): CoveyTownListener {
-//   return {
-//     onPlayerDisconnected(removedPlayer: Player): void {
-//       mockCoveyListenerOtherFns(removedPlayer);
-//     },
-//     onPlayerMoved(movedPlayer: Player): void {
-//       mockCoveyListenerOtherFns(movedPlayer);
-//     },
-//     onTownDestroyed() {
-//       mockCoveyListenerTownDestroyed();
-//     },
-//     onPlayerJoined(newPlayer: Player) {
-//       mockCoveyListenerOtherFns(newPlayer);
-//     }, onConversationAreaDestroyed(_conversationArea : ServerConversationArea){
-//       mockCoveyListenerOtherFns(_conversationArea);
-//     }, onConversationAreaUpdated(_conversationArea: ServerConversationArea){
-//       mockCoveyListenerOtherFns(_conversationArea);
-//     },
-//     onChatMessage(message: ChatMessage){
-//       mockCoveyListenerOtherFns(message);
-//     },
-//   };
-// }
+function mockCoveyListener(): CoveyTownListener {
+  return {
+    onPlayerDisconnected(removedPlayer: Player): void {
+      mockCoveyListenerOtherFns(removedPlayer);
+    },
+    onPlayerMoved(movedPlayer: Player): void {
+      mockCoveyListenerOtherFns(movedPlayer);
+    },
+    onTownDestroyed() {
+      mockCoveyListenerTownDestroyed();
+    },
+    onPlayerJoined(newPlayer: Player) {
+      mockCoveyListenerOtherFns(newPlayer);
+    }, onConversationAreaDestroyed(_conversationArea : ServerConversationArea){
+      mockCoveyListenerOtherFns(_conversationArea);
+    }, onConversationAreaUpdated(_conversationArea: ServerConversationArea){
+      mockCoveyListenerOtherFns(_conversationArea);
+    },
+    onChatMessage(message: ChatMessage){
+      mockCoveyListenerOtherFns(message);
+    },
+    onPlayerInvisible(invisiblePlayer: Player) {
+      mockCoveyListenerOtherFns(invisiblePlayer);
+    },
+    onPlayerVisible(visiblePlayer: Player) {
+      mockCoveyListenerOtherFns(visiblePlayer);
+    },
+    onVehicleMoved(movedVehicle: Vehicle) {
+      mockCoveyListenerOtherFns(movedVehicle);
+    },
+    onVehicleChangeLockSituation(updatedVehicle: Vehicle) {
+      mockCoveyListenerOtherFns(updatedVehicle);
+    },    
+    onVehicleCreated(newVehicle: Vehicle) {
+      mockCoveyListenerOtherFns(newVehicle);
+    },
+    onVehicleUpdatePassengers(updatedVehicle: Vehicle, passengerPlayer: Player){
+      mockCoveyListenerOtherFns(updatedVehicle, passengerPlayer);
+    },
+    onVehicleGetOffPassenger(updatedVehicle: Vehicle, passengerPlayer: Player){
+      mockCoveyListenerOtherFns(updatedVehicle, passengerPlayer);
+    },
+    onVehicleDestroyed(destroyedVehicle: Vehicle, passengerPlayerList: Player[]){
+      mockCoveyListenerOtherFns(destroyedVehicle, passengerPlayerList);
+    },
+    onPlayerJoinedVehicle(passenger: Passenger) {
+      mockCoveyListenerOtherFns(passenger);
+    },
+
+  };
+}
 
 function createTownForTesting(friendlyNameToUse?: string, isPublic = false) {
   const friendlyName = friendlyNameToUse !== undefined ? friendlyNameToUse :
@@ -143,34 +173,34 @@ describe('CoveyTownsStore', () => {
     });
   });
 
-  // describe('deleteTown', () => {
-  //   it('Should check the password before deleting the town', () => {
-  //     const town = createTownForTesting();
-  //     const res = CoveyTownsStore.getInstance()
-  //       .deleteTown(town.coveyTownID, `${town.townUpdatePassword}*`);
-  //     expect(res)
-  //       .toBe(false);
-  //   });
-  //   it('Should fail if the townID does not exist', async () => {
-  //     const res = CoveyTownsStore.getInstance()
-  //       .deleteTown('abcdef', 'efg');
-  //     expect(res)
-  //       .toBe(false);
-  //   });
-  //   it('Should disconnect all players', async () => {
-  //     const town = createTownForTesting();
-  //     town.addTownListener(mockCoveyListener());
-  //     town.addTownListener(mockCoveyListener());
-  //     town.addTownListener(mockCoveyListener());
-  //     town.addTownListener(mockCoveyListener());
-  //     town.disconnectAllPlayers();
+  describe('deleteTown', () => {
+    it('Should check the password before deleting the town', () => {
+      const town = createTownForTesting();
+      const res = CoveyTownsStore.getInstance()
+        .deleteTown(town.coveyTownID, `${town.townUpdatePassword}*`);
+      expect(res)
+        .toBe(false);
+    });
+    it('Should fail if the townID does not exist', async () => {
+      const res = CoveyTownsStore.getInstance()
+        .deleteTown('abcdef', 'efg');
+      expect(res)
+        .toBe(false);
+    });
+    it('Should disconnect all players', async () => {
+      const town = createTownForTesting();
+      town.addTownListener(mockCoveyListener());
+      town.addTownListener(mockCoveyListener());
+      town.addTownListener(mockCoveyListener());
+      town.addTownListener(mockCoveyListener());
+      town.disconnectAllPlayers();
 
-  //     expect(mockCoveyListenerOtherFns.mock.calls.length)
-  //       .toBe(0);
-  //     expect(mockCoveyListenerTownDestroyed.mock.calls.length)
-  //       .toBe(4);
-  //   });
-  // });
+      expect(mockCoveyListenerOtherFns.mock.calls.length)
+        .toBe(0);
+      expect(mockCoveyListenerTownDestroyed.mock.calls.length)
+        .toBe(4);
+    });
+  });
 
   describe('listTowns', () => {
     it('Should include public towns', async () => {
