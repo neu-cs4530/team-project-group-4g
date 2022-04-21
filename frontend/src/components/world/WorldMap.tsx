@@ -1403,7 +1403,7 @@ class CoveyGameScene extends Phaser.Scene {
       .text(
         16,
         96,
-        `Space key to add/enter a vehicle`,
+        `Shift key to leave a vehicle`,
         {
           font: '16px monospace',
           color: '#000000',
@@ -1421,25 +1421,7 @@ class CoveyGameScene extends Phaser.Scene {
       .text(
         16,
         136,
-        `Space key to lock/unlock a vehicle`,
-        {
-          font: '16px monospace',
-          color: '#000000',
-          padding: {
-            x: 20,
-            y: 10,
-          },
-          backgroundColor: '#ffffff',
-        },
-      )
-      .setScrollFactor(0)
-      .setDepth(30);
-
-    this.add
-      .text(
-        16,
-        176,
-        `Shift key to leave a vehicle`,
+        `Space key to add/enter a vehicle`,
         {
           font: '16px monospace',
           color: '#000000',
