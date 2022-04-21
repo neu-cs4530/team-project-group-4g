@@ -100,9 +100,10 @@ export default class CoveyTownController {
   }
 
   /**
-   * Finds the vehicle in the list
-   * @param passengerID 
-   * @returns 
+   * Finds the vehicle in the list.
+   * 
+   * @param passengerID A passenger ids
+   * @returns The vehicle that contains ids
    */
   findVehicle(passengerID: string): Vehicle | undefined {
     const vehicleList = this._vehicles;
@@ -185,12 +186,12 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onPlayerMoved(player));
   }
 
-  // 需要JS Doc
   /**
+   * Create a vehicle object when a player requests to switch to certain type of transportation.
    * 
-   * @param driver 
-   * @param initLocation 
-   * @param vehicleType 
+   * @param driver the player who initializes the vehicle
+   * @param initLocation the current player location
+   * @param vehicleType the type of tranportation the player requests
    */
   createInitVehicle(driver: Player, initLocation: UserLocation, vehicleType: string): void{
     let newVehicle: Vehicle;
@@ -233,32 +234,27 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.onVehicleCreated(newVehicle));
   }
 
-  // 需要JS Doc.
   /**
+   * Add the player as a passenger into the vehicle when they get in.
    * 
-   * 
-   * @param passengerPlayer 
-   * @param vehicleID 
+   * @param passengerPlayer The player who gets in
+   * @param vehicleID The id of the vehicle
    */
   getOnVehicle(passengerPlayer: Player, vehicleID: string) : void {
     passengerPlayer.visible = false;
-    // Plan to delete the onPlayerInvisible(). Delegate the functionality to the onVehicleUpdatePassengers.
-    // this._listeners.forEach(listener => listener.onPlayerInvisible(passengerPlayer));
     const vehicle = this._vehicles.find(v => v.id === vehicleID);
     if (vehicle){
       const passenger = new Passenger(passengerPlayer, vehicleID, false);
       vehicle.passengers.push(passenger);
       this._listeners.forEach(listener => listener.onVehicleUpdatePassengers(vehicle, passengerPlayer));
-    } else {
-      // throw new Error('Could not find the Vehicle');
     }
-   
   }
 
   /**
+   * Delete the player from the vehicle as they get off.
    * 
-   * @param passengerPlayer 
-   * @param vehicleID 
+   * @param passengerPlayer The player who gets off
+   * @param vehicleID The id of the given vehicle
    */
   getOffVehicle(passengerPlayer: Player, vehicleID: string) : void {
     passengerPlayer.visible = true;
@@ -270,8 +266,9 @@ export default class CoveyTownController {
   }
 
   /**
+   * Destroy the vehicle as all passenger(s) get off.
    * 
-   * @param vehicleID 
+   * @param vehicleID The id of the given vehicle
    */
   destroyVehicle(vehicleID: string) : void {
     const vehicle = this._vehicles.find(v => v.id === vehicleID);
@@ -283,7 +280,6 @@ export default class CoveyTownController {
         const player = this.players.find(p => p.id === vehicle.passengers[i].id);
         if (player){
           player.visible = true;
-          // this._listeners.forEach(listener => listener.onPlayerVisible(player));
           passengerPlayerList.push(player);
         }
       }
@@ -411,11 +407,9 @@ export default class CoveyTownController {
    */
   updateVehicleLocation(vehicle: Vehicle | undefined, location: VehicleLocation): void {
     if (vehicle === undefined) {
-      // throw Error('There is no vehicle such a vehicle');
       return;
     }
     if (vehicle.passengers === undefined) {
-      // throw Error('There is no defined  passengers list');
       return;
     }
 
@@ -439,8 +433,9 @@ export default class CoveyTownController {
   }
 
   /**
+   * Lock or unlock the given vehicle (which is controlled by the driver).
    * 
-   * @param vehicleID 
+   * @param vehicleID The vehicle id
    */
   changeVehicleLockSituation(vehicleID: string): void {
     const vehicle = this._vehicles.find(v => v.id === vehicleID);
