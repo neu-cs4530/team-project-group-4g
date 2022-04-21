@@ -44,7 +44,7 @@ type DinosaurAreaGameObjects = {
   label: string;
 }
 
-function getAtlasType(vehicle: Vehicle) : string{
+function getAtlasType(vehicle: Vehicle): string {
   let atlasType = 'car'
   switch (vehicle.vehicleType) {
     case 'Car':
@@ -59,11 +59,11 @@ function getAtlasType(vehicle: Vehicle) : string{
     default:
       throw new Error('The AtlasType is undefined');
       break;
-    }
+  }
   return atlasType;
 }
 
-function getAtlasName(vehicle: Vehicle) : string{
+function getAtlasName(vehicle: Vehicle): string {
   let atlasName = 'carAtlas';
   switch (vehicle.vehicleType) {
     case 'Car':
@@ -422,14 +422,14 @@ class CoveyGameScene extends Phaser.Scene {
           // @ts-ignore - JB todo
           // .sprite(0, 0, 'carAtlas', `car-${vehicle.location.rotation}`)
           .sprite(0, 0, getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-${vehicle.location.rotation}`)
-        if (myVehicle.vehicleType === 'Car'){
+        if (myVehicle.vehicleType === 'Car') {
           sprite
             .setScale(0.1)
             .setSize(10, 10)
         } else {
           sprite
             .setScale(1)
-            .setSize(20,20)
+            .setSize(20, 20)
         }
 
         const label = this.add.text(0, 0, `Driver: ${vehicle.gainDriverUserName()}`, {
@@ -453,7 +453,7 @@ class CoveyGameScene extends Phaser.Scene {
                   //   this.infoTextBoxForGetOnFailedDueCapacity?.setVisible(true);
                   // } else if (myVehicle.lock === true) {
                   //   this.infoTextBoxForGetOnFailedDueLock?.setVisible(true);
-                  if (myVehicle.lock === true ) {
+                  if (myVehicle.lock === true) {
                     this.infoTextBoxForGetOnFailedDueLock?.setVisible(true);
                   } else if (myVehicle.passengers.length >= myVehicle.capacity) {
                     this.infoTextBoxForGetOnFailedDueCapacity?.setVisible(true);
@@ -590,7 +590,7 @@ class CoveyGameScene extends Phaser.Scene {
               this.player.sprite.anims.play('misa-left-walk', true);
             } else {
               // this.player.sprite.anims.play('car-left-walk', true);
-              if (myVehicle) {this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-left-walk`, true)};
+              if (myVehicle) { this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-left-walk`, true) };
             }
             break;
           case 'right':
@@ -599,7 +599,7 @@ class CoveyGameScene extends Phaser.Scene {
               this.player.sprite.anims.play('misa-right-walk', true);
             } else {
               // this.player.sprite.anims.play('car-right-walk', true);
-              if (myVehicle) {this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-right-walk`, true)};
+              if (myVehicle) { this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-right-walk`, true) };
             }
             break;
           case 'front':
@@ -608,7 +608,7 @@ class CoveyGameScene extends Phaser.Scene {
               this.player.sprite.anims.play('misa-front-walk', true);
             } else {
               // this.player.sprite.anims.play('car-front-walk', true);
-              if (myVehicle) {this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-front-walk`, true)};
+              if (myVehicle) { this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-front-walk`, true) };
             }
             break;
           case 'back':
@@ -617,7 +617,7 @@ class CoveyGameScene extends Phaser.Scene {
               this.player.sprite.anims.play('misa-back-walk', true);
             } else {
               // this.player.sprite.anims.play('car-back-walk', true);
-              if (myVehicle) {this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-back-walk`, true)};
+              if (myVehicle) { this.player.sprite.anims.play(`${getAtlasType(myVehicle)}-back-walk`, true) };
             }
             break;
           default:
@@ -629,28 +629,28 @@ class CoveyGameScene extends Phaser.Scene {
                 this.player.sprite.setTexture('atlas', 'misa-left');
               } else {
                 // this.player.sprite.setTexture('carAtlas', 'car-left');
-                if (myVehicle) { this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-left`)};
+                if (myVehicle) { this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-left`) };
               }
             } else if (prevVelocity.x > 0) {
               if (myPlayer?.visible === true) {
                 this.player.sprite.setTexture('atlas', 'misa-right');
               } else {
                 // this.player.sprite.setTexture('carAtlas', 'car-right');
-                if (myVehicle) {this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-right`)};
+                if (myVehicle) { this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-right`) };
               }
             } else if (prevVelocity.y < 0) {
               if (myPlayer?.visible === true) {
                 this.player.sprite.setTexture('atlas', 'misa-back');
               } else {
                 // this.player.sprite.setTexture('carAtlas', 'car-back');
-                if (myVehicle) {this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-back`)};
+                if (myVehicle) { this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-back`) };
               }
             } else if (prevVelocity.y > 0) {
               if (myPlayer?.visible === true) {
                 this.player.sprite.setTexture('atlas', 'misa-front');
               } else {
                 // this.player.sprite.setTexture('carAtlas', 'car-front');
-                if (myVehicle) {this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-front`)};
+                if (myVehicle) { this.player.sprite.setTexture(getAtlasName(myVehicle), `${getAtlasType(myVehicle)}-front`) };
               }
             }
             break;
@@ -1403,7 +1403,7 @@ class CoveyGameScene extends Phaser.Scene {
       .text(
         16,
         96,
-        `Shift key to leave a vehicle`,
+        `Space key to add/enter a vehicle`,
         {
           font: '16px monospace',
           color: '#000000',
@@ -1421,7 +1421,25 @@ class CoveyGameScene extends Phaser.Scene {
       .text(
         16,
         136,
-        `Space key to add/enter a vehicle`,
+        `Space key to lock/unlock a vehicle`,
+        {
+          font: '16px monospace',
+          color: '#000000',
+          padding: {
+            x: 20,
+            y: 10,
+          },
+          backgroundColor: '#ffffff',
+        },
+      )
+      .setScrollFactor(0)
+      .setDepth(30);
+
+    this.add
+      .text(
+        16,
+        176,
+        `Shift key to leave a vehicle`,
         {
           font: '16px monospace',
           color: '#000000',
