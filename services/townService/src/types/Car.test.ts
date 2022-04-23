@@ -1,12 +1,12 @@
 import { nanoid } from 'nanoid';
 import Car from './Car';
-import Vehicle from './Vehicle';
 import Passenger from './Passenger';
 import Player from './Player';
+import Vehicle from './Vehicle';
 
-describe('should construct a valid vehicle', () => {
+describe('check for Car to work properly', () => {
   const car: Vehicle = new Car();
-  it('should create a valid vehicle', () => {
+  it('should inherit the correct value from Vehicle', () => {
     expect(car.location.x).toBe(0);
     expect(car.location.y).toBe(0);
     expect(car.location.rotation).toBe('back');
@@ -17,16 +17,20 @@ describe('should construct a valid vehicle', () => {
     expect(car.lock).toBe(false);
     expect(car.conversationArea).toBeUndefined();
   });
-  it('test getVehicleType returns a defined value', () => {
-    expect(car.getVehicleType).toBeDefined();
+  it('should construct a valid car', ()=>{
+    expect(car.capacity).toBe(4);
+    expect(car.speed).toBe(2);
   });
-  it('test addPassenger add the given passenger to the passenger list', () => {
+  it('test getVehicleType should return car', () => {
+    expect(car.getVehicleType() === 'Car').toBe(true);
+  });
+  it('test addPassenger works on a car', () => {
     const driver: Passenger = new Passenger(new Player(nanoid()), 'Car', true);
     expect(car.passengers.length).toBe(0);
     car.addPassenger(driver);
     expect(car.passengers.length).toBe(1);
   });
-  it('test gainDriverID returns the correct driver id', () => {
+  it('test gainDriverID works on a car', () => {
     const driverID = car.passengers[0].id;
     const passenger: Passenger = new Passenger(new Player(nanoid()), 'Car', false);
     car.addPassenger(passenger);

@@ -309,29 +309,38 @@ export function townSubscriptionHandler(socket: Socket): void {
   });
 
 
-  // Xin Jin 2022/04/12
+  // Register an event listener for the client socket: if the vehicle is created 
+  // by the client, inform the client
   socket.on('newVehicle', (initLocation: UserLocation, vehicleType: string) => {
     townController.createInitVehicle(s.player, initLocation, vehicleType);
   });
 
-  // Register an event listener for the client socket: if the client updates their
+  // Register an event listener for the client socket: if the vehicle updates their
   // location, inform the CoveyTownController
   socket.on('vehicleMovement', (movementData: VehicleLocation) => {
     townController.updateVehicleLocation(townController.findVehicle(s.player.id), movementData);
   });
 
+  // Register an event listener for the client socket: if the client locks/unlocks their 
+  // vehicle, inform the Vehicle
   socket.on('vehicleChangeLockSituation', (vehicleID: string) => {
     townController.changeVehicleLockSituation(vehicleID);
   });
 
+  // Register an event listener for the client socket: if the vehicle is destroyed 
+  // by the client, inform the Vehicle
   socket.on('destroyVehicle', (vehicleID: string) =>{
     townController.destroyVehicle(vehicleID);
   });
 
+  // Register an event listener for the client socket: if the client gets off the vehicle, 
+  // update the client
   socket.on('getOffVehicle', (vehicleID: string)=> {
     townController.getOffVehicle(s.player, vehicleID);
   });
 
+  // Register an event listener for the client socket: if the client gets on/in the vehicle, 
+  // update the client
   socket.on('getOnVehicle', (vehicleID: string) =>{
     townController.getOnVehicle(s.player, vehicleID);
   });

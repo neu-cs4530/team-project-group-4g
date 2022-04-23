@@ -5,7 +5,6 @@ import Passenger from './Passenger';
 
 /**
  * Each vehicle which is connected to a town is represented by a Vehicle object.
- * To be notified, vehicle is an abstract class. 
  */
 export default abstract class Vehicle {
 
@@ -82,6 +81,9 @@ export default abstract class Vehicle {
     this._conversationArea = conversationArea;
   }
 
+  /**
+   * Get the type of the given vehicle.
+   */
   abstract getVehicleType(): string;
 
   /** Add the passenger to the vehicle's list of Passengers */
@@ -90,8 +92,9 @@ export default abstract class Vehicle {
   }
 
   /**
+   * Get the driver's id from the passenger list.
    * 
-   * @returns 
+   * @returns the driver's id
    */
   gainDriverID() : string {
     const passengerList = this.passengers;
@@ -100,7 +103,6 @@ export default abstract class Vehicle {
         return passengerList[i].id;
       }
     }
-    // throw Error('No Driver on the vehicle');
     return '';
   }
 

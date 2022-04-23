@@ -2,7 +2,7 @@ import Player from './Player';
 import { ServerConversationArea } from '../client/TownsServiceClient';
 
 /**
- * Each user who is connected to a town is represented by a Player object
+ * Each player who is in/on a vehicle is represented by a Passenger object
  */
 export default class Passenger {
 

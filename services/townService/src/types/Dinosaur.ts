@@ -1,7 +1,7 @@
 import Vehicle from './Vehicle';
 
 /**
- * One type of the vehicle, which is a car vehicle. 
+ * Dinosaur is a type of vehicle. 
  */
 export default class Dinosaur extends Vehicle{
   private _type : string;
