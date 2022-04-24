@@ -17,9 +17,9 @@ A backend service (in the `services/townService` directory) implements the appli
 [Repository](https://github.com/neu-cs4530-s22/team-project-group-4g) <br />
 [Front-end deployment on Netlify](https://sharp-euler-df5a04.netlify.app/) <br />
 [Back-end deployment on Heroku](https://covey-app.herokuapp.com/towns) <br />
-[Skateboard](https://www.reddit.com/r/PokemonRMXP/comments/mp05yb/help_ive_bought_an_order_for_sprite_sheets_an_ive/) <br />
-[Dinasour](https://opengameart.org/content/dinosaur-0) <br />
-[Car](https://forums.rpgmakerweb.com/index.php?threads/tileset.128984/) <br />
+[Skateboard 2D pixel images](https://www.reddit.com/r/PokemonRMXP/comments/mp05yb/help_ive_bought_an_order_for_sprite_sheets_an_ive/) <br />
+[Dinasour 2D pixel images](https://opengameart.org/content/dinosaur-0) <br />
+[Car 2D pixel images](https://forums.rpgmakerweb.com/index.php?threads/tileset.128984/) <br />
 
 ## Running this app locally
 
