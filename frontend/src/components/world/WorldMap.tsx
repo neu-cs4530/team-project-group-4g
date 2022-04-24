@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import BoundingBox from '../../classes/BoundingBox';
 import ConversationArea from '../../classes/ConversationArea';
 import Player, { ServerPlayer, UserLocation } from '../../classes/Player';
-import Vehicle, { ServerVehicle, VehicleLocation, Passenger } from '../../classes/Vehicle';
+import Vehicle, { ServerVehicle, VehicleLocation } from '../../classes/Vehicle';
 import Video from '../../classes/Video/Video';
 import useConversationAreas from '../../hooks/useConversationAreas';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
@@ -364,7 +364,7 @@ class CoveyGameScene extends Phaser.Scene {
       }
     }
 
-    const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
+    // const myVehicle = this.vehicles.find(v => v.gainDriverID() === this.myPlayerID);
 
     if (this.myPlayerID === myPlayer.id && this.player?.sprite.visible === false && player.location && this.lastLocation) {
       // console.log(player.visible);
@@ -446,7 +446,8 @@ class CoveyGameScene extends Phaser.Scene {
           this.physics.add.overlap(
             this.player.sprite,
             sprite,
-            (overlappingPlayer) => {
+            // (overlappingPlayer) => {
+            ( ) => {
               if (cursorKeys.space.isDown) {
                 if (this.player && myPlayer && myPlayer.visible === true && myVehicle && myVehicle.passengers) {
                   // if (myVehicle.passengers.length >= myVehicle.capacity) {
