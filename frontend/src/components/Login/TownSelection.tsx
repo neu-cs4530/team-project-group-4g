@@ -81,7 +81,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
         assert(initData.providerVideoToken);
         await videoConnect(initData.providerVideoToken);
       }
-    } catch (err) {
+    } catch (err:any) {
       toast({
         title: 'Unable to connect to Towns Service',
         description: err.toString(),
@@ -128,7 +128,8 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
         duration: null,
       })
       await handleJoin(newTownInfo.coveyTownID);
-    } catch (err) {
+    } catch (err:any) {
+      console.log(err)
       toast({
         title: 'Unable to connect to Towns Service',
         description: err.toString(),

@@ -50,7 +50,7 @@ const TownSettings: React.FunctionComponent = () => {
           status: 'success'
         })
         closeSettings();
-      }catch(err){
+      }catch(err:any){
         toast({
           title: 'Unable to delete town',
           description: err.toString(),
@@ -71,7 +71,7 @@ const TownSettings: React.FunctionComponent = () => {
           status: 'success'
         })
         closeSettings();
-      }catch(err){
+      }catch(err:any){
         toast({
           title: 'Unable to update town',
           description: err.toString(),

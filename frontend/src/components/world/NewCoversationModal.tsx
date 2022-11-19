@@ -47,7 +47,7 @@ export default function NewConversationModal( {isOpen, closeModal, newConversati
           });
           video?.unPauseGame();
           closeModal();
-        } catch (err) {
+        } catch (err:any) {
           toast({
             title: 'Unable to create conversation',
             description: err.toString(),
