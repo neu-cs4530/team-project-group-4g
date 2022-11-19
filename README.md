@@ -65,3 +65,21 @@ You can clone our repository by entering:
 
 `$ git clone git@github.com:neu-cs4530-s22/team-project-group-4g.git`
 
+## Troubleshooting for Setup
+
+### ERESOLVE Error (when run $ npm install react-scripts)
+
+Delete the /node_modules directory and the package-lock.json file using the rm command:
+$ rm -rf node_modules
+$ rm -rf package-lock.json
+
+Then Install react-scripts using the following command:
+$ npm install react-scripts
+
+If still getting the error:
+try use $ --force command:
+$ npm install --force react-scripts
+You should be good to go, usually take about 10mins.
+
+
+
